@@ -67,4 +67,8 @@ namespace viva
 		}
 		void Destroy() override;
 	};
+
+	class D3D11Animation : public Animation
+	{
+	};
 }

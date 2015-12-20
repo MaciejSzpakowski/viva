@@ -9,4 +9,10 @@ namespace viva
 	public:
 		Sprite() {}
 	};
+
+	class Animation : public Sprite
+	{
+	protected:
+	public:
+	};
 }
