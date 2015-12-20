@@ -14,6 +14,7 @@ namespace viva
 		DrawManager() { initialized = false; }
 		void ThrowUninitialized();
 
+		Polygon* spriteMesh;  // polygon used by all sprites
 		RenderTarget* defaultRenderTarget;
 		vector<RenderTarget*> renderTargets;
 		//BitmapFont* defaultFont;
@@ -22,7 +23,7 @@ namespace viva
 		RasterizerState* wireframe;
 		RasterizerState* solid;
 		Matrix* renderTargetMatrix; // every render target has the same transform matrix
-		
+		Camera* camera;
 	public:
 		// cannot construct singleton
 		DrawManager(DrawManager const&) = delete;
@@ -41,7 +42,6 @@ namespace viva
 
 		void DrawAll(const Core& core);
 
-		// check if a particular object is on any of the DrawManager's lists
-		void HasObject();
+		Camera* GetCamera() const { return camera; }
 	};
 }

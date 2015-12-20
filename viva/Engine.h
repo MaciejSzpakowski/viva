@@ -9,7 +9,7 @@ namespace viva
 		Vulcan // YEAH! i wish
 	};
 
-	class Engine
+	class Engine : public Creator
 	{
 	protected:
 		Window* window;
@@ -35,12 +35,8 @@ namespace viva
 
 		Color GetBackGroundColor() const { return backgroundColor; }
 
-		void SetBackGroundColor(const Color& color) { backgroundColor = color; }
+		void SetBackGroundColor(const Color& color) { backgroundColor = color; }		
 
-		virtual PixelShader* CreatePixelShaderFromString(void* args) = 0;
-
-		virtual RenderTarget* CreateRenderTarget() = 0;
-
-		virtual void Draw(const vector<RenderTarget*>& targets) = 0;
+		virtual void Draw(const vector<RenderTarget*>& targets, const Camera* camera) = 0;
 	};
 }

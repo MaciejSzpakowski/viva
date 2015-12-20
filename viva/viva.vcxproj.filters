@@ -72,6 +72,15 @@
     <ClInclude Include="Camera.h">
       <Filter>Public Headers</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Public Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Create.h">
+      <Filter>Public Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>Public Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Test.cpp">
@@ -96,6 +105,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D3D11Types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

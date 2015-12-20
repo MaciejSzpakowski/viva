@@ -26,7 +26,7 @@ namespace viva
 		// gameloop: function called every frame
 		void Run(std::function<void()>& gameloop, std::function<void()> intloop);
 
-		void Draw(const vector<RenderTarget*>& targets) const;
+		void Draw(const vector<RenderTarget*>& targets, const Camera* camera) const;
 
 		// completely destroys core object
 		void Destroy();
@@ -42,5 +42,7 @@ namespace viva
 		{ 
 			return engine->GetBackGroundColor(); 
 		}
+
+		Creator* GetCreator() { return engine; }
 	};
 }

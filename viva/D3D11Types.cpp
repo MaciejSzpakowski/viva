@@ -24,5 +24,26 @@ namespace viva
 
 	void D3D11RenderTarget::Destroy()
 	{
+		delete this;
 	}
+
+	void D3D11Polygon::Destroy()
+	{
+		delete this;
+	}
+
+	void D3D11Sprite::Destroy()
+	{
+		delete this;
+	}
+
+	void D3D11Texture::Destroy()
+	{
+		if (cached)
+			ResourceManager::Get().RemoveTexture(name);
+
+		zShaderResource->Release();
+		delete this;
+	}
+
 }

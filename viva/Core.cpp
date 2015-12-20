@@ -41,8 +41,8 @@ namespace viva
 		engine->Run(gameloop, intloop);
 	}
 
-	void Core::Draw(const vector<RenderTarget*>& targets) const
+	void Core::Draw(const vector<RenderTarget*>& targets, const Camera* camera) const
 	{
-		engine->Draw(targets);
+		engine->Draw(targets, camera);
 	}
 }

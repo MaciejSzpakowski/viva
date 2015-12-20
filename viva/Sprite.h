@@ -2,9 +2,10 @@
 
 namespace viva
 {
-	class Sprite : public Dynamic
+	class Sprite : public Drawable
 	{
 	protected:
+		Texture* texture;
 	public:
 		Sprite() {}
 	};

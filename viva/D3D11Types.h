@@ -28,9 +28,39 @@ namespace viva
 		void Destroy() override;
 	};
 
+	class D3D11Polygon : public Polygon
+	{
+	private:
+	public:
+		D3D11Polygon() {}
+
+		void Destroy() override;
+	};
+
 	class D3D11Sprite : public Sprite
 	{
 	private:
 	public:
+		D3D11Sprite() {}
+
+		void Destroy() override;
+
+		void Draw() override;
+
+		void Transform() override;
+	};
+
+	struct D3D11Matrix : public Matrix
+    {
+		DirectX::XMMATRIX matrix;
+	};
+
+	class D3D11Texture : public Texture
+	{
+	private:		
+		ID3D11ShaderResourceView* zShaderResource;
+	public:
+		D3D11Texture() {}
+		void Destroy() override;
 	};
 }

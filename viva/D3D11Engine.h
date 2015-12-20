@@ -28,10 +28,20 @@ namespace viva
 		// gameloop: function called every frame
 		void Run(std::function<void()>& gameloop, std::function<void()>& intloop) override;
 
-		PixelShader* CreatePixelShaderFromString(void* args) override;
+		PixelShader* CreatePixelShaderFromFile(const wstring& filepath, void* args) override;
+
+		PixelShader* CreatePixelShaderFromString(const char* str, void* args) override;
 
 		RenderTarget* CreateRenderTarget() override;
 
-		void Draw(const vector<RenderTarget*>& targets) override;
+		Sprite* CreateSprite(const wstring& filepath) override;
+
+		Sprite* CreateSprite(Texture* texture) override;
+
+		Texture* CreateTexture(const wstring& filepath, bool cached) override;
+
+		Texture* CreateTexture(const byte data[], const Size& size, wstring& name);
+
+		void Draw(const vector<RenderTarget*>& targets, const Camera* camera) override;
 	};
 }

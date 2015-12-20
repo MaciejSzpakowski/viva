@@ -22,12 +22,42 @@ namespace viva
 		Size(float _width, float _height) :width(_width), height(_height) {}
 	};
 
+	struct Vertex
+	{
+		float x, y, z;
+		float r, g, b;
+		float u, v;
+		Vertex() {}
+		Vertex(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v)
+			: x(_x), y(_y), z(_z), r(_r), g(_g), b(_b), u(_u), v(_v) {}
+	};
+
 	struct TextureSampler
 	{
 	};
 
-	struct Polygon
+	class Texture
 	{
+	protected:
+		bool cached;
+		Size size;
+		wstring name;
+	public:
+		virtual void Destroy() = 0;
+
+		bool IsCached() const { return cached; }
+
+		void _SetCached(bool _cached) { cached = _cached; }
+
+		Size GetSize() const { return size; }
+
+		wstring GetName() const { return name; }
+	};
+
+	class Polygon
+	{
+	public:
+		virtual void Destroy() = 0;
 	};
 
 	struct RasterizerState
@@ -38,13 +68,15 @@ namespace viva
 	{
 	};
 
-	struct PixelShader
+	class PixelShader
 	{
+	public:
 		virtual void Destroy() = 0;
 	};
 
-	struct VertexShader
+	class VertexShader
 	{
+	public:
 		virtual void Destroy() = 0;
 	};
 }

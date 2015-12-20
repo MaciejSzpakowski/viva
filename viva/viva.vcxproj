@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Core.h" />
+    <ClInclude Include="Create.h" />
     <ClInclude Include="D3D11Engine.h" />
     <ClInclude Include="D3D11ShadersRC.h" />
     <ClInclude Include="Drawable.h" />
@@ -154,20 +155,25 @@
     <ClInclude Include="Includes.h" />
     <ClInclude Include="Proto.h" />
     <ClInclude Include="RenderTarget.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Viva.h" />
     <ClInclude Include="Win32.h" />
     <ClInclude Include="Win32Window.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="D3D11Engine.cpp" />
     <ClCompile Include="D3D11Types.cpp" />
     <ClCompile Include="DrawManager.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Test.cpp" />
+    <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Viva.cpp" />
     <ClCompile Include="Win32Window.cpp" />
   </ItemGroup>

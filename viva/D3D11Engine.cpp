@@ -99,10 +99,10 @@ namespace viva
 			&(((D3D11VertexShader*)defaultVertexShader)->vs));
 		Checkhr(hr, "CreateVertexShader()");
 		context->VSSetShader(((D3D11VertexShader*)defaultVertexShader)->vs, 0, 0);
-		const char* args[] = { rc_PixelShader , "main", "ps_5_0" };
-		defaultPixelShader = CreatePixelShaderFromString(args);
-		const char* args2[] = { rc_PostProcessing , "main", "ps_5_0" };
-		defaultPostProcessing = CreatePixelShaderFromString(args2);
+		const char* args[] = { "main", "ps_5_0" };
+		defaultPixelShader = CreatePixelShaderFromString(rc_PixelShader, args);
+		const char* args2[] = { "main", "ps_5_0" };
+		defaultPostProcessing = CreatePixelShaderFromString(rc_PostProcessing, args2);
 
 		////    INPUT LAYOUT    ////
 		//defaul input layout
@@ -166,16 +166,21 @@ namespace viva
 		static_cast<Win32Window*>(window)->Run(gameloop, intloop);
 	}
 
-	PixelShader* D3D11Engine::CreatePixelShaderFromString(void* args)
+	PixelShader* D3D11Engine::CreatePixelShaderFromFile(const wstring& filepath, void* args)
+	{
+		auto file = Utils::ReadFileToString(filepath);
+		return CreatePixelShaderFromString(std::string(file.begin(), file.end()).c_str(), args);
+	}
+
+	PixelShader* D3D11Engine::CreatePixelShaderFromString(const char* str, void* args)
 	{
 		PixelShader* pixelShader = new D3D11PixelShader();
 		ID3D11PixelShader* result;
 		ID3D10Blob *ps;
 		HRESULT hr;
 
-		hr = D3DCompile(((const char**)args)[0], strlen(((const char**)args)[0]), 0, 0, 0, ((const char**)args)[1], ((const char**)args)[2], 0, 0, &ps, 0);
+		hr = D3DCompile(str, strlen(str), 0, 0, 0, ((const char**)args)[0], ((const char**)args)[1], 0, 0, &ps, 0);
 		Checkhr(hr, "D3DCompile() in D3D11Engine::CreatePixelShaderFromString()");
-		//D3DCompile
 		hr = device->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), 0, &result);
 		Checkhr(hr, "CreatePixelShader() in D3D11Engine::CreatePixelShaderFromString()");
 		ps->Release();
@@ -235,7 +240,12 @@ namespace viva
 		return nullptr;
 	}
 
-	void D3D11Engine::Draw(const vector<RenderTarget*>& targets)
+	Sprite* D3D11Engine::CreateSprite(const wstring& filepath)
+	{
+		Sprite* sprite = new D3D11Sprite();
+	}
+
+	void D3D11Engine::Draw(const vector<RenderTarget*>& targets, const Camera* camera)
 	{
 		float col[4] = { backgroundColor.r, backgroundColor.g, 
 			backgroundColor.b, backgroundColor.a};

@@ -11,9 +11,11 @@ namespace viva
 	void DrawManager::Initialize()
 	{
 		if (initialized)
-			throw std::runtime_error("Core::Initialize()\nEngine is initialized");
+			throw std::runtime_error("DrawManager::Initialize()\nDrawManager is initialized");
 		
 		initialized = true;
+
+		camera = new Camera();
 	}
 
 	void DrawManager::ThrowUninitialized()
@@ -24,11 +26,16 @@ namespace viva
 
 	void DrawManager::DrawAll(const Core& core)
 	{
-		core.Draw(renderTargets);
+		core.Draw(renderTargets, camera);
 	}
-
 
 	void DrawManager::Destroy()
 	{
+		if (!initialized)
+			throw std::runtime_error("DrawManager::Destroy()\nDrawManager is not initialized");
+
+		initialized = false;
+
+		camera->Destroy();
 	}
 }
