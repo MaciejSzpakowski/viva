@@ -242,7 +242,22 @@ namespace viva
 
 	Sprite* D3D11Engine::CreateSprite(const wstring& filepath)
 	{
-		Sprite* sprite = new D3D11Sprite();
+		return new D3D11Sprite();
+	}
+
+	Sprite* D3D11Engine::CreateSprite(Texture* texture)
+	{
+		return new D3D11Sprite();
+	}
+
+	Texture* D3D11Engine::CreateTexture(const wstring& filepath, bool cached)
+	{
+		return new D3D11Texture(filepath,nullptr);
+	}
+
+	Texture* D3D11Engine::CreateTexture(const byte data[], const Size& size, wstring& name)
+	{
+		return new D3D11Texture(name, nullptr);
 	}
 
 	void D3D11Engine::Draw(const vector<RenderTarget*>& targets, const Camera* camera)

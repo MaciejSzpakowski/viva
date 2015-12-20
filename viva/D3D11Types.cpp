@@ -37,12 +37,20 @@ namespace viva
 		delete this;
 	}
 
+	void D3D11Sprite::Draw()
+	{
+	}
+
+	void D3D11Sprite::Transform()
+	{
+	}
+
 	void D3D11Texture::Destroy()
 	{
 		if (cached)
-			ResourceManager::Get().RemoveTexture(name);
+			ResourceManager::Get().RemoveResource(name);
 
-		zShaderResource->Release();
+		shaderResource->Release();
 		delete this;
 	}
 

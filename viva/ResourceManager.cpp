@@ -14,35 +14,43 @@ namespace viva
 			throw std::runtime_error("ResourceManager is not initialized");
 	}
 
-	void ResourceManager::AddTexture(Texture* texture)
+	void ResourceManager::AddResource(Resource* res)
 	{
-		auto it = textures.find(texture->GetName());
+		auto it = resources.find(res->GetName());
 
-		if (it != textures.end())
-			throw std::runtime_error("ResourceManager::AddTexture()\nTexture of that name already exists");
+		if (it != resources.end())
+			throw std::runtime_error("ResourceManager::AddResource()\nResource of that name already exists");
 
-		texture->_SetCached(true);
-		textures[texture->GetName()] = texture;
+		res->_SetCached(true);
+		resources[res->GetName()] = res;
 	}
 
-	Texture* ResourceManager::GetTexture(const wstring& name) const
+	Resource* ResourceManager::GetResource(const wstring& name) const
 	{
-		auto it = textures.find(name);
+		auto it = resources.find(name);
 
-		if (it == textures.end())
-			throw std::runtime_error("ResourceManager::GetTexture()\nTexture not found");
+		if (it == resources.end())
+			throw std::runtime_error("ResourceManager::GetResource()\nResource not found");
 
 		return it->second;
 	}
 
-	void ResourceManager::RemoveTexture(const wstring& name)
+	void ResourceManager::RemoveResource(const wstring& name)
 	{
-		auto it = textures.find(name);
+		auto it = resources.find(name);
 
-		if (it == textures.end())
-			throw std::runtime_error("ResourceManager::RemoveTexture()\nTexture not found");
+		if (it == resources.end())
+			throw std::runtime_error("ResourceManager::RemoveResource()\nResource not found");
 
 		it->second->_SetCached(false);
-		textures.erase(it);
+		resources.erase(it);
+	}
+
+	void ResourceManager::RemoveAll()
+	{
+		for (auto& r : resources)
+			r.second->_SetCached(false);
+
+		resources.clear();
 	}
 }

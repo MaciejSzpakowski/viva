@@ -58,9 +58,13 @@ namespace viva
 	class D3D11Texture : public Texture
 	{
 	private:		
-		ID3D11ShaderResourceView* zShaderResource;
+		ID3D11ShaderResourceView* shaderResource;
 	public:
-		D3D11Texture() {}
+		D3D11Texture(const wstring& _name, ID3D11ShaderResourceView* _shaderResource)
+			:Texture(_name)
+		{
+			shaderResource = _shaderResource;
+		}
 		void Destroy() override;
 	};
 }

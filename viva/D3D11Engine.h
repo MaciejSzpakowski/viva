@@ -40,7 +40,7 @@ namespace viva
 
 		Texture* CreateTexture(const wstring& filepath, bool cached) override;
 
-		Texture* CreateTexture(const byte data[], const Size& size, wstring& name);
+		Texture* CreateTexture(const byte data[], const Size& size, wstring& name) override;
 
 		void Draw(const vector<RenderTarget*>& targets, const Camera* camera) override;
 	};

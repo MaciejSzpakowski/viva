@@ -5,17 +5,19 @@ namespace viva
 	class ResourceManager
 	{
 	private:
-		map<wstring, Texture*> textures;
+		map<wstring, Resource*> resources;
 		bool initialized;
 		ResourceManager() { initialized = false; }
 		void ThrowUninitialized();
 	public:
 		static ResourceManager& Get();
 
-		void AddTexture(Texture* texture);
+		void AddResource(Resource* res);
 
-		Texture* GetTexture(const wstring& name) const;
+		Resource* GetResource(const wstring& name) const;
 
-		void RemoveTexture(const wstring& name);
+		void RemoveResource(const wstring& name);
+
+		void RemoveAll();
 	};
 }

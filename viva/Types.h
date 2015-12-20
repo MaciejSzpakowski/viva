@@ -5,6 +5,21 @@ namespace viva
 {
 	typedef unsigned char byte;
 
+	class Resource
+	{
+	protected:
+		wstring name;
+		bool cached;
+	public:
+		Resource(const wstring& _name) { name = _name; }
+
+		bool IsCached() const { return cached; }
+
+		void _SetCached(bool _cached) { cached = _cached; }
+		
+		wstring GetName() const { return name; }
+	};
+
 	struct Color
 	{
 		float r, g, b, a;
@@ -36,22 +51,16 @@ namespace viva
 	{
 	};
 
-	class Texture
+	class Texture : public Resource
 	{
 	protected:
-		bool cached;
 		Size size;
-		wstring name;
 	public:
+		Texture(const wstring& _name):Resource(_name) { }
+
 		virtual void Destroy() = 0;
 
-		bool IsCached() const { return cached; }
-
-		void _SetCached(bool _cached) { cached = _cached; }
-
 		Size GetSize() const { return size; }
-
-		wstring GetName() const { return name; }
 	};
 
 	class Polygon
