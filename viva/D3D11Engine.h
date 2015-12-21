@@ -13,6 +13,8 @@ namespace viva
 		ID3D11InputLayout* layout; //vertex input layout pos:float[3] col:float[3] uv:float[2]
 		ID3D11DepthStencilView* depthStencilView;
 		ID3D11Texture2D* depthStencilBuffer;
+		ID3D11RasterizerState* rsSolid;
+		ID3D11RasterizerState* rsWire;
 
 		double frequency;
 		long long startTime;
@@ -40,7 +42,7 @@ namespace viva
 
 		Texture* CreateTexture(const wstring& filepath, bool cached) override;
 
-		Texture* CreateTexture(const byte data[], const Size& size, wstring& name) override;
+		Texture* CreateTexture(const Pixel data[], const Size& size, wstring& name) override;
 
 		void Draw(const vector<RenderTarget*>& targets, const Camera* camera) override;
 	};

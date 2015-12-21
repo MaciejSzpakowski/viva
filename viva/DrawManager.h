@@ -2,11 +2,6 @@
 
 namespace viva
 {
-	enum class TextFilterCreationMode
-	{
-		Point, Linear
-	};
-
 	class DrawManager
 	{
 	private:
@@ -14,14 +9,10 @@ namespace viva
 		DrawManager() { initialized = false; }
 		void ThrowUninitialized();
 
-		Polygon* spriteMesh;  // polygon used by all sprites
 		RenderTarget* defaultRenderTarget;
 		vector<RenderTarget*> renderTargets;
 		//BitmapFont* defaultFont;
-		TextureSampler* pointSampler;
-		TextureSampler* lineSampler;
-		RasterizerState* wireframe;
-		RasterizerState* solid;
+		TextureFilter defaultFilter;
 		Matrix* renderTargetMatrix; // every render target has the same transform matrix
 		Camera* camera;
 	public:
@@ -40,8 +31,13 @@ namespace viva
 		// completely destroys DrawManager object
 		void Destroy();
 
+		// DO I ACTUALLY NEED THIS ?
 		void DrawAll(const Core& core);
 
 		Camera* GetCamera() const { return camera; }
+
+		void SetDefaultTextureFilter(TextureFilter filter) { defaultFilter = filter; }
+
+		TextureFilter GetDefaultTextureFilter() const { return defaultFilter; }
 	};
 }

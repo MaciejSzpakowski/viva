@@ -38,10 +38,12 @@ namespace viva
 			engine->SetBackGroundColor(color);
 		}
 
-		Color GetBackgroundColor() const 
+		Color GetBackgroundColor() const
 		{ 
 			return engine->GetBackGroundColor(); 
 		}
+
+		Console* GetConsole() { return engine->GetConsole(); }
 
 		Creator* GetCreator() { return engine; }
 	};

@@ -24,6 +24,8 @@ namespace viva
 
 		window = new Win32Window(title.c_str(), clientWidth, clientHeigth);
 
+		console = new Win32Console();
+
 		//// *********** PIPELINE SETUP STARTS HERE *********** ////
 		// create a struct to hold information about the swap chain
 		DXGI_SWAP_CHAIN_DESC scd;
@@ -86,17 +88,16 @@ namespace viva
 
 		////    VS and PS    ////
 		//default shaders
-		defaultPixelShader = new D3D11PixelShader();
-		defaultPostProcessing = new D3D11PixelShader();
-		defaultVertexShader = new D3D11VertexShader();
-		ID3D10Blob *vs; //release vs after CreateInputLayout()
+		ID3D11VertexShader* vs;
+		ID3D10Blob *blob; //release vs after CreateInputLayout()
 						//alternative to loading shader from cso file
 						//hr = D3DCompileFromFile(L"VertexShader.hlsl", 0, 0, "main", "vs_5_0", 0, 0, &vs, 0); CHECKHR();
 		hr = D3DCompile(rc_VertexShader, strlen(rc_VertexShader),
-			0, 0, 0, "main", "vs_5_0", 0, 0, &vs, 0);
+			0, 0, 0, "main", "vs_5_0", 0, 0, &blob, 0);
 		Checkhr(hr, "D3DCompile()");
-		hr = device->CreateVertexShader(vs->GetBufferPointer(), vs->GetBufferSize(), 0,
-			&(((D3D11VertexShader*)defaultVertexShader)->vs));
+		hr = device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), 0,
+			&vs);
+		defaultVertexShader = new D3D11VertexShader(vs);
 		Checkhr(hr, "CreateVertexShader()");
 		context->VSSetShader(((D3D11VertexShader*)defaultVertexShader)->vs, 0, 0);
 		const char* args[] = { "main", "ps_5_0" };
@@ -117,10 +118,10 @@ namespace viva
 			//if you need to pass something on your own to PS or VS per vertex
 			//{ "SOME_MORE_DATA", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
-		hr = device->CreateInputLayout(ied, 3, vs->GetBufferPointer(), vs->GetBufferSize(),
+		hr = device->CreateInputLayout(ied, 3, blob->GetBufferPointer(), blob->GetBufferSize(),
 			&layout);
 		Checkhr(hr, "CreateInputLayout()");
-		vs->Release();
+		blob->Release();
 		context->IASetInputLayout(layout);
 
 		///    BLEND STATE    ////
@@ -141,6 +142,19 @@ namespace viva
 		hr = device->CreateBlendState(&blendDesc, &blendState);
 		Checkhr(hr, "CreateBlendState()");
 
+		////    RASTERIZERS     ////
+
+		D3D11_RASTERIZER_DESC rd;
+		ZeroMemory(&rd, sizeof(rd));
+		rd.FillMode = D3D11_FILL_WIREFRAME;
+		rd.CullMode = D3D11_CULL_NONE;
+		hr = device->CreateRasterizerState(&rd, &rsWire);
+		Checkhr(hr, "CreateRasterizerState()");
+		rd.FillMode = D3D11_FILL_SOLID;
+		rd.CullMode = D3D11_CULL_FRONT;
+		hr = device->CreateRasterizerState(&rd, &rsSolid);
+		Checkhr(hr, "CreateRasterizerState()");
+
 		//// *********** PIPELINE SETUP ENDS HERE *********** ////
 		
 		//timer
@@ -159,6 +173,7 @@ namespace viva
 	void D3D11Engine::Destroy()
 	{
 		window->Destroy();
+		delete console;
 	}
 
 	void D3D11Engine::Run(std::function<void()>& gameloop, std::function<void()>& intloop)
@@ -174,19 +189,17 @@ namespace viva
 
 	PixelShader* D3D11Engine::CreatePixelShaderFromString(const char* str, void* args)
 	{
-		PixelShader* pixelShader = new D3D11PixelShader();
-		ID3D11PixelShader* result;
-		ID3D10Blob *ps;
+		ID3D11PixelShader* ps;
+		ID3D10Blob *blob;
 		HRESULT hr;
 
-		hr = D3DCompile(str, strlen(str), 0, 0, 0, ((const char**)args)[0], ((const char**)args)[1], 0, 0, &ps, 0);
+		hr = D3DCompile(str, strlen(str), 0, 0, 0, ((const char**)args)[0], ((const char**)args)[1], 0, 0, &blob, 0);
 		Checkhr(hr, "D3DCompile() in D3D11Engine::CreatePixelShaderFromString()");
-		hr = device->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), 0, &result);
+		hr = device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), 0, &ps);
 		Checkhr(hr, "CreatePixelShader() in D3D11Engine::CreatePixelShaderFromString()");
 		ps->Release();
 
-		((D3D11PixelShader*)pixelShader)->ps = result;
-		return pixelShader;
+		return new D3D11PixelShader(ps);
 	}
 
 	RenderTarget* D3D11Engine::CreateRenderTarget()
@@ -226,18 +239,7 @@ namespace viva
 		hr = device->CreateShaderResourceView(tex, &shaderResourceViewDesc, &srv);
 		Checkhr(hr, "CreateShaderResourceView() in D3D11Engine::CreateRenderTarget()");
 
-		RenderTarget* target = new D3D11RenderTarget();
-		/*target->zTexture = tex;
-		target->zTargetView = rtv;
-		target->zSprite = new CSprite();
-		target->zSprite->FlipVertically = true;
-		target->zSprite->Pickable = false;
-		target->zSprite->zTexture = nullptr;
-		target->zSprite->PixelShader = nullptr;
-		target->zSprite->zShaderResource = srv;
-
-		zRenderTargets.push_back(target);*/
-		return nullptr;
+		return new D3D11RenderTarget(tex, rtv, srv);
 	}
 
 	Sprite* D3D11Engine::CreateSprite(const wstring& filepath)
@@ -255,7 +257,7 @@ namespace viva
 		return new D3D11Texture(filepath,nullptr);
 	}
 
-	Texture* D3D11Engine::CreateTexture(const byte data[], const Size& size, wstring& name)
+	Texture* D3D11Engine::CreateTexture(const Pixel data[], const Size& size, wstring& name)
 	{
 		return new D3D11Texture(name, nullptr);
 	}

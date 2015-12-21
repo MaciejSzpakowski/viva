@@ -6,7 +6,6 @@ namespace viva
 	{
 	protected:
 		vector<RenderTarget*>* parentContainer;
-		Sprite* sprite; // sprite as render target
 		PixelShader* pixelShader;
 		vector<Polygon*> polygons;
 		vector<Sprite*> sprites;

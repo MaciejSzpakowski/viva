@@ -14,7 +14,7 @@ namespace viva
 			throw std::runtime_error("DrawManager::Initialize()\nDrawManager is initialized");
 		
 		initialized = true;
-
+		defaultFilter = TextureFilter::POINT;
 		camera = new Camera();
 	}
 

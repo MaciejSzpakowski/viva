@@ -8,11 +8,11 @@ namespace viva
 		return instance;
 	}
 
-	void ResourceManager::ThrowUninitialized()
+	/*void ResourceManager::ThrowUninitialized()
 	{
 		if (!initialized)
 			throw std::runtime_error("ResourceManager is not initialized");
-	}
+	}*/
 
 	void ResourceManager::AddResource(Resource* res)
 	{

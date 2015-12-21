@@ -18,7 +18,7 @@ namespace viva
 		virtual Texture* CreateTexture(const wstring& filepath, bool cached) = 0;
 
 		// create texture from byte array
-		virtual Texture* CreateTexture(const byte data[], const Size& size, wstring& name) = 0;
+		virtual Texture* CreateTexture(const Pixel data[], const Size& size, wstring& name) = 0;
 
 		// create sprite from file
 		virtual Sprite* CreateSprite(const wstring& filepath) = 0;

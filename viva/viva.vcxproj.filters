@@ -60,12 +60,6 @@
     <ClInclude Include="D3D11Types.h">
       <Filter>Private Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Drawable.h">
-      <Filter>Public Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Dynamic.h">
-      <Filter>Public Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Sprite.h">
       <Filter>Public Headers</Filter>
     </ClInclude>
@@ -75,10 +69,16 @@
     <ClInclude Include="ResourceManager.h">
       <Filter>Public Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Create.h">
+    <ClInclude Include="Utils.h">
       <Filter>Public Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h">
+    <ClInclude Include="Win32Console.h">
+      <Filter>Private Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Public Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Creator.h">
       <Filter>Public Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -114,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

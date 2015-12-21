@@ -10,6 +10,7 @@
 #include <d3dcompiler.h>
 #include <Xinput.h>
 
+#include "Win32Console.h"
 #include "Win32Window.h"
 #include "D3D11Types.h"
 #include "D3D11Engine.h"

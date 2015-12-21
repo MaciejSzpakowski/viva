@@ -6,10 +6,15 @@ namespace viva
 	{
 	private:
 		map<wstring, Resource*> resources;
-		bool initialized;
-		ResourceManager() { initialized = false; }
-		void ThrowUninitialized();
+		ResourceManager() { }
+		//void ThrowUninitialized();
 	public:
+		// cannot construct singleton
+		ResourceManager(ResourceManager const&) = delete;
+
+		//cannot assign to singleton
+		void operator=(ResourceManager const&) = delete;
+
 		static ResourceManager& Get();
 
 		void AddResource(Resource* res);

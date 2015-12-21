@@ -6,7 +6,7 @@ namespace viva
 	{
 		ID3D11PixelShader* ps;
 
-		D3D11PixelShader() { ps = nullptr; }
+		D3D11PixelShader(ID3D11PixelShader* _ps):ps(_ps) { }
 		void Destroy() override;
 	};
 
@@ -14,15 +14,20 @@ namespace viva
 	{
 		ID3D11VertexShader* vs;
 
-		D3D11VertexShader() { vs = nullptr; }
+		D3D11VertexShader(ID3D11VertexShader* _vs):vs(_vs) { }
 		void Destroy() override;
 	};
 
 	class D3D11RenderTarget : public RenderTarget
 	{
 	private:
-
+		ID3D11Texture2D* tex;
+		ID3D11RenderTargetView* rtv;
+		ID3D11ShaderResourceView* srv;
 	public:
+		D3D11RenderTarget(ID3D11Texture2D* _tex, ID3D11RenderTargetView* _rtv, ID3D11ShaderResourceView* _srv) :
+			tex(_tex), rtv(_rtv), srv(_srv) {}
+
 		void Draw() override;
 
 		void Destroy() override;
@@ -70,5 +75,7 @@ namespace viva
 
 	class D3D11Animation : public Animation
 	{
+	private:
+	public:
 	};
 }

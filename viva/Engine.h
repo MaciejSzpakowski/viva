@@ -13,6 +13,7 @@ namespace viva
 	{
 	protected:
 		Window* window;
+		Console* console;
 		EngineType type;
 		Color backgroundColor;
 		Size size;
@@ -38,5 +39,7 @@ namespace viva
 		void SetBackGroundColor(const Color& color) { backgroundColor = color; }		
 
 		virtual void Draw(const vector<RenderTarget*>& targets, const Camera* camera) = 0;
+	
+		Console* GetConsole() const { return console; }
 	};
 }

@@ -20,12 +20,21 @@ namespace viva
 		wstring GetName() const { return name; }
 	};
 
+	struct Matrix
+	{
+	};
+
 	struct Color
 	{
 		float r, g, b, a;
 		Color() : r(0), g(0), b(0), a(0) {}
 		Color(float _r, float _g, float _b, float _a) : r(_r), g(_g), b(_b), a(_a) {}
 		Color(byte _r, byte _g, byte _b, byte _a) : r(_r / 255.0f), g(_g / 255.0f), b(_b / 255.0f), a(_a / 255.0f) {}
+	};
+
+	struct Pixel
+	{
+		byte r, g, b, a;
 	};
 
 	struct Size
@@ -47,8 +56,28 @@ namespace viva
 			: x(_x), y(_y), z(_z), r(_r), g(_g), b(_b), u(_u), v(_v) {}
 	};
 
-	struct TextureSampler
+	class PixelShader
 	{
+	protected:
+	public:
+		virtual void Destroy() = 0;
+	};
+
+	class VertexShader
+	{
+	protected:
+	public:
+		virtual void Destroy() = 0;
+	};
+
+	enum class TextureFilter
+	{
+		POINT, LINEAR
+	};
+
+	enum class ViewMode
+	{
+		WIREFRAME, TEXTURED //, SOLID <-- maybe i can figure it out later
 	};
 
 	class Texture : public Resource
@@ -63,29 +92,29 @@ namespace viva
 		Size GetSize() const { return size; }
 	};
 
-	class Polygon
+	class Dynamic
 	{
+	protected:
+		int index; // index in the parent container
 	public:
+		Dynamic() :index(-1) {}
+
+		virtual void Transform() = 0;
+
 		virtual void Destroy() = 0;
 	};
 
-	struct RasterizerState
+	class Drawable : public Dynamic
 	{
-	};
-
-	struct Matrix
-	{
-	};
-
-	class PixelShader
-	{
+	protected:
+		//RenderTarget* renderTarget;
 	public:
-		virtual void Destroy() = 0;
+		virtual void Draw() = 0;
 	};
 
-	class VertexShader
+	class Polygon : Drawable
 	{
+	protected:
 	public:
-		virtual void Destroy() = 0;
 	};
 }
