@@ -78,4 +78,19 @@ namespace viva
 	private:
 	public:
 	};
+
+	class D3D11Polygon : public Polygon
+	{
+	private:
+		ID3D11Buffer* vertexBuffer;
+		vector<DirectX::XMVECTOR> transformedVertices;
+	public:
+		D3D11Polygon(ID3D11Device* device, const vector<Point>& points);
+
+		void Destroy() override;
+
+		void Draw() override;
+
+		void Transform() override;
+	};
 }

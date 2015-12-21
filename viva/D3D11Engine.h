@@ -44,6 +44,8 @@ namespace viva
 
 		Texture* CreateTexture(const Pixel data[], const Size& size, wstring& name) override;
 
+		Polygon* CreatePolygon(const vector<Point>& points) override;
+
 		void Draw(const vector<RenderTarget*>& targets, const Camera* camera) override;
 	};
 }

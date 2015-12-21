@@ -262,6 +262,11 @@ namespace viva
 		return new D3D11Texture(name, nullptr);
 	}
 
+	Polygon* D3D11Engine::CreatePolygon(const vector<Point>& points)
+	{
+
+	}
+
 	void D3D11Engine::Draw(const vector<RenderTarget*>& targets, const Camera* camera)
 	{
 		float col[4] = { backgroundColor.r, backgroundColor.g, 
@@ -289,5 +294,10 @@ namespace viva
 		//	DebugManager->zDebugText->zDraw();
 
 		swapChain->Present(0, 0);
+	}
+
+	Polygon* D3D11Engine::CreatePolygon(const vector<Point>& points)
+	{
+		return new D3D11Polygon(device, points);
 	}
 }

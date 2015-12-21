@@ -8,7 +8,7 @@ namespace viva
 		return instance;
 	}
 
-	void DrawManager::Initialize()
+	void DrawManager::Initialize(RenderTarget* _defaultRenderTarget)
 	{
 		if (initialized)
 			throw std::runtime_error("DrawManager::Initialize()\nDrawManager is initialized");
@@ -16,6 +16,8 @@ namespace viva
 		initialized = true;
 		defaultFilter = TextureFilter::POINT;
 		camera = new Camera();
+		defaultRenderTarget = _defaultRenderTarget;
+		renderTargets.push_back(defaultRenderTarget);
 	}
 
 	void DrawManager::ThrowUninitialized()

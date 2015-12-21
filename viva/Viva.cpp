@@ -10,7 +10,7 @@ namespace viva
 	void Initialize(EngineType type, const wstring& title, int clientWidth, int clientHeigth)
 	{
 		Core::Get().Initialize(type, title, clientWidth, clientHeigth);
-		DrawManager::Get().Initialize();
+		DrawManager::Get().Initialize(Core::Get().GetCreator()->CreateRenderTarget());
 	}
 
 	void Run(std::function<void()> gameloop)

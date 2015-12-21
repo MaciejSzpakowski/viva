@@ -26,7 +26,7 @@ namespace viva
 		static DrawManager& Get();
 
 		// initializes DrawManager object
-		void Initialize();
+		void Initialize(RenderTarget* _defaultRenderTarget);
 
 		// completely destroys DrawManager object
 		void Destroy();

@@ -37,6 +37,11 @@ namespace viva
 		byte r, g, b, a;
 	};
 
+	struct Point
+	{
+		float x, y;
+	};
+
 	struct Size
 	{
 		float width;
@@ -95,6 +100,7 @@ namespace viva
 	class Dynamic
 	{
 	protected:
+		Point position;
 		int index; // index in the parent container
 	public:
 		Dynamic() :index(-1) {}
@@ -107,7 +113,9 @@ namespace viva
 	class Drawable : public Dynamic
 	{
 	protected:
-		//RenderTarget* renderTarget;
+		Color color;
+		bool flipHorizontally;
+		bool flipVertically;
 	public:
 		virtual void Draw() = 0;
 	};
@@ -115,6 +123,8 @@ namespace viva
 	class Polygon : Drawable
 	{
 	protected:
+		vector<Point> vertices;
+		float radius; //distance from origin to the furthest vertex
 	public:
 	};
 }

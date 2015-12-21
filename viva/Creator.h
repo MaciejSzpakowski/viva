@@ -25,5 +25,8 @@ namespace viva
 
 		// create sprite from texture
 		virtual Sprite* CreateSprite(Texture* texture) = 0;
+		
+		// create polygon from list of points
+		virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
 	};
 }
