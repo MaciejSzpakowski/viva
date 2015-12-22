@@ -2,14 +2,13 @@
 
 namespace viva
 {
-	template <class Vector, class Matrix>
 	class Sprite : public Drawable
 	{
 	protected:
 		Texture* texture;
 		TextureFilter filter;
 	public:
-		Sprite():Drawable( {}
+		Sprite() {}
 
 		void SetFilterType(TextureFilter _filter) { filter = _filter; }
 
@@ -18,7 +17,6 @@ namespace viva
 		Texture* GetTexture() const { return texture; }
 	};
 
-	template <class Vector, class Matrix>
 	class Animation : public Sprite
 	{
 	protected:

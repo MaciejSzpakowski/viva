@@ -2,7 +2,6 @@
 
 namespace viva
 {
-	template <class Matrix>
 	DrawManager& DrawManager::Get()
 	{
 		static DrawManager instance;

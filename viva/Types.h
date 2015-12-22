@@ -47,6 +47,16 @@ namespace viva
 		Size(float _width, float _height) :width(_width), height(_height) {}
 	};
 
+	struct Matrix
+	{
+		float m[4][4];
+	};
+
+	struct Vector
+	{
+		float x, y, z, w;
+	};
+
 	struct Vertex
 	{
 		float x, y, z;
@@ -93,7 +103,6 @@ namespace viva
 		Size GetSize() const { return size; }
 	};
 
-	template <class Vector, class Matrix>
 	class Dynamic
 	{
 	protected:
@@ -104,15 +113,13 @@ namespace viva
 		Matrix world;
 		int index; // index in the parent container
 	public:
-		Dynamic(const Vector& pos,const Vector& rot,const Vector& sca) :index(-1),rotation(rot),
-			position(pos),scale(sca),parent(nullptr) {}
+		Dynamic() :index(-1), parent(nullptr) {}
 
 		virtual void Transform() = 0;
 
 		virtual void Destroy() = 0;
 	};
 
-	template <class Vector, class Matrix>
 	class Drawable : public Dynamic
 	{
 	protected:
@@ -120,10 +127,11 @@ namespace viva
 		bool flipHorizontally;
 		bool flipVertically;
 	public:
+		Drawable():color(Color(1.0f, 1, 1, 1)), flipHorizontally(false), 
+			flipVertically(false) {}
 		virtual void Draw() = 0;
 	};
 
-	template <class Vector, class Matrix>
 	class Polygon : Drawable
 	{
 	protected:

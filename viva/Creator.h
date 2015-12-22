@@ -28,5 +28,11 @@ namespace viva
 		
 		// create polygon from list of points
 		virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
+
+		// create vector xyzw
+		virtual Vector* CreateVector(float x, float y, float z, float w) = 0;
+
+		// creates identity matrix
+		virtual Matrix* CreateMatrix() = 0;
 	};
 }

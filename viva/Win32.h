@@ -25,3 +25,5 @@
 #pragma comment(lib, "Xinput9_1_0.lib")
 #endif
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
+
+using namespace DirectX;

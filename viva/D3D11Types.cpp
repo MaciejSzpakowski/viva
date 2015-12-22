@@ -34,7 +34,7 @@ namespace viva
 
 	D3D11Polygon::D3D11Polygon(ID3D11Device* device, const vector<Point>& points)
 	{
-		int n = points.size();
+		int n = (int)points.size();
 		float radius = 0;
 
 		D3D11_BUFFER_DESC bd;
@@ -66,24 +66,24 @@ namespace viva
 
 	void D3D11Polygon::Transform()
 	{
-		DirectX::XMMATRIX scale = DirectX::XMMatrixIdentity();
-		//DirectX::XMMATRIX origin = XMMatrixTranslation(-Origin.x, -Origin.y, 0);
-		//DirectX::XMMATRIX norigin = XMMatrixTranslation(Origin.x, Origin.y, 0);
-		DirectX::XMMATRIX rot = DirectX::XMMatrixRotationRollPitchYawFromVector(zRotation);
-		DirectX::XMMATRIX loc = DirectX::XMMatrixTranslationFromVector(zPosition);
-		//zWorld = origin * scale * rot * loc * norigin;
-		if (zParent != nullptr)
-		{
-			XMMATRIX parentLoc = XMMatrixRotationRollPitchYawFromVector(zParent->zRotation);
-			XMMATRIX parentRot = XMMatrixTranslationFromVector(zParent->zPosition);
-			zWorld = zWorld * parentLoc * parentRot;
-		}
-		XMMATRIX worldViewProj = zWorld * Camera->zView * Camera->zProj;
-		//check for cursor
-		/*if (Pickable)
-			zCheckForCursor(zWorld);*/
-		worldViewProj = XMMatrixTranspose(worldViewProj);
-		Core->zContext->UpdateSubresource(DrawManager->zCbBufferVS, 0, NULL, &worldViewProj, 0, 0);
+		//DirectX::XMMATRIX scale = DirectX::XMMatrixIdentity();
+		////DirectX::XMMATRIX origin = XMMatrixTranslation(-Origin.x, -Origin.y, 0);
+		////DirectX::XMMATRIX norigin = XMMatrixTranslation(Origin.x, Origin.y, 0);
+		//DirectX::XMMATRIX rot = DirectX::XMMatrixRotationRollPitchYawFromVector(zRotation);
+		//DirectX::XMMATRIX loc = DirectX::XMMatrixTranslationFromVector(zPosition);
+		////zWorld = origin * scale * rot * loc * norigin;
+		//if (zParent != nullptr)
+		//{
+		//	XMMATRIX parentLoc = XMMatrixRotationRollPitchYawFromVector(zParent->zRotation);
+		//	XMMATRIX parentRot = XMMatrixTranslationFromVector(zParent->zPosition);
+		//	zWorld = zWorld * parentLoc * parentRot;
+		//}
+		//XMMATRIX worldViewProj = zWorld * Camera->zView * Camera->zProj;
+		////check for cursor
+		///*if (Pickable)
+		//	zCheckForCursor(zWorld);*/
+		//worldViewProj = XMMatrixTranspose(worldViewProj);
+		//Core->zContext->UpdateSubresource(DrawManager->zCbBufferVS, 0, NULL, &worldViewProj, 0, 0);
 	}
 
 	void D3D11Sprite::Destroy()

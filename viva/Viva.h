@@ -1,5 +1,6 @@
 // PUBLIC GLOBAL HEADER FILE
 #pragma once
+#define D3D11
 #include "Includes.h"
 #include "Utils.h"
 #include "Console.h"
