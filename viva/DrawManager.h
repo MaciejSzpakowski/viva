@@ -2,6 +2,7 @@
 
 namespace viva
 {
+	template <class Matrix>
 	class DrawManager
 	{
 	private:

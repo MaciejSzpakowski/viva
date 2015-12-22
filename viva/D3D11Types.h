@@ -33,15 +33,6 @@ namespace viva
 		void Destroy() override;
 	};
 
-	class D3D11Polygon : public Polygon
-	{
-	private:
-	public:
-		D3D11Polygon() {}
-
-		void Destroy() override;
-	};
-
 	class D3D11Sprite : public Sprite
 	{
 	private:

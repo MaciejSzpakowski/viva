@@ -66,11 +66,11 @@ namespace viva
 
 	void D3D11Polygon::Transform()
 	{
-		DirectX::XMMATRIX scale = zGetScaleMatrix();
+		DirectX::XMMATRIX scale = DirectX::XMMatrixIdentity();
 		//DirectX::XMMATRIX origin = XMMatrixTranslation(-Origin.x, -Origin.y, 0);
 		//DirectX::XMMATRIX norigin = XMMatrixTranslation(Origin.x, Origin.y, 0);
-		DirectX::XMMATRIX rot = XMMatrixRotationRollPitchYawFromVector(zRotation);
-		DirectX::XMMATRIX loc = XMMatrixTranslationFromVector(zPosition);
+		DirectX::XMMATRIX rot = DirectX::XMMatrixRotationRollPitchYawFromVector(zRotation);
+		DirectX::XMMATRIX loc = DirectX::XMMatrixTranslationFromVector(zPosition);
 		//zWorld = origin * scale * rot * loc * norigin;
 		if (zParent != nullptr)
 		{

@@ -20,10 +20,6 @@ namespace viva
 		wstring GetName() const { return name; }
 	};
 
-	struct Matrix
-	{
-	};
-
 	struct Color
 	{
 		float r, g, b, a;
@@ -97,19 +93,26 @@ namespace viva
 		Size GetSize() const { return size; }
 	};
 
+	template <class Vector, class Matrix>
 	class Dynamic
 	{
 	protected:
-		Point position;
+		Dynamic* parent;
+		Vector position;
+		Vector rotation;
+		Vector scale;
+		Matrix world;
 		int index; // index in the parent container
 	public:
-		Dynamic() :index(-1) {}
+		Dynamic(const Vector& pos,const Vector& rot,const Vector& sca) :index(-1),rotation(rot),
+			position(pos),scale(sca),parent(nullptr) {}
 
 		virtual void Transform() = 0;
 
 		virtual void Destroy() = 0;
 	};
 
+	template <class Vector, class Matrix>
 	class Drawable : public Dynamic
 	{
 	protected:
@@ -120,6 +123,7 @@ namespace viva
 		virtual void Draw() = 0;
 	};
 
+	template <class Vector, class Matrix>
 	class Polygon : Drawable
 	{
 	protected:
