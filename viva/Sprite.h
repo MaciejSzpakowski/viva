@@ -2,7 +2,7 @@
 
 namespace viva
 {
-	class Sprite : public Drawable
+	/*class Sprite : public Drawable
 	{
 	protected:
 		Texture* texture;
@@ -21,5 +21,5 @@ namespace viva
 	{
 	protected:
 	public:
-	};
+	};*/
 }

@@ -1,4 +1,4 @@
-#include "Win32.h"
+#include "Viva.h"
 
 namespace viva
 {
@@ -23,7 +23,7 @@ namespace viva
 		return 0;
 	}
 
-	Win32Window::Win32Window(LPCWSTR title, int width, int heigth)
+	Window::Window(LPCWSTR title, int width, int heigth)
 	{
 		const wchar_t className[] = L"myWindowClass";
 		WNDCLASSEX wc;
@@ -59,17 +59,17 @@ namespace viva
 		}
 	}
 
-	void* Win32Window::GetNativeHandle()
+	void* Window::GetNativeHandle()
 	{
 		return handle;
 	}
 
-	void Win32Window::Destroy()
+	void Window::Destroy()
 	{
 		delete this;
 	}
 
-	void Win32Window::Run(std::function<void()>& gameloop, std::function<void()>& intloop)
+	void Window::Run(std::function<void()>& gameloop, std::function<void()>& intloop)
 	{
 		ShowWindow(handle, SW_SHOW);
 		UpdateWindow(handle);

@@ -1,5 +1,5 @@
-#include "Win32.h"
-#include "D3D11ShadersRC.h"
+#include "Viva.h"
+#include "ShadersRC.h"
 
 namespace viva
 {
@@ -17,14 +17,13 @@ namespace viva
 		throw std::runtime_error(message.str().c_str());
 	}
 
-	D3D11Engine::D3D11Engine(const wstring& title, int clientWidth, int clientHeigth)
-		: Engine(EngineType::DirectX11, Size((float)clientWidth, (float)clientHeigth))
+	Engine::Engine(Size _size, const wstring& title)
 	{
 		HRESULT hr;
 
-		window = new Win32Window(title.c_str(), clientWidth, clientHeigth);
+		window = new Window(title.c_str(), _size.width, _size.height);
 
-		console = new Win32Console();
+		console = new Console();
 
 		//// *********** PIPELINE SETUP STARTS HERE *********** ////
 		// create a struct to hold information about the swap chain
@@ -33,7 +32,7 @@ namespace viva
 		scd.BufferCount = 1;                                    // one back buffer
 		scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;     // use 32-bit color
 		scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;      // how swap chain is to be used
-		scd.OutputWindow = (HWND)window->GetNativeHandle();     // the window to be used
+		scd.OutputWindow = window->GetHandle();     // the window to be used
 		scd.SampleDesc.Quality = 0;
 		scd.SampleDesc.Count = 1;                               // no anti aliasing
 		scd.Windowed = TRUE;                                    // windowed/full-screen mode
@@ -57,8 +56,8 @@ namespace viva
 
 		//Describe our Depth/Stencil Buffer
 		D3D11_TEXTURE2D_DESC depthStencilDesc;
-		depthStencilDesc.Width = clientWidth;
-		depthStencilDesc.Height = clientHeigth;
+		depthStencilDesc.Width = _size.width;
+		depthStencilDesc.Height = _size.height;
 		depthStencilDesc.MipLevels = 1;
 		depthStencilDesc.ArraySize = 1;
 		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -80,8 +79,8 @@ namespace viva
 		ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = (float)clientWidth;
-		viewport.Height = (float)clientHeigth;
+		viewport.Width = (float)_size.width;
+		viewport.Height = (float)_size.height;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 		context->RSSetViewports(1, &viewport);
@@ -97,9 +96,9 @@ namespace viva
 		Checkhr(hr, "D3DCompile()");
 		hr = device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), 0,
 			&vs);
-		defaultVertexShader = new D3D11VertexShader(vs);
+		defaultVertexShader = new VertexShader(vs);
 		Checkhr(hr, "CreateVertexShader()");
-		context->VSSetShader(((D3D11VertexShader*)defaultVertexShader)->vs, 0, 0);
+		context->VSSetShader(defaultVertexShader->vs, 0, 0);
 		const char* args[] = { "main", "ps_5_0" };
 		defaultPixelShader = CreatePixelShaderFromString(rc_PixelShader, args);
 		const char* args2[] = { "main", "ps_5_0" };
@@ -156,6 +155,29 @@ namespace viva
 		Checkhr(hr, "CreateRasterizerState()");
 
 		//// *********** PIPELINE SETUP ENDS HERE *********** ////
+
+		//shared vertex shader buffer
+		D3D11_BUFFER_DESC cbbd;
+		ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+		cbbd.Usage = D3D11_USAGE_DEFAULT;
+		cbbd.ByteWidth = sizeof(XMMATRIX);
+		cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cbbd.CPUAccessFlags = 0;
+		cbbd.MiscFlags = 0;
+		device->CreateBuffer(&cbbd, NULL, &zCbBufferVS);
+		context->VSSetConstantBuffers(0, 1, &zCbBufferVS);
+
+		//shared vertex shader 2nd buffer and pixel shader buffer
+		ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+		cbbd.Usage = D3D11_USAGE_DEFAULT;
+		cbbd.ByteWidth = sizeof(Color);
+		cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cbbd.CPUAccessFlags = 0;
+		cbbd.MiscFlags = 0;
+		device->CreateBuffer(&cbbd, NULL, &zCbBufferPS);
+		device->CreateBuffer(&cbbd, NULL, &zCbBufferUV); //has the same size
+		context->PSSetConstantBuffers(0, 1, &zCbBufferPS);
+		context->VSSetConstantBuffers(1, 1, &zCbBufferUV);
 		
 		//timer
 		LARGE_INTEGER li;
@@ -170,24 +192,24 @@ namespace viva
 		frameTime = 0;
 	}
 
-	void D3D11Engine::Destroy()
+	void Engine::Destroy()
 	{
 		window->Destroy();
 		delete console;
 	}
 
-	void D3D11Engine::Run(std::function<void()>& gameloop, std::function<void()>& intloop)
+	void Engine::Run(std::function<void()>& gameloop, std::function<void()>& intloop)
 	{ 
-		static_cast<Win32Window*>(window)->Run(gameloop, intloop);
+		static_cast<Window*>(window)->Run(gameloop, intloop);
 	}
 
-	PixelShader* D3D11Engine::CreatePixelShaderFromFile(const wstring& filepath, void* args)
+	PixelShader* Engine::CreatePixelShaderFromFile(const wstring& filepath, void* args)
 	{
 		auto file = Utils::ReadFileToString(filepath);
 		return CreatePixelShaderFromString(std::string(file.begin(), file.end()).c_str(), args);
 	}
 
-	PixelShader* D3D11Engine::CreatePixelShaderFromString(const char* str, void* args)
+	PixelShader* Engine::CreatePixelShaderFromString(const char* str, void* args)
 	{
 		ID3D11PixelShader* ps;
 		ID3D10Blob *blob;
@@ -199,10 +221,10 @@ namespace viva
 		Checkhr(hr, "CreatePixelShader() in D3D11Engine::CreatePixelShaderFromString()");
 		ps->Release();
 
-		return new D3D11PixelShader(ps);
+		return new PixelShader(ps);
 	}
 
-	RenderTarget* D3D11Engine::CreateRenderTarget()
+	RenderTarget* Engine::CreateRenderTarget()
 	{
 		HRESULT hr;
 		D3D11_TEXTURE2D_DESC textureDesc;
@@ -239,36 +261,36 @@ namespace viva
 		hr = device->CreateShaderResourceView(tex, &shaderResourceViewDesc, &srv);
 		Checkhr(hr, "CreateShaderResourceView() in D3D11Engine::CreateRenderTarget()");
 
-		return new D3D11RenderTarget(tex, rtv, srv);
+		return new RenderTarget(tex, rtv, srv);
 	}
 
-	Sprite* D3D11Engine::CreateSprite(const wstring& filepath)
+	/*Sprite* Engine::CreateSprite(const wstring& filepath)
 	{
 		return new D3D11Sprite();
 	}
 
-	Sprite* D3D11Engine::CreateSprite(Texture* texture)
+	Sprite* Engine::CreateSprite(Texture* texture)
 	{
 		return new D3D11Sprite();
-	}
+	}*/
 
-	Texture* D3D11Engine::CreateTexture(const wstring& filepath, bool cached)
+	Texture* Engine::CreateTexture(const wstring& filepath, bool cached)
 	{
-		return new D3D11Texture(filepath,nullptr);
+		return new Texture(filepath,nullptr);
 	}
 
-	Texture* D3D11Engine::CreateTexture(const Pixel data[], const Size& size, wstring& name)
+	Texture* Engine::CreateTexture(const Pixel data[], const Size& size, wstring& name)
 	{
-		return new D3D11Texture(name, nullptr);
+		return new Texture(name, nullptr);
 	}
 
-	void D3D11Engine::Draw(const vector<RenderTarget*>& targets, const Camera* camera)
+	void Engine::Draw(const vector<RenderTarget*>& targets, const Camera* camera)
 	{
 		float col[4] = { backgroundColor.r, backgroundColor.g, 
 			backgroundColor.b, backgroundColor.a};
 
 		for (auto t : targets)
-			t->Draw();
+			DrawRenderTarget(t);
 
 		context->ClearRenderTargetView(backBuffer, col);
 		context->ClearDepthStencilView(depthStencilView,
@@ -291,8 +313,8 @@ namespace viva
 		swapChain->Present(0, 0);
 	}
 
-	Polygon* D3D11Engine::CreatePolygon(const vector<Point>& points)
+	Polygon* Engine::CreatePolygon(const vector<Point>& points)
 	{
-		return new D3D11Polygon(device, points);
+		return new Polygon(device, points);
 	}
 }

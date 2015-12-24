@@ -4,18 +4,23 @@ namespace viva
 {
 	class RenderTarget
 	{
-	protected:
+	private:
+		ID3D11Texture2D* tex;
+		ID3D11RenderTargetView* rtv;
+		ID3D11ShaderResourceView* srv;
+
 		vector<RenderTarget*>* parentContainer;
 		PixelShader* pixelShader;
 		vector<Polygon*> polygons;
-		vector<Sprite*> sprites;
+		//vector<Sprite*> sprites;
 		//vector<BitmapText*> texts;
 
 	public:
-		RenderTarget() { parentContainer = nullptr; }
+		RenderTarget(ID3D11Texture2D* _tex, ID3D11RenderTargetView* _rtv, ID3D11ShaderResourceView* _srv) :
+			tex(_tex), rtv(_rtv), srv(_srv), parentContainer(nullptr) {}
 
-		// draw all objects that belong to the render target
-		virtual void Draw() = 0;
+		void Draw(ID3D11DeviceContext* context, ID3D11DepthStencilView* dsv, PixelShader* defaultPs,
+			ID3D11RasterizerState* wireframe, float gametime, Camera* cam, ID3D11Buffer* cbbuffervs);
 
 		// move to the top of the stack
 		void MoveToTop();
@@ -36,6 +41,6 @@ namespace viva
 		void Remove();
 
 		// dstroy the render target and all objects on it
-		virtual void Destroy() = 0;
+		void Destroy();
 	};
 }

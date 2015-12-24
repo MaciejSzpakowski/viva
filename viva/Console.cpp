@@ -1,13 +1,13 @@
-#include "Win32.h"
+#include "Viva.h"
 
 namespace viva
 {
-	Win32Console::Win32Console()
+	Console::Console()
 	{
 		opened = false;		
 	}
 
-	void Win32Console::Open()
+	void Console::Open()
 	{
 		if (opened)
 			throw std::runtime_error("Win32Console::Open() already opened");
@@ -19,7 +19,7 @@ namespace viva
 		freopen("CONIN$", "r", stdin);
 	}
 
-	void Win32Console::Close()
+	void Console::Close()
 	{
 		if (!opened)
 			throw std::runtime_error("Win32Console::Close() already closed");
@@ -28,7 +28,7 @@ namespace viva
 		FreeConsole();
 	}
 
-	void Win32Console::WriteLine(std::wstring& str)
+	void Console::WriteLine(std::wstring& str)
 	{
 		if (!opened)
 			throw std::runtime_error("Win32Console::WriteLine() console not opened");
@@ -36,7 +36,7 @@ namespace viva
 		std::wcout << str << std::endl;
 	}
 
-	void Win32Console::Write(std::wstring& str)
+	void Console::Write(std::wstring& str)
 	{
 		if (!opened)
 			throw std::runtime_error("Win32Console::Write() console not opened");
@@ -44,7 +44,7 @@ namespace viva
 		std::wcout << str;
 	}
 
-	wstring Win32Console::ReadLine()
+	wstring Console::ReadLine()
 	{
 		if (!opened)
 			throw std::runtime_error("Win32Console::ReadLine() console not opened");

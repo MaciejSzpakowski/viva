@@ -47,14 +47,15 @@ namespace viva
 		Size(float _width, float _height) :width(_width), height(_height) {}
 	};
 
-	struct Matrix
+	struct Rect
 	{
-		float m[4][4];
-	};
-
-	struct Vector
-	{
-		float x, y, z, w;
+		float left;
+		float top;
+		float right;
+		float bottom;
+		Rect() :left(0), right(0), top(0), bottom(0) {}
+		Rect(float _left, float _top, float _right, float _bottom) :
+			left(_left), top(_top), right(_right), bottom(_bottom) {}
 	};
 
 	struct Vertex
@@ -69,60 +70,65 @@ namespace viva
 
 	class PixelShader
 	{
-	protected:
 	public:
-		virtual void Destroy() = 0;
+		ID3D11PixelShader* ps;
+		PixelShader(ID3D11PixelShader* _ps) :ps(_ps) {}
+		void Destroy()
+		{
+			if (ps != nullptr)
+				ps->Release();
+
+			delete this;
+		}
 	};
 
 	class VertexShader
 	{
-	protected:
 	public:
-		virtual void Destroy() = 0;
+		ID3D11VertexShader* vs;
+		VertexShader(ID3D11VertexShader* _vs) :vs(_vs) {}
+		void Destroy()
+		{
+			if (vs != nullptr)
+				vs->Release();
+
+			delete this;
+		}
 	};
 
 	enum class TextureFilter
 	{
-		POINT, LINEAR
+		Point, Linear
 	};
 
 	enum class ViewMode
 	{
-		WIREFRAME, TEXTURED //, SOLID <-- maybe i can figure it out later
+		Wireframe, Textured //, SOLID <-- maybe i can figure it out later
 	};
 
 	class Texture : public Resource
 	{
-	protected:
+	private:
+		ID3D11ShaderResourceView* shaderResource;
 		Size size;
 	public:
-		Texture(const wstring& _name):Resource(_name) { }
+		Texture(const wstring& _name, ID3D11ShaderResourceView* srv):Resource(_name) { }
 
-		virtual void Destroy() = 0;
+		void Destroy()
+		{
+			if (cached)
+				ResourceManager::Get().RemoveResource(name);
+
+			shaderResource->Release();
+			delete this;
+		}
 
 		Size GetSize() const { return size; }
-	};
+	};	
 
-	class Dynamic
+	/*class Drawable : public Dynamic
 	{
-	protected:
-		Dynamic* parent;
-		Vector position;
-		Vector rotation;
-		Vector scale;
-		Matrix world;
-		int index; // index in the parent container
-	public:
-		Dynamic() :index(-1), parent(nullptr) {}
-
-		virtual void Transform() = 0;
-
-		virtual void Destroy() = 0;
-	};
-
-	class Drawable : public Dynamic
-	{
-	protected:
+	private:
 		Color color;
 		bool flipHorizontally;
 		bool flipVertically;
@@ -130,13 +136,5 @@ namespace viva
 		Drawable():color(Color(1.0f, 1, 1, 1)), flipHorizontally(false), 
 			flipVertically(false) {}
 		virtual void Draw() = 0;
-	};
-
-	class Polygon : Drawable
-	{
-	protected:
-		vector<Point> vertices;
-		float radius; //distance from origin to the furthest vertex
-	public:
-	};
+	};*/
 }

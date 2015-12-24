@@ -5,21 +5,23 @@ namespace viva
 	class Console
 	{
 	protected:
+		bool opened;
 	public:
+		Console();
 
 		// open a new console
-		virtual void Open() = 0;
+		void Open();
 
 		// close the console
-		virtual void Close() = 0;
+		void Close();
 
 		// write something with line break at the end
-		virtual void WriteLine(std::wstring& str) = 0;
+		void WriteLine(std::wstring& str);
 
 		// write something
-		virtual void Write(std::wstring& str) = 0;
+		void Write(std::wstring& str);
 
 		// get something from user until enter
-		virtual wstring ReadLine() = 0;
+		wstring ReadLine();
 	};
 }

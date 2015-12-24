@@ -20,19 +20,13 @@ namespace viva
 		// create texture from byte array
 		virtual Texture* CreateTexture(const Pixel data[], const Size& size, wstring& name) = 0;
 
-		// create sprite from file
-		virtual Sprite* CreateSprite(const wstring& filepath) = 0;
+		//// create sprite from file
+		//virtual Sprite* CreateSprite(const wstring& filepath) = 0;
 
-		// create sprite from texture
-		virtual Sprite* CreateSprite(Texture* texture) = 0;
+		//// create sprite from texture
+		//virtual Sprite* CreateSprite(Texture* texture) = 0;
 		
 		// create polygon from list of points
 		virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
-
-		// create vector xyzw
-		virtual Vector* CreateVector(float x, float y, float z, float w) = 0;
-
-		// creates identity matrix
-		virtual Matrix* CreateMatrix() = 0;
 	};
 }

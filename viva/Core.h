@@ -20,7 +20,7 @@ namespace viva
 		static Core& Get();
 
 		// initializes Core object
-		void Initialize(EngineType type, const wstring& title, int clientWidth, int clientHeigth);
+		void Initialize(const wstring& title, int clientWidth, int clientHeigth);
 
 		// starts the engine
 		// gameloop: function called every frame

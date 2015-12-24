@@ -146,37 +146,33 @@
     <ClInclude Include="Console.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="Creator.h" />
-    <ClInclude Include="D3D11Engine.h" />
-    <ClInclude Include="D3D11ShadersRC.h" />
+    <ClInclude Include="Dynamic.h" />
+    <ClInclude Include="Polygon.h" />
+    <ClInclude Include="ShadersRC.h" />
     <ClInclude Include="DrawManager.h" />
-    <ClInclude Include="D3D11Types.h" />
     <ClInclude Include="Engine.h" />
-    <ClInclude Include="Includes.h" />
-    <ClInclude Include="Proto.h" />
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Sprite.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Viva.h" />
-    <ClInclude Include="Win32.h" />
-    <ClInclude Include="Win32Console.h" />
-    <ClInclude Include="Win32Window.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Core.cpp" />
-    <ClCompile Include="D3D11Engine.cpp" />
-    <ClCompile Include="D3D11Types.cpp" />
+    <ClCompile Include="Dynamic.cpp" />
+    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="DrawManager.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Test.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Viva.cpp" />
-    <ClCompile Include="Win32Console.cpp" />
-    <ClCompile Include="Win32Window.cpp" />
+    <ClCompile Include="Console.cpp" />
+    <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

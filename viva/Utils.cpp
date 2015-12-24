@@ -1,4 +1,4 @@
-#include "Proto.h"
+#include "Viva.h"
 
 namespace viva
 {

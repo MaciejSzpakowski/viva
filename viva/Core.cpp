@@ -1,4 +1,4 @@
-#include "Win32.h"
+#include "Viva.h"
 
 namespace viva
 {
@@ -8,15 +8,12 @@ namespace viva
 		return instance;
 	}
 
-	void Core::Initialize(EngineType type, const wstring& title, int clientWidth, int clientHeigth)
+	void Core::Initialize(const wstring& title, int clientWidth, int clientHeigth)
 	{
 		if (initialized)
 			throw std::runtime_error("Core::Initialize()\nEngine is initialized");
 
-		if (type == EngineType::DirectX11)
-			engine = new D3D11Engine(title, clientWidth, clientHeigth);
-		else
-			throw std::runtime_error("Core::Initialize()\nEngine not implemented");
+		engine = new Engine(title, clientWidth, clientHeigth);
 
 		initialized = true;
 	}
