@@ -39,7 +39,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -101,6 +101,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Szpak\Documents\Visual Studio 2015\Projects\viva\viva;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,6 +135,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\Szpak\Documents\Visual Studio 2015\Projects\viva\viva;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,41 +146,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Console.h" />
-    <ClInclude Include="Core.h" />
-    <ClInclude Include="Creator.h" />
-    <ClInclude Include="D3D11Engine.h" />
-    <ClInclude Include="D3D11ShadersRC.h" />
-    <ClInclude Include="DrawManager.h" />
-    <ClInclude Include="D3D11Types.h" />
-    <ClInclude Include="Engine.h" />
-    <ClInclude Include="Includes.h" />
-    <ClInclude Include="Proto.h" />
-    <ClInclude Include="RenderTarget.h" />
-    <ClInclude Include="ResourceManager.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="Types.h" />
-    <ClInclude Include="Utils.h" />
-    <ClInclude Include="Viva.h" />
-    <ClInclude Include="Win32.h" />
-    <ClInclude Include="Win32Console.h" />
-    <ClInclude Include="Win32Window.h" />
-    <ClInclude Include="Window.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Core.cpp" />
-    <ClCompile Include="D3D11Engine.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="core.cpp" />
+    <ClCompile Include="math.cpp" />
+    <ClCompile Include="win32_engine.cpp" />
     <ClCompile Include="D3D11Types.cpp" />
     <ClCompile Include="DrawManager.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="Test.cpp" />
-    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="utils.cpp" />
     <ClCompile Include="Viva.cpp" />
-    <ClCompile Include="Win32Console.cpp" />
-    <ClCompile Include="Win32Window.cpp" />
+    <ClCompile Include="win32_window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="viva\camera.h" />
+    <ClInclude Include="viva\core.h" />
+    <ClInclude Include="viva\Creator.h" />
+    <ClInclude Include="viva\math.h" />
+    <ClInclude Include="viva\win32_engine.h" />
+    <ClInclude Include="viva\D3D11Types.h" />
+    <ClInclude Include="viva\DrawManager.h" />
+    <ClInclude Include="viva\engine.h" />
+    <ClInclude Include="viva\error.h" />
+    <ClInclude Include="viva\Proto.h" />
+    <ClInclude Include="viva\RenderTarget.h" />
+    <ClInclude Include="viva\ResourceManager.h" />
+    <ClInclude Include="viva\Sprite.h" />
+    <ClInclude Include="viva\types.h" />
+    <ClInclude Include="viva\utils.h" />
+    <ClInclude Include="viva\graphics.h" />
+    <ClInclude Include="viva\Win32.h" />
+    <ClInclude Include="viva\win32_window.h" />
+    <ClInclude Include="viva\window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

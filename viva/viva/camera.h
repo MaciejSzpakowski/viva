@@ -1,8 +1,10 @@
 #pragma once
+#include <viva/types.h>
+#include <viva/math.h>
 
 namespace viva
 {
-	class Camera : public Dynamic
+	class Camera
 	{
 	private:
 		Matrix zView;
@@ -18,8 +20,5 @@ namespace viva
 		XMFLOAT2 GetFrustumSize(float z);
 		XMMATRIX GetViewMatrix();
 		XMMATRIX GetProjMatrix();*/
-		void Destroy() override;
-
-		void Transform() override;
 	};
 }

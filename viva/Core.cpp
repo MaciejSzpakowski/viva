@@ -1,48 +1,32 @@
-#include "Win32.h"
+#include <viva/graphics.h>
+#include <viva/win32_engine.h>
 
 namespace viva
 {
-	Core& Core::Get()
-	{
-		static Core instance;
-		return instance;
-	}
+    Core* core;
 
-	void Core::Initialize(EngineType type, const wstring& title, int clientWidth, int clientHeigth)
-	{
-		if (initialized)
-			throw std::runtime_error("Core::Initialize()\nEngine is initialized");
+    Core::Core(const wstring& title, const Size& size, const wstring& path)
+    {
+        viva::core = this;
 
-		if (type == EngineType::DirectX11)
-			engine = new D3D11Engine(title, clientWidth, clientHeigth);
-		else
-			throw std::runtime_error("Core::Initialize()\nEngine not implemented");
+#ifdef _WIN32
+        engine = new Win32Engine(title, size, path);
+#endif // _WIN32
+    }
 
-		initialized = true;
-	}
-
-	void Core::ThrowUninitialized()
-	{
-		if (!initialized)
-			throw std::runtime_error("Engine is not initialized");
-	}
+    Core::~Core()
+    {
+        Destroy();
+    }
 
 	void Core::Destroy()
 	{
-		ThrowUninitialized();
-		initialized = false;
-		engine->Destroy();
-		delete engine;
+        engine->Destroy();
+        core = nullptr;
 	}
 
-	void Core::Run(std::function<void()>& gameloop, std::function<void()> intloop)
+	void Core::Run(const std::function<void()>& gameloop)
 	{
-		ThrowUninitialized();
-		engine->Run(gameloop, intloop);
-	}
-
-	void Core::Draw(const vector<RenderTarget*>& targets, const Camera* camera) const
-	{
-		engine->Draw(targets, camera);
+		engine->Run(gameloop);
 	}
 }

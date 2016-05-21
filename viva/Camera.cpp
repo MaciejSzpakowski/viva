@@ -1,13 +1,13 @@
-#include "Proto.h"
-
-namespace viva
-{
-	void Camera::Transform()
-	{
-	}
-
-	void Camera::Destroy()
-	{
-		delete this;
-	}
-}
+//#include "Proto.h"
+//
+//namespace viva
+//{
+//	void Camera::Transform()
+//	{
+//	}
+//
+//	void Camera::Destroy()
+//	{
+//		delete this;
+//	}
+//}

@@ -1,19 +1,18 @@
-#include "Proto.h"
+#include <viva/utils.h>
+#include <viva/error.h>
+#include <fstream>
 
 namespace viva
 {
-	namespace Utils
+	namespace utils
 	{
-		wstring ReadFileToString(const wstring& filepath)
-		{
-			std::wifstream file(filepath);
-			return wstring((std::istreambuf_iterator<wchar_t>(file)),
-				std::istreambuf_iterator<wchar_t>());
-		}
-
-		std::string ReadFileToString(const std::string& filepath)
+		std::string ReadFileToString(const std::wstring& filepath)
 		{
 			std::ifstream file(filepath);
+
+            if (!file)
+                throw viva::Error("ReadFileToString()", "could not open the file");
+
 			return std::string((std::istreambuf_iterator<char>(file)),
 				std::istreambuf_iterator<char>());
 		}
