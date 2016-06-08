@@ -1,8 +1,6 @@
 #ifdef _WIN32
 
-#include <Windows.h>
-#include <viva/win32_window.h>
-#include <viva/error.h>
+#include <viva/proto.h>
 
 namespace viva
 {

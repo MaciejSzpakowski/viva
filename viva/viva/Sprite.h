@@ -2,7 +2,7 @@
 
 namespace viva
 {
-	class Sprite : public Drawable
+	class Sprite : public Node, public IDrawable
 	{
 	protected:
 		Texture* texture;
@@ -15,11 +15,5 @@ namespace viva
 		TextureFilter GetFilterType() const { return filter; }
 
 		Texture* GetTexture() const { return texture; }
-	};
-
-	class Animation : public Sprite
-	{
-	protected:
-	public:
 	};
 }

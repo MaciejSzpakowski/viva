@@ -1,6 +1,4 @@
-#include <viva/utils.h>
-#include <viva/error.h>
-#include <fstream>
+#include <viva/proto.h>
 
 namespace viva
 {

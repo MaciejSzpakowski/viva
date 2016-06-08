@@ -1,13 +1,4 @@
-#ifdef _WIN32
-
 #pragma once
-#include <viva/engine.h>
-#include <viva/types.h>
-#include <d3d11.h>
-#include <string>
-
-#pragma comment(lib,"d3d11.lib")
-#pragma comment(lib, "D3DCompiler.lib")
 
 namespace viva
 {
@@ -29,6 +20,7 @@ namespace viva
         ID3D11VertexShader* defaultVS;
         ID3D11PixelShader* defaultPS;
         ID3D11PixelShader* defaultPost;
+        ID3D11Buffer* constantBufferVS;
 
         // TIME OBJECT
 		/*double frequency;
@@ -67,5 +59,3 @@ namespace viva
         void render();
 	};
 }
-
-#endif

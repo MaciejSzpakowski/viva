@@ -1,9 +1,6 @@
-#include <viva/win32_engine.h>
-#include <viva/win32_window.h>
-#include <viva/error.h>
-#include <sstream>
-#include <d3dcompiler.h>
-#include <viva/utils.h>
+#ifdef _WIN32
+
+#include <viva/proto.h>
 
 namespace viva
 {
@@ -26,7 +23,7 @@ namespace viva
 	}
 
     Win32Engine::Win32Engine(const wstring& title, const Size& size, const wstring& path)
-		: Engine(path)
+		: Engine(path, size )
 	{
 		HRESULT hr = 0;
 
@@ -43,7 +40,7 @@ namespace viva
 		scd.SampleDesc.Quality = 0;
 		scd.SampleDesc.Count = 1;                               // no anti aliasing
 		scd.Windowed = TRUE;                                    // windowed/full-screen mode
-		//scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;     // alternative fullscreen mode
+		//scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;   // alternative fullscreen mode
 
 		////    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
 		hr = D3D11CreateDeviceAndSwapChain(NULL,
@@ -51,7 +48,7 @@ namespace viva
 			D3D11_SDK_VERSION, &scd, &swapChain, &device, NULL,
 			&context);
 		Checkhr(hr, "D3D11CreateDeviceAndSwapChain()");
-
+        
 		////    BACK BUFFER AS RENDER TARGET, DEPTH STENCIL   ////
 		// get the address of the back buffer
 		ID3D11Texture2D* buf;
@@ -174,12 +171,45 @@ namespace viva
 		prevFrameTime = startTime;
 		gameTime = 0;
 		frameTime = 0;*/
+
+        viva::creator = new Win32Creator(device, context); // device and context have to be initialized
+        viva::drawManager = new DrawManager();
+        viva::camera = new Camera(size);
+
+        //shared vertex shader buffer
+        D3D11_BUFFER_DESC cbbd;
+        ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+        cbbd.Usage = D3D11_USAGE_DEFAULT;
+        cbbd.ByteWidth = sizeof(Matrix);
+        cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        cbbd.CPUAccessFlags = 0;
+        cbbd.MiscFlags = 0;
+        device->CreateBuffer(&cbbd, NULL, &constantBufferVS);
+        context->VSSetConstantBuffers(0, 1, &constantBufferVS);
 	}
 
     void Win32Engine::render()
     {
         float col[4] = { backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A };
         context->ClearRenderTargetView(backBuffer, col);
+
+        //transform
+        Matrix world;
+        Matrix::Multiply(camera->_GetView(), camera->_GetProj(), &world);
+        world.Transpose();
+        context->UpdateSubresource(constantBufferVS, 0, 0, &world, 0, 0);
+        UINT stride = sizeof(Vertex);
+        UINT offset = 0;
+        Win32Polygon* p = static_cast<Win32Polygon*>(drawManager->GetPolygon());
+
+        context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP);
+        context->OMSetRenderTargets(1, &backBuffer, depthStencilView);
+        context->PSSetShader(defaultPS, 0, 0);
+        context->RSSetState(rsWire);
+        context->IASetVertexBuffers(0, 1, p->_GetVertexBufferAddr(), &stride, &offset);
+        context->Draw(p->GetVertexCount(), 0);
+        
         swapChain->Present(0, 0);
     }
 
@@ -339,3 +369,5 @@ namespace viva
 	//	swapChain->Present(0, 0);
 	//}
 }
+
+#endif

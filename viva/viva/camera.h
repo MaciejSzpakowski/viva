@@ -1,24 +1,29 @@
 #pragma once
-#include <viva/types.h>
-#include <viva/math.h>
 
 namespace viva
 {
 	class Camera
 	{
 	private:
-		Matrix zView;
-		Matrix zProj;
-		Matrix zUp;
-		float zNearPlane;
-		float zFarPlane;
-		float zFovAngle;
-		float zAspectRatio;
+        Transform transform;
+		Matrix view;
+		Matrix proj;
+		Vector up;
+		float nearPlane;
+		float farPlane;
+		float fovAngle;
+		float aspectRatio;
 	public:
-		Camera() {}
+        // size: viewport size
+        Camera(const Size& size);
 		/*XMFLOAT3 GetCursorWorldPos(float z);
 		XMFLOAT2 GetFrustumSize(float z);
 		XMMATRIX GetViewMatrix();
 		XMMATRIX GetProjMatrix();*/
+
+        const Matrix& _GetView() const { return view; }
+        const Matrix& _GetProj() const { return proj; }
+
+        void Destroy();
 	};
 }

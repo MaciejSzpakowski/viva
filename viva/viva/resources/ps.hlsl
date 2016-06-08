@@ -15,6 +15,8 @@ struct VS_OUTPUT
 
 float4 main(VS_OUTPUT input) : SV_TARGET
 {
+    return float4(1,1,1,1);
+
     if (input.Col.r == 0)
     {
         float4 result = ObjTexture.Sample(ObjSamplerState, input.TexCoord);

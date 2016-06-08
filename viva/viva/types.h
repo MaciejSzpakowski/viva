@@ -1,8 +1,6 @@
 // structures that are not big enough to have their own file
 #pragma once
 
-#include <string>
-
 namespace viva
 {
 	typedef unsigned char byte;
@@ -23,22 +21,33 @@ namespace viva
 	//	wstring GetName() const { return name; }
 	//};
 
-	//struct Matrix
-	//{
-	//};
+    class IDrawable
+    {
+    public:
+        virtual void _Draw() = 0;
+    };
+
+    struct Point
+    {
+        float X;
+        float Y;
+
+        Point() :X(0), Y(0) {}
+        Point(float x, float y) :X(x), Y(y) {}
+    };
 
 	struct Color
 	{
-		float R, G, B, A;
+        float R;
+        float G;
+        float B;
+        float A;
 
         //  color rgba(0,0,0,0)
 		Color() : R(0), G(0), B(0), A(0) {}
 
         // white = (1,1,1,1)
 		Color(float _r, float _g, float _b, float _a): R(_r), G(_g), B(_b), A(_a) {}
-
-        // white = (255,255,255,255)
-		Color(byte _r, byte _g, byte _b, byte _a) : R(_r / 255.0f), G(_g / 255.0f), B(_b / 255.0f), A(_a / 255.0f) {}
 	};
 
 	//struct Pixel
@@ -56,15 +65,15 @@ namespace viva
 		Size(float _width, float _height) :Width(_width), Height(_height) {}
 	};
 
-	//struct Vertex
-	//{
-	//	float x, y, z;
-	//	float r, g, b;
-	//	float u, v;
-	//	Vertex() {}
-	//	Vertex(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v)
-	//		: x(_x), y(_y), z(_z), r(_r), g(_g), b(_b), u(_u), v(_v) {}
-	//};
+	struct Vertex
+	{
+		float X, Y, Z;
+		float R, G, B;
+		float U, V;
+		Vertex() {}
+		Vertex(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v)
+			: X(_x), Y(_y), Z(_z), R(_r), G(_g), B(_b), U(_u), V(_v) {}
+	};
 
 	//class PixelShader
 	//{
@@ -90,17 +99,17 @@ namespace viva
 	//	WIREFRAME, TEXTURED //, SOLID <-- maybe i can figure it out later
 	//};
 
-	//class Texture : public Resource
-	//{
-	//protected:
-	//	Size size;
-	//public:
-	//	Texture(const wstring& _name):Resource(_name) { }
+	class Texture// : public Resource
+	{
+	protected:
+		Size size;
+	public:
+		Texture(const wstring& _name) { }
 
-	//	virtual void Destroy() = 0;
+		virtual void Destroy() = 0;
 
-	//	Size GetSize() const { return size; }
-	//};
+		Size GetSize() const { return size; }
+	};
 
 	//class Dynamic
 	//{

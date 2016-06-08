@@ -1,11 +1,5 @@
 #pragma once
 
-#ifdef _WIN32
-
-#include <viva/window.h>
-#include <viva/types.h>
-#include <functional>
-
 namespace viva
 {
 	class Win32Window : public Window
@@ -29,5 +23,3 @@ namespace viva
 		void Run(const std::function<void()>& gameloop, const std::function<void()>& intloop);
 	};
 }
-
-#endif

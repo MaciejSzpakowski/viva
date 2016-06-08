@@ -2,7 +2,7 @@
 
 namespace viva
 {
-	struct D3D11PixelShader : public PixelShader
+	/*struct D3D11PixelShader : public PixelShader
 	{
 		ID3D11PixelShader* ps;
 
@@ -58,24 +58,18 @@ namespace viva
 	struct D3D11Matrix : public Matrix
     {
 		DirectX::XMMATRIX matrix;
-	};
+	};*/
 
-	class D3D11Texture : public Texture
+	class Win32Texture : public Texture
 	{
 	private:		
 		ID3D11ShaderResourceView* shaderResource;
 	public:
-		D3D11Texture(const wstring& _name, ID3D11ShaderResourceView* _shaderResource)
+        Win32Texture(const wstring& _name, ID3D11ShaderResourceView* _shaderResource)
 			:Texture(_name)
 		{
 			shaderResource = _shaderResource;
 		}
 		void Destroy() override;
-	};
-
-	class D3D11Animation : public Animation
-	{
-	private:
-	public:
 	};
 }

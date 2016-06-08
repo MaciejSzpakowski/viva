@@ -1,9 +1,13 @@
-#include <viva/graphics.h>
-#include <viva/win32_engine.h>
+#include <viva/proto.h>
 
 namespace viva
 {
+    // global objects for faster access
     Core* core;
+    Engine* engine;
+    Camera* camera;
+    Creator* creator;
+    DrawManager* drawManager;
 
     Core::Core(const wstring& title, const Size& size, const wstring& path)
     {
@@ -12,6 +16,8 @@ namespace viva
 #ifdef _WIN32
         engine = new Win32Engine(title, size, path);
 #endif // _WIN32
+
+        viva::engine = this->engine;
     }
 
     Core::~Core()

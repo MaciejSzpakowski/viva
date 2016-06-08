@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdexcept>
-
 namespace viva
 {
     class Error : public std::runtime_error

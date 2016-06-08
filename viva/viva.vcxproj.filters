@@ -17,15 +17,6 @@
     <ClCompile Include="Viva.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DrawManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderTarget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D3D11Types.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -47,39 +38,39 @@
     <ClCompile Include="math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_creator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_polygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="draw_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="viva\Creator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\D3D11Types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\DrawManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\Proto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\RenderTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="viva\ResourceManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\Sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\Win32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="viva\error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="viva\core.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="viva\engine.h">
@@ -104,6 +95,45 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="viva\math.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\polygon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\creator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\win32_creator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\win32_polygon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\proto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\draw_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\surface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\win32_surface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\win32_sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\win32_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

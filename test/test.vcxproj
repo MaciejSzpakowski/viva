@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{09B23316-A8F6-46D7-9155-0176464C5C37}</ProjectGuid>
+    <ProjectGuid>{93B892B3-4546-4900-8CEF-7251CBDF9AFE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>viva</RootNamespace>
+    <RootNamespace>test</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -39,7 +39,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -87,7 +87,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -100,13 +100,14 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\Szpak\Documents\Visual Studio 2015\Projects\viva\viva;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\Szpak\Documents\Visual Studio 2015\Projects\viva\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,10 +118,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -134,60 +135,17 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Szpak\Documents\Visual Studio 2015\Projects\viva\viva;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="camera.cpp" />
-    <ClCompile Include="core.cpp" />
-    <ClCompile Include="math.cpp" />
-    <ClCompile Include="node.cpp" />
-    <ClCompile Include="win32_polygon.cpp" />
-    <ClCompile Include="transform.cpp" />
-    <ClCompile Include="win32_creator.cpp" />
-    <ClCompile Include="win32_engine.cpp" />
-    <ClCompile Include="win32_types.cpp" />
-    <ClCompile Include="draw_manager.cpp" />
-    <ClCompile Include="win32_sprite.cpp" />
-    <ClCompile Include="win32_surface.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="utils.cpp" />
-    <ClCompile Include="Viva.cpp" />
-    <ClCompile Include="win32_window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="viva\camera.h" />
-    <ClInclude Include="viva\core.h" />
-    <ClInclude Include="viva\creator.h" />
-    <ClInclude Include="viva\math.h" />
-    <ClInclude Include="viva\node.h" />
-    <ClInclude Include="viva\polygon.h" />
-    <ClInclude Include="viva\proto.h" />
-    <ClInclude Include="viva\transform.h" />
-    <ClInclude Include="viva\win32_creator.h" />
-    <ClInclude Include="viva\win32_engine.h" />
-    <ClInclude Include="viva\win32_types.h" />
-    <ClInclude Include="viva\draw_manager.h" />
-    <ClInclude Include="viva\engine.h" />
-    <ClInclude Include="viva\error.h" />
-    <ClInclude Include="viva\surface.h" />
-    <ClInclude Include="viva\ResourceManager.h" />
-    <ClInclude Include="viva\sprite.h" />
-    <ClInclude Include="viva\types.h" />
-    <ClInclude Include="viva\utils.h" />
-    <ClInclude Include="viva\win32_polygon.h" />
-    <ClInclude Include="viva\win32_sprite.h" />
-    <ClInclude Include="viva\win32_surface.h" />
-    <ClInclude Include="viva\win32_window.h" />
-    <ClInclude Include="viva\window.h" />
+    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

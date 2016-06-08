@@ -1,8 +1,5 @@
 #pragma once
 
-#include <viva/types.h>
-#include <viva/engine.h>
-
 namespace viva
 {
 	class Core
