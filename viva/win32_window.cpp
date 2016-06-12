@@ -1,6 +1,7 @@
 #ifdef _WIN32
 
-#include <viva/proto.h>
+#include <viva/viva.h>
+#include <viva/win32/win32.h>
 
 namespace viva
 {
@@ -102,7 +103,7 @@ namespace viva
 		return handle;
 	}
 
-	void Win32Window::Destroy()
+	void Win32Window::_Destroy()
 	{
         DestroyWindow(handle);
         UnregisterClass(L"myWindowClass", GetModuleHandle(0));

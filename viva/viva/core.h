@@ -2,38 +2,20 @@
 
 namespace viva
 {
+    // Main viva object. Viva starts and ends here.
 	class Core
 	{        
 	private:
-		Engine* engine;
+        Engine* engine;
+
 	public:
-        // path is the default path, engine will look for default shaders there
+        // Initialize viva.
+        // title: window title
+        // size: size of the viewport
+        // path: the default path, engine will look for default shaders there
         Core(const wstring& title, const Size& size, const wstring& path = L"");
         
-		// starts the engine
-		// gameloop: function called every frame
-        void Run(const std::function<void()>& gameloop = []() {});
-
-		//void Draw(const vector<RenderTarget*>& targets, const Camera* camera) const;
-
-		// completely destroys core object
-		void Destroy();
-
-        Engine* GetEngine() const
-        {
-            return engine;
-        }
-
-        void Exit()
-        {
-            engine->Exit();
-        }
-
-		void OpenConsole() { engine->OpenConsole(); }
-        void CloseConsole() { engine->CloseConsole(); }
-
-		//Creator* GetCreator() { return engine; }
-
+        // Destructor.
         ~Core();
 	};
 }

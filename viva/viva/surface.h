@@ -2,6 +2,7 @@
 
 namespace viva
 {
+    // Special drawable where all of its objects are drawn on it.
 	class Surface
 	{
 	protected:
@@ -11,14 +12,25 @@ namespace viva
 		//vector<BitmapText*> texts;
 
 	public:
+        // Ctor.
         Surface() {  }
 
-        void AddPolygon(Polygon* p) { drawables.push_back(p); }
+        // Insert drawable onto this surface.
+        // d: drawable to add
+        void Add(IDrawable* d) { drawables.push_back(d); }
 
+        // Draw all objects this surface contains.
         virtual void _DrawAll() = 0;
 
-		// draw all objects that belong to the render target
-		//virtual void Draw() = 0;
+		// Draw surface itself.
+		virtual void _Draw() = 0;
+
+        // Get pixel shader.
+        virtual PixelShader* GetPixelShader() = 0;
+
+        // Set pixel shader.
+        // ps: ps
+        virtual void SetPixelShader(PixelShader* ps) = 0;
 
 		//// move to the top of the stack
 		//void MoveToTop();
@@ -38,7 +50,7 @@ namespace viva
 		// unsed by draw manager to remove
 		////void Remove();
 
-		// dstroy the surface and all objects on it
+		// Destroy the surface and all drawables it contains.
 		virtual void Destroy() = 0;
 	};
 }

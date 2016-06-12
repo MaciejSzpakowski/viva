@@ -4,6 +4,7 @@
 
 namespace viva
 {
+    // Transform object responsible for position, rotation, scale etc. of its owner.
     class Transform
     {
     private:
@@ -22,6 +23,7 @@ namespace viva
         Vector scaleAcceleration;
         float sizeAcceleration;
     public:
+        // Ctor.
         Transform();
 
         void SetPosition(float x, float y, float z);
@@ -37,8 +39,14 @@ namespace viva
             return position;
         }
 
+        // Simply position + (x,y,z).
+        // x: offset x
+        // y: offset y
+        // z: offset z
         void Translate(float x, float y, float z);
 
+        // Simply position + v.
+        // v: offset
         void Translate(const Vector& v);
     };
 }

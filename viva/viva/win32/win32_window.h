@@ -15,7 +15,7 @@ namespace viva
 
 		void* Win32Window::GetHandle() const override;
 
-		void Win32Window::Destroy() override;
+		void Win32Window::_Destroy() override;
 
 		// start win32 message pump
 		// gameloop: user's function that runs every frame

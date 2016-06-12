@@ -1,6 +1,5 @@
 cbuffer cbBufferPS
 {
-    float4 color;
 };
 
 Texture2D ObjTexture;
@@ -17,5 +16,5 @@ float4 main(VS_OUTPUT input) : SV_TARGET
 {
     float4 result = ObjTexture.Sample(ObjSamplerState, input.TexCoord);
     clip(result.a - 0.001f);
-    return result * color;
+    return result;
 }

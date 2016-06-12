@@ -2,11 +2,17 @@
 
 namespace viva
 {
+    // Window where everything is being drawn.
 	class Window
 	{
 	public:
-		Window() {}
-		virtual void Destroy() = 0;
+        // Ctor.
+		Window(){}
+
+        // Destroy window.
+		virtual void _Destroy() = 0;
+
+        // Get native handle.
 		virtual void* GetHandle() const = 0;
 	};
 }

@@ -108,6 +108,9 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -154,13 +157,11 @@
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="win32_creator.cpp" />
     <ClCompile Include="win32_engine.cpp" />
-    <ClCompile Include="win32_types.cpp" />
-    <ClCompile Include="draw_manager.cpp" />
     <ClCompile Include="win32_sprite.cpp" />
+    <ClCompile Include="draw_manager.cpp" />
     <ClCompile Include="win32_surface.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="utils.cpp" />
-    <ClCompile Include="Viva.cpp" />
     <ClCompile Include="win32_window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,11 +171,8 @@
     <ClInclude Include="viva\math.h" />
     <ClInclude Include="viva\node.h" />
     <ClInclude Include="viva\polygon.h" />
-    <ClInclude Include="viva\proto.h" />
+    <ClInclude Include="viva\viva.h" />
     <ClInclude Include="viva\transform.h" />
-    <ClInclude Include="viva\win32_creator.h" />
-    <ClInclude Include="viva\win32_engine.h" />
-    <ClInclude Include="viva\win32_types.h" />
     <ClInclude Include="viva\draw_manager.h" />
     <ClInclude Include="viva\engine.h" />
     <ClInclude Include="viva\error.h" />
@@ -183,11 +181,27 @@
     <ClInclude Include="viva\sprite.h" />
     <ClInclude Include="viva\types.h" />
     <ClInclude Include="viva\utils.h" />
-    <ClInclude Include="viva\win32_polygon.h" />
-    <ClInclude Include="viva\win32_sprite.h" />
-    <ClInclude Include="viva\win32_surface.h" />
-    <ClInclude Include="viva\win32_window.h" />
+    <ClInclude Include="viva\win32\win32.h" />
+    <ClInclude Include="viva\win32\win32_creator.h" />
+    <ClInclude Include="viva\win32\win32_engine.h" />
+    <ClInclude Include="viva\win32\win32_polygon.h" />
+    <ClInclude Include="viva\win32\win32_sprite.h" />
+    <ClInclude Include="viva\win32\win32_surface.h" />
+    <ClInclude Include="viva\win32\win32_types.h" />
+    <ClInclude Include="viva\win32\win32_window.h" />
     <ClInclude Include="viva\window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="viva\resources\post.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="viva\resources\ps.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="viva\resources\vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

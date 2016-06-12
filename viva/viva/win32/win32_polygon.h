@@ -8,12 +8,18 @@ namespace viva
     {
     private:
         ID3D11Buffer* vertexBuffer;
+        Win32PixelShader* ps;
     public:
         Win32Polygon(ID3D11Buffer* vertexbuffer, int count);
 
         void Destroy() override;
 
-        ID3D11Buffer** _GetVertexBufferAddr() { return &vertexBuffer; }
+        PixelShader* GetPixelShader() override
+        {
+            return ps;
+        }
+
+        void SetPixelShader(PixelShader* _ps) { ps = (Win32PixelShader*)_ps; }
         
         void _Draw() override;
 

@@ -1,12 +1,15 @@
 #ifdef _WIN32
 
-#include <viva/proto.h>
+#include <viva/viva.h>
+#include <viva/win32/win32.h>
 
 namespace viva
 {
     void intloop()
     {
     }
+
+    D3D11 d3d;
 
 	void Checkhr(HRESULT hr, const char* function)
 	{
@@ -22,15 +25,33 @@ namespace viva
         throw viva::Error(function, message.str().c_str());
 	}
 
+    ID3D11Buffer* CreateConstantBuffer(UINT size)
+    {
+        ID3D11Buffer* cb;
+
+        D3D11_BUFFER_DESC cbbd;
+        ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
+        cbbd.Usage = D3D11_USAGE_DEFAULT;
+        cbbd.ByteWidth = size;
+        cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        cbbd.CPUAccessFlags = 0;
+        cbbd.MiscFlags = 0;
+        d3d.device->CreateBuffer(&cbbd, NULL, &cb);
+
+        return cb;
+    }
+
     Win32Engine::Win32Engine(const wstring& title, const Size& size, const wstring& path)
-		: Engine(path, size )
-	{
+        : Engine(path, size)
+    {
+        window = new Win32Window(title.c_str(), size);
+    }
+
+    void Win32Engine::_Init()
+    {
 		HRESULT hr = 0;
 
-		window = new Win32Window(title.c_str(), size);
-
-		//// *********** PIPELINE SETUP STARTS HERE *********** ////
-		// create a struct to hold information about the swap chain
+        ////    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
 		DXGI_SWAP_CHAIN_DESC scd;
 		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
 		scd.BufferCount = 1;                                    // one back buffer
@@ -41,27 +62,24 @@ namespace viva
 		scd.SampleDesc.Count = 1;                               // no anti aliasing
 		scd.Windowed = TRUE;                                    // windowed/full-screen mode
 		//scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;   // alternative fullscreen mode
-
-		////    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
+        		
 		hr = D3D11CreateDeviceAndSwapChain(NULL,
 			D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, NULL, NULL,
-			D3D11_SDK_VERSION, &scd, &swapChain, &device, NULL,
-			&context);
+			D3D11_SDK_VERSION, &scd, &d3d.swapChain, &d3d.device, NULL,
+			&d3d.context);
 		Checkhr(hr, "D3D11CreateDeviceAndSwapChain()");
         
 		////    BACK BUFFER AS RENDER TARGET, DEPTH STENCIL   ////
-		// get the address of the back buffer
 		ID3D11Texture2D* buf;
-		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&buf);
+        d3d.swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&buf);
 		// use the back buffer address to create the render target
-		hr = device->CreateRenderTargetView(buf, NULL, &backBuffer);
+		hr = d3d.device->CreateRenderTargetView(buf, NULL, &d3d.backBuffer);
 		Checkhr(hr, "CreateRenderTargetView()");
 		buf->Release();
 
-		//Describe our Depth/Stencil Buffer
 		D3D11_TEXTURE2D_DESC depthStencilDesc;
-		depthStencilDesc.Width = (UINT)size.Width;
-		depthStencilDesc.Height = (UINT)size.Height;
+		depthStencilDesc.Width = (UINT)clientSize.Width;
+		depthStencilDesc.Height = (UINT)clientSize.Height;
 		depthStencilDesc.MipLevels = 1;
 		depthStencilDesc.ArraySize = 1;
 		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -72,10 +90,9 @@ namespace viva
 		depthStencilDesc.CPUAccessFlags = 0;
 		depthStencilDesc.MiscFlags = 0;
 
-		//Create the Depth/Stencil View
-		hr = device->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilBuffer);
+		hr = d3d.device->CreateTexture2D(&depthStencilDesc, NULL, &d3d.depthStencilBuffer);
 		Checkhr(hr, "CreateTexture2D() for depthStencilDesc");
-		hr = device->CreateDepthStencilView(depthStencilBuffer, NULL, &depthStencilView);
+		hr = d3d.device->CreateDepthStencilView(d3d.depthStencilBuffer, NULL, &d3d.depthStencil);
 		Checkhr(hr, "CreateDepthStencilView()");
 
 		////   VIEWPORT    ////
@@ -84,32 +101,25 @@ namespace viva
 		ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = (float)size.Width;
-		viewport.Height = (float)size.Height;
+		viewport.Width = (float)clientSize.Width;
+		viewport.Height = (float)clientSize.Height;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
-		context->RSSetViewports(1, &viewport);
+        d3d.context->RSSetViewports(1, &viewport);
 
-		////    VS and PS    ////
-		//default shaders
+		////    VS   ////
 		ID3D10Blob *vs; //release vs after CreateInputLayout()
 						//alternative to loading shader from cso file
-						//hr = D3DCompileFromFile(L"VertexShader.hlsl", 0, 0, "main", "vs_5_0", 0, 0, &vs, 0); CHECKHR();
-        std::string str = utils::ReadFileToString(defaultPath + L"vs.hlsl");
-        hr = D3DCompile(str.c_str(), str.length(), 0, 0, 0, "main", "vs_5_0", 0, 0, &vs, 0);
+        std::string str = util::ReadFileToString(defaultPath + L"vs.hlsl");
+        hr = D3DCompile(str.c_str(), str.length(), 0, 0, 0, "main", "vs_5_0", D3DCOMPILE_DEBUG, 0, &vs, 0);
 		Checkhr(hr, "D3DCompile() vs");
-		hr = device->CreateVertexShader(vs->GetBufferPointer(), vs->GetBufferSize(), 0,
-			&defaultVS);
+		hr = d3d.device->CreateVertexShader(vs->GetBufferPointer(), vs->GetBufferSize(), 0,
+			&d3d.defaultVS);
         Checkhr(hr, "CreateVertexShader()");
-		context->VSSetShader(defaultVS, 0, 0);
-		Checkhr(hr, "CreateVertexShader()");
-        str = utils::ReadFileToString(defaultPath + L"ps.hlsl");
-		defaultPS = CreatePixelShaderFromString(str);
-        str = utils::ReadFileToString(defaultPath + L"post.hlsl");
-		defaultPost = CreatePixelShaderFromString(str);
+        d3d.context->VSSetShader(d3d.defaultVS, 0, 0);
+		Checkhr(hr, "CreateVertexShader()");        
 
 		//    INPUT LAYOUT    ////
-		// defaul input layout
 		D3D11_INPUT_ELEMENT_DESC ied[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,
@@ -121,11 +131,11 @@ namespace viva
 			//if you need to pass something on your own to PS or VS per vertex
 			//{ "SOME_MORE_DATA", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
-		hr = device->CreateInputLayout(ied, 3, vs->GetBufferPointer(), vs->GetBufferSize(),
-			&layout);
+		hr = d3d.device->CreateInputLayout(ied, 3, vs->GetBufferPointer(), vs->GetBufferSize(),
+			&d3d.layout);
 		Checkhr(hr, "CreateInputLayout()");
 		vs->Release();
-		context->IASetInputLayout(layout);
+        d3d.context->IASetInputLayout(d3d.layout);
 
 		///    BLEND STATE    ////
 		D3D11_BLEND_DESC blendDesc;
@@ -142,24 +152,51 @@ namespace viva
         rtbd.RenderTargetWriteMask = D3D10_COLOR_WRITE_ENABLE_ALL;
         blendDesc.AlphaToCoverageEnable = false;
         blendDesc.RenderTarget[0] = rtbd;
-		hr = device->CreateBlendState(&blendDesc, &blendState);
+		hr = d3d.device->CreateBlendState(&blendDesc, &d3d.blendState);
 		Checkhr(hr, "CreateBlendState()");
 
 		////    RASTERIZERS     ////
-
 		D3D11_RASTERIZER_DESC rd;
 		ZeroMemory(&rd, sizeof(rd));
 		rd.FillMode = D3D11_FILL_WIREFRAME;
 		rd.CullMode = D3D11_CULL_NONE;
-		hr = device->CreateRasterizerState(&rd, &rsWire);
+		hr = d3d.device->CreateRasterizerState(&rd, &d3d.rsWire);
 		Checkhr(hr, "CreateRasterizerState()");
 		rd.FillMode = D3D11_FILL_SOLID;
 		rd.CullMode = D3D11_CULL_FRONT;
-		hr = device->CreateRasterizerState(&rd, &rsSolid);
+		hr = d3d.device->CreateRasterizerState(&rd, &d3d.rsSolid);
 		Checkhr(hr, "CreateRasterizerState()");
+        
+        ////    SAMPLERS    //////
+        D3D11_SAMPLER_DESC sampDesc;
+        ZeroMemory(&sampDesc, sizeof(sampDesc));
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+        sampDesc.MinLOD = 0;
+        sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+        d3d.device->CreateSamplerState(&sampDesc, &d3d.samplerPoint);
+        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        d3d.device->CreateSamplerState(&sampDesc, &d3d.samplerLinear);
 
-		//// *********** PIPELINE SETUP ENDS HERE *********** ////
-		
+        //// SO FAR ONLY INDEX BUFFER ////
+        vector<int> indices({ 0, 1, 2, 0, 2, 3, });
+
+        D3D11_BUFFER_DESC indexBufferDesc;
+        ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
+        indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        indexBufferDesc.ByteWidth = sizeof(int) * 6;
+        indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        indexBufferDesc.CPUAccessFlags = 0;
+        indexBufferDesc.MiscFlags = 0;
+
+        D3D11_SUBRESOURCE_DATA srd;
+        srd.pSysMem = indices.data();
+        d3d.device->CreateBuffer(&indexBufferDesc, &srd, &d3d.indexBuffer);
+        d3d.context->IASetIndexBuffer(d3d.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        		
 		//timer
 		/*LARGE_INTEGER li;
 		if (!QueryPerformanceFrequency(&li))
@@ -172,70 +209,96 @@ namespace viva
 		gameTime = 0;
 		frameTime = 0;*/
 
-        viva::creator = new Win32Creator(device, context); // device and context have to be initialized
-        viva::drawManager = new DrawManager();
-        viva::camera = new Camera(size);
 
-        //shared vertex shader buffer
-        D3D11_BUFFER_DESC cbbd;
-        ZeroMemory(&cbbd, sizeof(D3D11_BUFFER_DESC));
-        cbbd.Usage = D3D11_USAGE_DEFAULT;
-        cbbd.ByteWidth = sizeof(Matrix);
-        cbbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        cbbd.CPUAccessFlags = 0;
-        cbbd.MiscFlags = 0;
-        device->CreateBuffer(&cbbd, NULL, &constantBufferVS);
-        context->VSSetConstantBuffers(0, 1, &constantBufferVS);
+        //// GLOBALS ////
+        viva::creator = new Win32Creator();
+                
+        //////   PS    ///////
+        d3d.defaultPS = (Win32PixelShader*)creator->CreatePixelShader(defaultPath + L"ps.hlsl");
+        d3d.defaultPost = (Win32PixelShader*)creator->CreatePixelShader(defaultPath + L"post.hlsl");
+
+        viva::drawManager = new DrawManager();
+        viva::camera = new Camera(clientSize);
+
+        ///// CONSTANT BUFFERS ///////
+        d3d.constantBufferVS = CreateConstantBuffer(sizeof(Matrix));
+        d3d.context->VSSetConstantBuffers(0, 1, &d3d.constantBufferVS);
+
+        d3d.constantBufferUV = CreateConstantBuffer(sizeof(float) * 2);
+        d3d.context->VSSetConstantBuffers(1, 1, &d3d.constantBufferUV);
+
+        d3d.constantBufferPS = CreateConstantBuffer(sizeof(Color));
+        d3d.context->PSSetConstantBuffers(0, 1, &d3d.constantBufferPS);
+
+        d3d.constantBufferPSExtra = CreateConstantBuffer(16);
+        d3d.context->PSSetConstantBuffers(1, 1, &d3d.constantBufferPSExtra);
+        
+        ///// SQUARE VERTEX BUFFER //////
+        vector<Vertex> v({
+            Vertex(-1.0f, -1.0f, 0, 0, 0, 0, 0, 1),
+            Vertex(1.0f, -1.0f, 0, 0, 0, 0, 1, 1),
+            Vertex(1.0f, 1.0f, 0, 0, 0, 0, 1, 0),
+            Vertex(-1.0f, 1.0f, 0, 0, 0, 0, 0, 0) });
+
+        D3D11_BUFFER_DESC vertexBufferDesc;
+        ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
+        vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        vertexBufferDesc.ByteWidth = sizeof(Vertex) * 4;
+        vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        vertexBufferDesc.CPUAccessFlags = 0;
+        vertexBufferDesc.MiscFlags = 0;
+
+        D3D11_SUBRESOURCE_DATA vertexBufferData;
+        ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
+        vertexBufferData.pSysMem = v.data();
+        d3d.device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &d3d.vertexBuffer);
 	}
 
-    void Win32Engine::render()
+    void Win32Engine::Activity()
     {
-        float col[4] = { backgroundColor.R, backgroundColor.G, backgroundColor.B, backgroundColor.A };
-        context->ClearRenderTargetView(backBuffer, col);
+        // render
+        drawManager->_DrawNodes();
 
-        //transform
-        Matrix world;
-        Matrix::Multiply(camera->_GetView(), camera->_GetProj(), &world);
-        world.Transpose();
-        context->UpdateSubresource(constantBufferVS, 0, 0, &world, 0, 0);
-        UINT stride = sizeof(Vertex);
-        UINT offset = 0;
-        Win32Polygon* p = static_cast<Win32Polygon*>(drawManager->GetPolygon());
+        // this snippet is here because drawmanager is front end/generic non win32 specific
+        float col[4] = { backgroundColor.R,backgroundColor.G,backgroundColor.B,backgroundColor.A };
+        d3d.context->ClearRenderTargetView(d3d.backBuffer, col);
+        d3d.context->ClearDepthStencilView(d3d.depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        d3d.context->OMSetRenderTargets(1, &d3d.backBuffer, d3d.depthStencil);
+        d3d.context->RSSetState(d3d.rsSolid);
+        d3d.context->PSSetSamplers(0, 1, &d3d.samplerPoint);
+        Matrix t;
+        Matrix::Identity(&t);
+        d3d.context->UpdateSubresource(d3d.constantBufferVS, 0, NULL, &t, 0, 0);
 
-        context->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-        context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP);
-        context->OMSetRenderTargets(1, &backBuffer, depthStencilView);
-        context->PSSetShader(defaultPS, 0, 0);
-        context->RSSetState(rsWire);
-        context->IASetVertexBuffers(0, 1, p->_GetVertexBufferAddr(), &stride, &offset);
-        context->Draw(p->GetVertexCount(), 0);
+        drawManager->_DrawSurfaces();
         
-        swapChain->Present(0, 0);
+        d3d.swapChain->Present(0, 0);
     }
 
-	void Win32Engine::Destroy()
+	void Win32Engine::_Destroy()
 	{
-        blendState->Release();
-        layout->Release();
-        rsSolid->Release();
-        rsWire->Release();
-        defaultVS->Release();
-        defaultPS->Release();
-        defaultPost->Release();
-        depthStencilBuffer->Release();
-        depthStencilView->Release();
-        backBuffer->Release();
-        swapChain->Release();
-        context->Release();
-        device->Release();
+        d3d.vertexBuffer->Release();
+        d3d.blendState->Release();
+        d3d.layout->Release();
+        d3d.rsSolid->Release();
+        d3d.rsWire->Release();
+        d3d.defaultVS->Release();
+        d3d.defaultPS->Destroy();
+        d3d.defaultPost->Destroy();
+        d3d.depthStencilBuffer->Release();
+        d3d.depthStencil->Release();
+        d3d.backBuffer->Release();
+        d3d.swapChain->Release();
+        d3d.context->Release();
+        d3d.device->Release();
 
-		window->Destroy();
+		window->_Destroy();
 		delete this;
 	}
 
 	void Win32Engine::Run(const std::function<void()>& gameloop)
 	{ 
-        static_cast<Win32Window*>(window)->Run(gameloop, [&]() {this->render(); });
+        static_cast<Win32Window*>(window)->Run(gameloop, [&]() {Activity(); });
 	}
 
     void Win32Engine::Exit()
@@ -243,131 +306,18 @@ namespace viva
         PostMessage((HWND)window->GetHandle(), WM_CLOSE, 0, 0);
     }
 
-	//PixelShader* D3D11Engine::CreatePixelShaderFromFile(const wstring& filepath, void* args)
-	//{
-	//	auto file = Utils::ReadFileToString(filepath);
-	//	return CreatePixelShaderFromString(std::string(file.begin(), file.end()).c_str(), args);
-	//}
-
-	//PixelShader* D3D11Engine::CreatePixelShaderFromString(const char* str, void* args)
-	//{
-	//	ID3D11PixelShader* ps;
-	//	ID3D10Blob *blob;
-	//	HRESULT hr;
-
-	//	hr = D3DCompile(str, strlen(str), 0, 0, 0, ((const char**)args)[0], ((const char**)args)[1], 0, 0, &blob, 0);
-	//	Checkhr(hr, "D3DCompile() in D3D11Engine::CreatePixelShaderFromString()");
-	//	hr = device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), 0, &ps);
-	//	Checkhr(hr, "CreatePixelShader() in D3D11Engine::CreatePixelShaderFromString()");
-	//	ps->Release();
-
-	//	return new D3D11PixelShader(ps);
-	//}
-
-	//RenderTarget* D3D11Engine::CreateRenderTarget()
-	//{
-	//	HRESULT hr;
-	//	D3D11_TEXTURE2D_DESC textureDesc;
-	//	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	//	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-
-	//	ID3D11Texture2D* tex;
-	//	ZeroMemory(&textureDesc, sizeof(textureDesc));
-	//	textureDesc.Width = (UINT)size.width;
-	//	textureDesc.Height = (UINT)size.height;
-	//	textureDesc.MipLevels = 1;
-	//	textureDesc.ArraySize = 1;
-	//	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	//	textureDesc.SampleDesc.Count = 1;
-	//	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	//	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	//	textureDesc.CPUAccessFlags = 0;
-	//	textureDesc.MiscFlags = 0;
-	//	hr = device->CreateTexture2D(&textureDesc, NULL, &tex);
-	//	Checkhr(hr, "CreatePixelShader() in D3D11Engine::CreateRenderTarget()");
-
-	//	ID3D11RenderTargetView* rtv;
-	//	renderTargetViewDesc.Format = textureDesc.Format;
-	//	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	//	renderTargetViewDesc.Texture2D.MipSlice = 0;
-	//	hr = device->CreateRenderTargetView(tex, &renderTargetViewDesc, &rtv);
-	//	Checkhr(hr, "CreatePixelShader() in D3D11Engine::CreateRenderTarget()");
-
-	//	ID3D11ShaderResourceView* srv;
-	//	shaderResourceViewDesc.Format = textureDesc.Format;
-	//	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	//	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	//	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-	//	hr = device->CreateShaderResourceView(tex, &shaderResourceViewDesc, &srv);
-	//	Checkhr(hr, "CreateShaderResourceView() in D3D11Engine::CreateRenderTarget()");
-
-	//	return new D3D11RenderTarget(tex, rtv, srv);
-	//}
-
-	//Sprite* D3D11Engine::CreateSprite(const wstring& filepath)
-	//{
-	//	return new D3D11Sprite();
-	//}
-
-	//Sprite* D3D11Engine::CreateSprite(Texture* texture)
-	//{
-	//	return new D3D11Sprite();
-	//}
-
-	//Texture* D3D11Engine::CreateTexture(const wstring& filepath, bool cached)
-	//{
-	//	return new D3D11Texture(filepath,nullptr);
-	//}
-
-    ID3D11PixelShader* Win32Engine::CreatePixelShaderFromString(const std::string& str, const char* target)
+    void Win32Engine::OpenConsole()
     {
-        ID3D11PixelShader* result;
-
-        ID3D10Blob *ps;
-        HRESULT hr = D3DCompile(str.c_str(), str.length(), 0, 0, 0, "main", target, 0, 0, &ps, 0);
-
-        if (hr != 0)
-            throw Error("D3DCompile()","Error compiling pixel shader");
-
-        hr = device->CreatePixelShader(ps->GetBufferPointer(), ps->GetBufferSize(), 0, &result);
-        Checkhr(hr, "CreatePixelShader()");
-        ps->Release();
-        return result;
+        AllocConsole();
+        SetConsoleTitle(L"Console");
+        freopen("CONOUT$", "w", stdout);
+        freopen("CONIN$", "r", stdin);
     }
 
-	//Texture* D3D11Engine::CreateTexture(const Pixel data[], const Size& size, wstring& name)
-	//{
-	//	return new D3D11Texture(name, nullptr);
-	//}
-
-	//void D3D11Engine::Draw(const vector<RenderTarget*>& targets, const Camera* camera)
-	//{
-	//	float col[4] = { backgroundColor.r, backgroundColor.g, 
-	//		backgroundColor.b, backgroundColor.a};
-
-	//	for (auto t : targets)
-	//		t->Draw();
-
-	//	context->ClearRenderTargetView(backBuffer, col);
-	//	context->ClearDepthStencilView(depthStencilView,
-	//		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	//	context->OMSetRenderTargets(1, &backBuffer, depthStencilView);
-
-	//	for (auto t : targets)
-	//	{
-	//		/*zRenderTargetTransform(i);
-	//		Core->zContext->PSSetShader(zRenderTargets[i]->PixelShader, 0, 0);
-	//		zRenderTargets[i]->zSprite->zDraw();*/
-	//	}
-
-	//	//debug text
-	//	//context->PSSetShader(Core->zDefaultPS, 0, 0);
-	//	//DebugManager->Flush();
-	//	//if (DebugManager->zDebugText->Text != L"")
-	//	//	DebugManager->zDebugText->zDraw();
-
-	//	swapChain->Present(0, 0);
-	//}
+    void Win32Engine::CloseConsole()
+    {
+        FreeConsole();
+    }
 }
 
 #endif

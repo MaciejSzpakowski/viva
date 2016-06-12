@@ -2,18 +2,22 @@
 
 namespace viva
 {
-	class Sprite : public Node, public IDrawable
+    // Drawable picture.
+	class Sprite : public Node, public IDrawable, public IColorable
 	{
 	protected:
-		Texture* texture;
 		TextureFilter filter;
 	public:
+        // Ctor.
 		Sprite() {}
 
+        // Set filter type.
 		void SetFilterType(TextureFilter _filter) { filter = _filter; }
 
+        // Get filter type.
 		TextureFilter GetFilterType() const { return filter; }
 
-		Texture* GetTexture() const { return texture; }
+        // Get texture associated with this sprite. Sprites can share a texture.
+        virtual Texture* GetTexture() = 0;
 	};
 }

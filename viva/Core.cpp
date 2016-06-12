@@ -1,13 +1,14 @@
-#include <viva/proto.h>
+#include <viva/viva.h>
+#include <viva/win32/win32.h>
 
 namespace viva
 {
     // global objects for faster access
-    Core* core;
-    Engine* engine;
-    Camera* camera;
-    Creator* creator;
-    DrawManager* drawManager;
+    Core* core = nullptr;
+    Engine* engine = nullptr;
+    Camera* camera = nullptr;
+    Creator* creator = nullptr;
+    DrawManager* drawManager = nullptr;
 
     Core::Core(const wstring& title, const Size& size, const wstring& path)
     {
@@ -18,21 +19,17 @@ namespace viva
 #endif // _WIN32
 
         viva::engine = this->engine;
+        engine->_Init();
     }
 
     Core::~Core()
     {
-        Destroy();
-    }
+        engine->_Destroy();
 
-	void Core::Destroy()
-	{
-        engine->Destroy();
         core = nullptr;
-	}
-
-	void Core::Run(const std::function<void()>& gameloop)
-	{
-		engine->Run(gameloop);
-	}
+        engine = nullptr;
+        camera = nullptr;
+        creator = nullptr;
+        drawManager = nullptr;
+    }
 }

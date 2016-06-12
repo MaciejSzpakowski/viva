@@ -1,11 +1,11 @@
-#include <viva/proto.h>
+#include <viva/viva.h>
 
 namespace viva
 {
     Camera::Camera(const Size& size)
     {
         nearPlane = 0.1f;
-        farPlane = 1000.0f;
+        farPlane = 50.0f;
         fovAngle = 0.4f*3.14f; //72 deg
                                //Camera information
         transform.SetPosition(0, 0, -20);

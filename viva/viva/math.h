@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma message ("DirectXMath.h is temporary")
 #include <DirectXMath.h>
 
 namespace viva

@@ -2,6 +2,7 @@
 
 namespace viva
 {
+    // 1000 MHP
 	class Engine
 	{
 	protected:
@@ -9,46 +10,62 @@ namespace viva
 		Window* window;
 		Color backgroundColor;
 		Size clientSize;
-       /* Creator creator;
-		
-		PixelShader* defaultPixelShader;
-		PixelShader* defaultPostProcessing;
-		VertexShader* defaultVertexShader;*/
+
+        // Internal gameloop.
+        virtual void Activity() = 0;
 	public:
+        // Ctor.
+        // path: used to load some resources
+        // size: viewport size
         Engine(const std::wstring& path, const Size& size) :backgroundColor(0, 0.25f, 0.5f, 1),
         defaultPath(path),clientSize(size){}
 
-        void* GetWindowHandle() { window->GetHandle(); }
-		virtual void Destroy() = 0;
-		//
-		//// start the engine
-		//// gameloop: function called every frame
-		virtual void Run(const std::function<void()>& gameloop) = 0;
+        // Post constructor.
+        virtual void _Init() = 0;
 
+        // Get native window handle. Useful if you want to do something platform specific.
+        void* GetWindowHandle() { window->GetHandle(); }
+
+        // Completely destroys engine.
+		virtual void _Destroy() = 0;
+
+		// Start engine (game loop).
+		// gameloop: user's function called every frame
+        virtual void Run(const std::function<void()>& gameloop = []() {}) = 0;
+
+        // Get background color. Background color is the color being drawn if there's nothing there.
 		const Color& GetBackgroundColor() const { return backgroundColor; }
         
+        // Set background color. Background color is the color being drawn if there's nothing there.
+        // color: the color
 		void SetBackgroundColor(const Color& color) { backgroundColor = color; }
 
+        // Get default path.
         const std::wstring& GetDefaultPath() const
         {
             return defaultPath;
         }
 
+        // Get viewport/client size. Client is the drawing area in window.
         const Size& GetClientSize() const
         {
             return clientSize;
         }
 
+        // Set default path.
+        // path: the path
         void SetDefaultPath(const std::wstring& path)
         {
             defaultPath = path;
         }
 
+        // Stop engine. Makes Run method return.
         virtual void Exit() = 0;
-
-		//virtual void Draw(const vector<RenderTarget*>& targets, const Camera* camera) = 0;
 	
-		void OpenConsole() const {  }
-        void CloseConsole() const {}
+        // Open console in win32.
+        virtual void OpenConsole() = 0;
+
+        // Close console in win32.
+        virtual void CloseConsole() = 0;
 	};
 }

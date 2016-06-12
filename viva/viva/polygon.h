@@ -2,13 +2,15 @@
 
 namespace viva
 {
-    class Polygon : public Node, public IDrawable
+    // Drawable that consist of lines.
+    class Polygon : public Node, public IDrawable, public IColorable
     {
     protected:
-        Transform transform;
         float span; //distance from origin to the furthest vertex
         int vertexCount;
     public:
+        // Ctor.
+        // count: vertex count
         Polygon(int count) :vertexCount(count) {}
         //XMMATRIX _GetScaleMatrix() override;
 
@@ -18,6 +20,14 @@ namespace viva
         //stuff that is not copied: children (since they can have only one parent)
         //virtual Polygon* Clone();
 
+        // Get pixel shader.
+        virtual PixelShader* GetPixelShader() = 0;
+
+        // Set pixel shader.
+        // ps: the ps
+        virtual void SetPixelShader(PixelShader* ps) = 0;
+
+        // Get vertex count.
         int GetVertexCount() const { return vertexCount; }
     };
 }
