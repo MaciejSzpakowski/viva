@@ -35,4 +35,11 @@ namespace viva
         defaultRenderTarget->Add(s);
         return s;
     }
+
+    Sprite* DrawManager::AddSprite(const wstring& filepath)
+    {
+        Sprite* s = creator->CreateSprite(filepath);
+        defaultRenderTarget->Add(s);
+        return s;
+    }
 }

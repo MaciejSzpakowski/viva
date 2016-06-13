@@ -5,9 +5,49 @@
 
 namespace viva
 {
-    Size util::ReadImageToPixels(const std::wstring& filepath, vector<Pixel>& dst)
+    Size util::ReadImageToPixels(const std::wstring& filepath, Array<Pixel>& dst)
     {
-        return Size();
+        UINT w, h;
+        ULONG_PTR m_gdiplusToken;
+        Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+        Gdiplus::GdiplusStartup(&m_gdiplusToken, &gdiplusStartupInput, NULL);
+
+        {
+            Gdiplus::Bitmap gdibitmap(filepath.c_str());
+
+            if (gdibitmap.GetLastStatus() != 0)
+            {
+                std::stringstream msg;
+                msg << "Could not open " << std::string(filepath.begin(), filepath.end());
+                Gdiplus::GdiplusShutdown(m_gdiplusToken);
+                throw Error("ReadImageToPixels()", msg.str().c_str());
+            }
+
+            h = gdibitmap.GetHeight();
+            w = gdibitmap.GetWidth();
+
+            HBITMAP hbitmap;
+            Gdiplus::Color c(0, 0, 0);
+            gdibitmap.GetHBITMAP(c, &hbitmap);
+
+            int status = gdibitmap.GetLastStatus();
+
+            BITMAP bitmap;
+            GetObject(hbitmap, sizeof(bitmap), (LPVOID)&bitmap);
+            BYTE* data = (BYTE*)bitmap.bmBits;
+
+            dst = Array<Pixel>(h * w);
+
+            // funny order, it's probably endianess mismatch
+            for (int i = 0; i < (int)(h*w * 4); i += 4)
+                dst[i >> 2] = { data[i + 2],data[i + 1],data[i + 0],data[i + 3] };
+
+            DeleteObject(hbitmap);
+        }
+
+        Gdiplus::GdiplusShutdown(m_gdiplusToken);
+
+        return Size((float)w, (float)h);
     }
 
     Polygon* Win32Creator::CreatePolygon(const vector<Point>& points)
@@ -128,13 +168,13 @@ namespace viva
         return new Win32PixelShader(result);
     }
 
-    ID3D11ShaderResourceView* Win32Creator::SrvFromPixels(const vector<Pixel>& pixels, const Size& _size)
+    ID3D11ShaderResourceView* Win32Creator::SrvFromPixels(const Array<Pixel>& pixels, const Size& _size)
     {
         ID3D11Texture2D *tex;
         ID3D11ShaderResourceView* srv;
 
         D3D11_SUBRESOURCE_DATA sub;
-        sub.pSysMem = (void *)pixels.data();
+        sub.pSysMem = pixels.data();
         sub.SysMemPitch = (UINT)_size.Width * 4;
         sub.SysMemSlicePitch = (UINT)_size.Height*(UINT)_size.Width * 4;
 
@@ -163,17 +203,20 @@ namespace viva
         return srv;
     }
 
-    Sprite*  Win32Creator::CreateSprite(Texture* texture)
+    Sprite* Win32Creator::CreateSprite(Texture* texture)
     {
         Win32Texture* tex = static_cast<Win32Texture*>(texture);
         return new Win32Sprite(tex);
     }
 
-    Texture* CreateTexture(const wstring& filepath, bool cached);
-
-    Win32Texture* Win32Creator::CreateTextureWin32(const vector<Pixel>& pixels, const Size& size, const wstring& name)
+    Sprite* Win32Creator::CreateSprite(const wstring& filepath)
     {
-        return new Win32Texture(name, SrvFromPixels(pixels, size), size);
+        Win32Texture* tex = static_cast<Win32Texture*>(resourceManager->GetTexture(filepath));
+
+        if (tex == nullptr)
+            tex = CreateTextureWin32(filepath, true);
+
+        return new Win32Sprite(tex);
     }
 }
 

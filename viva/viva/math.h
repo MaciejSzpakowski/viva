@@ -45,9 +45,17 @@ namespace viva
         void Z(float z) { f.z = z; }
         void W(float w) { f.w = w; }
 
-        /*static void Add(const Vector& v1, const Vector& v2);
+        // Adds v1 to itself.
+        // v1: another vector
+        void Add(const Vector& v1);
 
-        static void Multiply(float scalar);
+        // Adds two vectors and returns a new one.
+        Vector operator+(const Vector& rhs)
+        {
+            return Vector(f.x + rhs.f.x, f.y + rhs.f.y, f.z + rhs.f.z, f.w + rhs.f.w);
+        }
+
+        /*static void Multiply(float scalar);
 
         void Normalize();
 
@@ -77,7 +85,7 @@ namespace viva
 
         static void Translation(const Vector& position, Matrix* result);
 
-        static void Scale(const Point& scale, Matrix* result);
+        static void Scaling(const Point& scale, Matrix* result);
 
         static void Multiply(const Matrix& m1, const Matrix& m2, Matrix* result);
         

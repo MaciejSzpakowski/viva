@@ -7,7 +7,11 @@ namespace viva
 {
     void Win32Sprite::_Draw()
     {
-        _Transform();
+        // transform
+        Matrix worldViewProj;
+        T()->GetWorldViewProj(&worldViewProj);
+        worldViewProj.Transpose();
+        d3d.context->UpdateSubresource(d3d.constantBufferVS, 0, NULL, &worldViewProj, 0, 0);
 
         d3d.context->RSSetState(d3d.rsSolid);
         d3d.context->PSSetSamplers(0, 1, &d3d.samplerPoint);
@@ -18,17 +22,6 @@ namespace viva
         d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         d3d.context->PSSetShaderResources(0, 1, &texture->shaderResource);
         d3d.context->DrawIndexed(6, 0, 0);
-    }
-
-    void Win32Sprite::_Transform()
-    {
-        Matrix t;
-        Matrix::Translation(transform.GetPosition(), &t);
-        Matrix::Multiply(t, camera->GetView(), &t);
-        Matrix::Multiply(t, camera->GetProj(), &t);
-        t.Transpose();
-
-        d3d.context->UpdateSubresource(d3d.constantBufferVS, 0, NULL, &t, 0, 0);
     }
 
     void Win32Sprite::Destroy()

@@ -6,6 +6,9 @@
 #include <string>
 #include <vector>
 #include <cstdarg>
+#include <map>
+#include <array>
+#include <math.h>
 
 namespace viva
 {
@@ -15,6 +18,7 @@ namespace viva
 
 #include <viva/error.h>
 #include <viva/types.h>
+#include <viva/resource_manager.h>
 #include <viva/utils.h>
 #include <viva/math.h>
 #include <viva/transform.h>
@@ -36,5 +40,6 @@ namespace viva
     extern Camera* camera;
     extern Creator* creator;
     extern DrawManager* drawManager;
-
+    extern Window* window;
+    extern ResourceManager* resourceManager;
 }

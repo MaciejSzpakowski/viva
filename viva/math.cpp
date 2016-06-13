@@ -22,7 +22,7 @@ namespace viva
         result->m = DirectX::XMMatrixTranslationFromVector(position.v);
     }
 
-    void Matrix::Scale(const Point& scale, Matrix* result)
+    void Matrix::Scaling(const Point& scale, Matrix* result)
     {
         result->m = DirectX::XMMatrixScaling(scale.X, scale.Y, 1);
     }
@@ -45,5 +45,13 @@ namespace viva
     void Matrix::Rotation(float angle, Matrix* result)
     {
         result->m = DirectX::XMMatrixRotationZ(angle);
+    }
+
+    void Vector::Add(const Vector& rhs)
+    {
+        f.x += rhs.f.x;
+        f.y += rhs.f.y;
+        f.z += rhs.f.z;
+        f.w += rhs.f.w;
     }
 }

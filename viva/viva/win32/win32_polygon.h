@@ -22,7 +22,5 @@ namespace viva
         void SetPixelShader(PixelShader* _ps) { ps = (Win32PixelShader*)_ps; }
         
         void _Draw() override;
-
-        void _Transform() override;
     };
 }

@@ -8,13 +8,18 @@ namespace viva
 
 	class Resource
 	{
+    public:
+        enum class Type { Texture };
 	protected:
 		wstring name;
 		bool cached;
+        Type type;
 	public:
-		Resource(const wstring& _name) { name = _name; }
+        Resource(const wstring& _name, Type t) { name = _name; type = t; }
 
 		bool IsCached() const { return cached; }
+
+        Type GetType() const { return type; }
 
 		void _SetCached(bool _cached) { cached = _cached; }
 		
@@ -94,12 +99,6 @@ namespace viva
 	struct Pixel
 	{
         byte R, G, B, A;
-
-        // Pixel(255,255,255,255) i.e. white
-        Pixel(): R(255), G(255), B(255), A(255) {}
-
-        Pixel(byte r, byte g, byte b, byte a) :
-            R(r), G(g), B(b), A(a) {}
 	};
 
 	struct Size
@@ -152,7 +151,7 @@ namespace viva
 		Size size;
 	public:
 		Texture(const wstring& _name):
-            Resource(_name) { }
+            Resource(_name, Resource::Type::Texture) { }
 
 		virtual void Destroy() = 0;
 

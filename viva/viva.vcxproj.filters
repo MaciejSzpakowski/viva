@@ -17,9 +17,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="win32_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -59,11 +56,14 @@
     <ClCompile Include="win32_sprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="resource_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="viva\ResourceManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="viva\error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -135,6 +135,9 @@
     </ClInclude>
     <ClInclude Include="viva\win32\win32_window.h">
       <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\resource_manager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

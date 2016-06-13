@@ -8,7 +8,7 @@ namespace viva
         farPlane = 50.0f;
         fovAngle = 0.4f*3.14f; //72 deg
                                //Camera information
-        transform.SetPosition(0, 0, -20);
+        transform.SetPosition(0, 0, -20);  // by default camera is at -20
         Vector target(0.0f, 0.0f, 0.0f, 0.0f);
         up = Vector(0.0f, 1.0f, 0.0f, 0.0f);
 
@@ -18,6 +18,14 @@ namespace viva
         //Set the Projection matrix
         aspectRatio = (float)size.Width / size.Height;
         Matrix::PerspectiveFovLH(fovAngle, aspectRatio, nearPlane, farPlane, &proj);
+    }
+
+    Size Camera::GetFrustumSize(float z)
+    {
+        Size s;
+        s.Width = (20 + z) * tan(fovAngle / 2) * aspectRatio * 2;
+        s.Height = (20 + z) * tan(fovAngle / 2) * 2;
+        return s;
     }
 
 	/*void Camera::Transform()

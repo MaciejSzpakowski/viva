@@ -19,9 +19,13 @@ namespace viva
         Camera(const Size& size);
 
 		/*XMFLOAT3 GetCursorWorldPos(float z);
-		XMFLOAT2 GetFrustumSize(float z);
 		XMMATRIX GetViewMatrix();
 		XMMATRIX GetProjMatrix();*/
+
+        // Get size on frustum/viewport in world coordinates at speciic Z.
+        // It's different at different distance from the camera.
+        // z: z offset in world coordinates
+		Size GetFrustumSize(float z);
 
         // Get view matrix.
         const Matrix& GetView() const { return view; }

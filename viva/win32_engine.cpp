@@ -217,6 +217,7 @@ namespace viva
         d3d.defaultPS = (Win32PixelShader*)creator->CreatePixelShader(defaultPath + L"ps.hlsl");
         d3d.defaultPost = (Win32PixelShader*)creator->CreatePixelShader(defaultPath + L"post.hlsl");
 
+        viva::resourceManager = new ResourceManager();
         viva::drawManager = new DrawManager();
         viva::camera = new Camera(clientSize);
 

@@ -9,6 +9,8 @@ namespace viva
     Camera* camera = nullptr;
     Creator* creator = nullptr;
     DrawManager* drawManager = nullptr;
+    Window* window = nullptr;
+    ResourceManager* resourceManager = nullptr;
 
     Core::Core(const wstring& title, const Size& size, const wstring& path)
     {
@@ -26,10 +28,12 @@ namespace viva
     {
         engine->_Destroy();
 
+        resourceManager = nullptr;
         core = nullptr;
         engine = nullptr;
         camera = nullptr;
         creator = nullptr;
         drawManager = nullptr;
+        window = nullptr;
     }
 }

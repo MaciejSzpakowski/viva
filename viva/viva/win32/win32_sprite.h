@@ -12,8 +12,6 @@ namespace viva
 
         void _Draw() override;
 
-        void _Transform() override;
-
         void Destroy() override;
 
         Texture* GetTexture() override

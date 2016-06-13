@@ -2,6 +2,78 @@
 
 namespace viva
 {
+    template<typename T>
+    class Array
+    {
+    private:
+        T* arr;
+        size_t sz;
+    public:
+        Array()
+        {
+            sz = 0;
+            arr = nullptr;
+        }
+
+        Array(size_t n)
+        {
+            sz = n;
+            arr = new T[n];
+        }
+
+        T* data() const
+        {
+            return arr;
+        }
+
+        size_t size() const
+        {
+            return sz;
+        }
+
+        T& operator[](size_t index)
+        {
+            if (index >= sz)
+                throw Error("Array[]", "Argument out of bounds");
+
+            return arr[index];
+        }
+
+        Array& operator=(Array&& other)
+        {
+            if (sz != 0)
+                delete[] arr;
+
+            sz = other.sz;
+            arr = new T[sz];
+
+            return *this;
+        }
+
+        Array& operator=(const Array& other)
+        {
+            if (other != *this)
+            {
+                if (sz != 0)
+                    delete[] arr;
+
+                sz = other.sz;
+                arr = new T[sz];
+
+                for (int i = 0; i < sz; i++)
+                    arr[i] = other.arr[i];
+            }
+
+            return *this;
+        }
+
+        ~Array()
+        {
+            if(sz != 0)
+                delete[] arr;
+        }
+    };
+
 	namespace util
 	{
         // Read file contents to ASCII string.
@@ -12,6 +84,7 @@ namespace viva
         // dst: destination vector
         void ReadFileToBytes(const std::wstring& filepath, vector<byte>& dst);
 
-        Size ReadImageToPixels(const std::wstring& filepath, vector<Pixel>& dst);
+        // 
+        Size ReadImageToPixels(const std::wstring& filepath, Array<Pixel>& dst);
 	}
 }

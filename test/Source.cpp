@@ -1,6 +1,10 @@
 #include <viva/viva.h>
 #pragma comment(lib,"viva.lib")
 
+#define IMG_LEAF  L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/images/leaf.png"
+#define IMG_BRICK L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/images/brick.png"
+#define IMG_ANI   L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/images/ani.png"
+
 int wrapper()
 {
     while (true)
@@ -24,13 +28,19 @@ int wrapper()
             p2->T()->SetPosition(5.0f, 7.0f);
             p3->T()->SetPosition(5.0f, 9.0f);
 
-            std::vector<viva::Pixel> pixels;
+            viva::Array<viva::Pixel> pixels(100*100);
             for (int i = 0; i < 100; i++)
                 for (int j = 0; j < 100; j++)
-                    pixels.push_back(viva::Pixel(100 + i, 100 + j, 255, 255));
+                    pixels[i * 100 + j] = { viva::byte(100 + i), viva::byte(100 + j), 255, 255 };
             auto t1 = viva::creator->CreateTexture(pixels, viva::Size(100, 100), viva::wstring(L""));
             auto s1 = viva::drawManager->AddSprite(t1);
-            
+            s1->T()->SetRotation(viva::Math::Deg2Rad(45));
+            s1->T()->SetSize(3);
+
+            auto s2 = viva::drawManager->AddSprite(IMG_ANI);
+            s2->T()->SetPosition(-5, 4);
+            s2->SetPixelScale({ 512,512 });
+                        
             viva::engine->Run();
         }
 

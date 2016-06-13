@@ -14,10 +14,7 @@ namespace viva
 
         // Get transform of the object.
         Transform* T() { return &transform; }
-
-        // Transform the object.
-        virtual void _Transform() = 0;
-
+        
         // Get index.
         int _GetIndex() const { return index; }
 

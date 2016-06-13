@@ -153,6 +153,7 @@
     <ClCompile Include="core.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="node.cpp" />
+    <ClCompile Include="sprite.cpp" />
     <ClCompile Include="win32_polygon.cpp" />
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="win32_creator.cpp" />
@@ -160,7 +161,7 @@
     <ClCompile Include="win32_sprite.cpp" />
     <ClCompile Include="draw_manager.cpp" />
     <ClCompile Include="win32_surface.cpp" />
-    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="resource_manager.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="win32_window.cpp" />
   </ItemGroup>
@@ -177,7 +178,7 @@
     <ClInclude Include="viva\engine.h" />
     <ClInclude Include="viva\error.h" />
     <ClInclude Include="viva\surface.h" />
-    <ClInclude Include="viva\ResourceManager.h" />
+    <ClInclude Include="viva\resource_manager.h" />
     <ClInclude Include="viva\sprite.h" />
     <ClInclude Include="viva\types.h" />
     <ClInclude Include="viva\utils.h" />

@@ -27,8 +27,16 @@ namespace viva
         // Draw surfaces.
         void _DrawSurfaces();
 
+        // Create and add polygon to be drawn.
+        // points: list of points
         Polygon* AddPolygon(const vector<Point>& points);
 
+        // Create and add sprite to be drawn.
+        // t: texture to be used by the sprite
         Sprite* AddSprite(Texture* t);
+
+        // Create and add sprite to be drawn. Also, create texture if it doesnt exist.
+        // filepath: file path of the image to be used by the texture
+        Sprite* AddSprite(const wstring& filepath);
 	};
 }

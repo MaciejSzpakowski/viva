@@ -17,6 +17,16 @@ namespace viva
         // Get filter type.
 		TextureFilter GetFilterType() const { return filter; }
 
+        // Set scale to match pixel size.
+        // _size: desired size in pixels
+        void SetPixelScale(const viva::Size& _size);
+
+        // Set scale to match texture size.
+        void SetScale2TextureSize()
+        {
+            SetPixelScale(GetTexture()->GetSize());
+        }
+
         // Get texture associated with this sprite. Sprites can share a texture.
         virtual Texture* GetTexture() = 0;
 	};

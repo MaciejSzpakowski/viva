@@ -7,7 +7,6 @@ namespace viva
 	{
 	protected:
         wstring defaultPath;
-		Window* window;
 		Color backgroundColor;
 		Size clientSize;
 
@@ -22,9 +21,6 @@ namespace viva
 
         // Post constructor.
         virtual void _Init() = 0;
-
-        // Get native window handle. Useful if you want to do something platform specific.
-        void* GetWindowHandle() { window->GetHandle(); }
 
         // Completely destroys engine.
 		virtual void _Destroy() = 0;
