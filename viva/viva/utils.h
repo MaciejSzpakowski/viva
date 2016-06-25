@@ -31,6 +31,14 @@ namespace viva
             return sz;
         }
 
+        const T& at(size_t index) const
+        {
+            if (index >= sz)
+                throw Error("Array[]", "Argument out of bounds");
+
+            return arr[index];
+        }
+
         T& operator[](size_t index)
         {
             if (index >= sz)
@@ -67,6 +75,13 @@ namespace viva
             return *this;
         }
 
+        void swap(Array& other)
+        {
+            T* temp = arr;
+            arr = other.arr;
+            other.arr = temp;
+        }
+
         ~Array()
         {
             if(sz != 0)
@@ -86,5 +101,7 @@ namespace viva
 
         // 
         Size ReadImageToPixels(const std::wstring& filepath, Array<Pixel>& dst);
+
+        Size ReadTgaToPixels(const std::wstring& filepath, Array<Pixel>& dst);
 	}
 }

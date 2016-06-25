@@ -14,7 +14,7 @@ namespace viva
 
         void Destroy() override;
 
-        PixelShader* GetPixelShader() override
+        PixelShader* GetPixelShader() const override
         {
             return ps;
         }

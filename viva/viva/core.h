@@ -4,10 +4,7 @@ namespace viva
 {
     // Main viva object. Viva starts and ends here.
 	class Core
-	{        
-	private:
-        Engine* engine;
-
+	{
 	public:
         // Initialize viva.
         // title: window title

@@ -5,6 +5,8 @@
 
 namespace viva
 {
+    Input::Win32Mouse* win32mouse = nullptr;
+
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
         switch (msg)
@@ -28,7 +30,7 @@ namespace viva
             break;
         case WM_MOUSEWHEEL:
         {
-            //InputManager->_SetMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
+            win32mouse->SetMouseWheel(GET_WHEEL_DELTA_WPARAM(wParam));
             break;
         }
         case WM_INPUT:
@@ -45,7 +47,7 @@ namespace viva
             {
                 int xPosRelative = raw->data.mouse.lLastX;
                 int yPosRelative = raw->data.mouse.lLastY;
-                //InputManager->_SetCursorDelta(xPosRelative, yPosRelative);
+                win32mouse->SetCursorDeltaRaw(xPosRelative, yPosRelative);
             }
             break;
         }
@@ -115,6 +117,7 @@ namespace viva
         ShowWindow(handle, SW_SHOW);
         UpdateWindow(handle);
 
+        win32mouse = (Input::Win32Mouse*)mouse;
         activity = gameloop;
         worker = intloop;
 

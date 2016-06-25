@@ -121,6 +121,15 @@ namespace viva
 			: X(_x), Y(_y), Z(_z), R(_r), G(_g), B(_b), U(_u), V(_v) {}
 	};
 
+    struct Rect
+    {
+        float left, top, right, bottom;
+
+        Rect() :left(0), top(0), right(0), bottom(0) {}
+        Rect(float _left, float _top, float _right, float _bottom) :
+            left(_left), top(_top), right(_right), bottom(_bottom) {}
+    };
+
 	class PixelShader
 	{
 	protected:

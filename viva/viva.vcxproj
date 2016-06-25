@@ -151,9 +151,11 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="event_manager.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="node.cpp" />
     <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="win32_input.cpp" />
     <ClCompile Include="win32_polygon.cpp" />
     <ClCompile Include="transform.cpp" />
     <ClCompile Include="win32_creator.cpp" />
@@ -163,15 +165,20 @@
     <ClCompile Include="win32_surface.cpp" />
     <ClCompile Include="resource_manager.cpp" />
     <ClCompile Include="utils.cpp" />
+    <ClCompile Include="win32_time.cpp" />
     <ClCompile Include="win32_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="viva\camera.h" />
     <ClInclude Include="viva\core.h" />
     <ClInclude Include="viva\creator.h" />
+    <ClInclude Include="viva\event_manager.h" />
+    <ClInclude Include="viva\input.h" />
+    <ClInclude Include="viva\keys.h" />
     <ClInclude Include="viva\math.h" />
     <ClInclude Include="viva\node.h" />
     <ClInclude Include="viva\polygon.h" />
+    <ClInclude Include="viva\time.h" />
     <ClInclude Include="viva\viva.h" />
     <ClInclude Include="viva\transform.h" />
     <ClInclude Include="viva\draw_manager.h" />
@@ -185,9 +192,11 @@
     <ClInclude Include="viva\win32\win32.h" />
     <ClInclude Include="viva\win32\win32_creator.h" />
     <ClInclude Include="viva\win32\win32_engine.h" />
+    <ClInclude Include="viva\win32\win32_input.h" />
     <ClInclude Include="viva\win32\win32_polygon.h" />
     <ClInclude Include="viva\win32\win32_sprite.h" />
     <ClInclude Include="viva\win32\win32_surface.h" />
+    <ClInclude Include="viva\win32\win32_time.h" />
     <ClInclude Include="viva\win32\win32_types.h" />
     <ClInclude Include="viva\win32\win32_window.h" />
     <ClInclude Include="viva\window.h" />

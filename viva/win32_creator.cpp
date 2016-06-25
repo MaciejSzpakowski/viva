@@ -7,6 +7,9 @@ namespace viva
 {
     Size util::ReadImageToPixels(const std::wstring& filepath, Array<Pixel>& dst)
     {
+        if (filepath.substr(filepath.length() - 3, 3) == L"tga")
+            return util::ReadTgaToPixels(filepath, dst);
+
         UINT w, h;
         ULONG_PTR m_gdiplusToken;
         Gdiplus::GdiplusStartupInput gdiplusStartupInput;
@@ -39,8 +42,16 @@ namespace viva
             dst = Array<Pixel>(h * w);
 
             // funny order, it's probably endianess mismatch
-            for (int i = 0; i < (int)(h*w * 4); i += 4)
-                dst[i >> 2] = { data[i + 2],data[i + 1],data[i + 0],data[i + 3] };
+            /*for (int i = 0; i < (int)(h*w * 4); i += 4)
+                dst[i >> 2] = { data[i + 2],data[i + 1],data[i + 0],data[i + 3] };*/
+
+            int dstindex = 0;
+            for (int i = h - 1; i >= 0; i--)
+                for (int j = 0; j < (int)(w * 4); j+=4)
+                {
+                    int index = i*(w * 4) + j;
+                    dst[dstindex++] = { data[index + 2],data[index + 1],data[index + 0],data[index + 3] };
+                }
 
             DeleteObject(hbitmap);
         }

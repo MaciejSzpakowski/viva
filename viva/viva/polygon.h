@@ -21,7 +21,7 @@ namespace viva
         //virtual Polygon* Clone();
 
         // Get pixel shader.
-        virtual PixelShader* GetPixelShader() = 0;
+        virtual PixelShader* GetPixelShader() const = 0;
 
         // Set pixel shader.
         // ps: the ps

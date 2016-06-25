@@ -26,7 +26,7 @@ namespace viva
 		virtual void _Draw() = 0;
 
         // Get pixel shader.
-        virtual PixelShader* GetPixelShader() = 0;
+        virtual PixelShader* GetPixelShader() const = 0;
 
         // Set pixel shader.
         // ps: ps

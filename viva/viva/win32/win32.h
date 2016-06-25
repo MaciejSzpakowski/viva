@@ -23,12 +23,14 @@
 #pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
 
 #include <viva/win32/win32_types.h>
+#include <viva/win32/win32_time.h>
 #include <viva/win32/win32_window.h>
 #include <viva/win32/win32_polygon.h>
 #include <viva/win32/win32_sprite.h>
 #include <viva/win32/win32_surface.h>
 #include <viva/win32/win32_engine.h>
 #include <viva/win32/win32_creator.h>
+#include <viva/win32/win32_input.h>
 
 namespace viva
 {

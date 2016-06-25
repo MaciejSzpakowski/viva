@@ -7,9 +7,16 @@ namespace viva
 	{
 	protected:
 		TextureFilter filter;
+        Rect uv;
+        bool flipHorizontally;
+        bool flipVertically;
 	public:
         // Ctor.
-		Sprite() {}
+		Sprite():
+            flipHorizontally(false), 
+            flipVertically(false),
+            uv(0, 1, 1, 0)
+        {}
 
         // Set filter type.
 		void SetFilterType(TextureFilter _filter) { filter = _filter; }
@@ -26,6 +33,39 @@ namespace viva
         {
             SetPixelScale(GetTexture()->GetSize());
         }
+
+        // Is sprite flipped horizontally.
+        bool IsFlippedHorizontally() const
+        {
+            return flipHorizontally;
+        }
+
+        // Set horizontal flip.
+        // _flipHorizontally: flip or not
+        void SetFlipHorizontally(bool _flipHorizontally)
+        { 
+            flipHorizontally = _flipHorizontally;
+        }
+
+        // Is sprite flipped vertically.
+        bool IsFlippedVertically() const
+        { 
+            return flipVertically;
+        }
+
+        // Set vertical flip.
+        // _flipVertically: flip or not
+        void SetFlipVertically(bool _flipVertically)
+        {
+            flipVertically = _flipVertically;
+        }
+
+        // Get uv.
+        const Rect& GetUV() const { return uv; }
+
+        // Set uv.
+        // _uv: new uv
+        void SetUV(const Rect& _uv) { uv = _uv; }
 
         // Get texture associated with this sprite. Sprites can share a texture.
         virtual Texture* GetTexture() = 0;

@@ -28,10 +28,6 @@ namespace viva
         return s;
     }
 
-	/*void Camera::Transform()
-	{
-	}*/
-
 	void Camera::Destroy()
 	{
 		delete this;

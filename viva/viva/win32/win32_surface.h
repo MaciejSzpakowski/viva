@@ -16,7 +16,7 @@ namespace viva
         {
         }
 
-        PixelShader* GetPixelShader() override
+        PixelShader* GetPixelShader() const override
         {
             return ps;
         }

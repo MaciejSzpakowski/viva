@@ -2,8 +2,13 @@
 #pragma comment(lib,"viva.lib")
 
 #define IMG_LEAF  L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/images/leaf.png"
-#define IMG_BRICK L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/images/brick.png"
+#define IMG_BRICK L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/images/brick.jpg"
 #define IMG_ANI   L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/images/ani.png"
+#define IMG_HEX   L"C:/bajery/bLeNdEr/tekstury/hex.tga"
+
+void f()
+{
+}
 
 int wrapper()
 {
@@ -28,20 +33,25 @@ int wrapper()
             p2->T()->SetPosition(5.0f, 7.0f);
             p3->T()->SetPosition(5.0f, 9.0f);
 
-            viva::Array<viva::Pixel> pixels(100*100);
-            for (int i = 0; i < 100; i++)
-                for (int j = 0; j < 100; j++)
-                    pixels[i * 100 + j] = { viva::byte(100 + i), viva::byte(100 + j), 255, 255 };
-            auto t1 = viva::creator->CreateTexture(pixels, viva::Size(100, 100), viva::wstring(L""));
+            viva::Size t1size(256, 256);
+            viva::Array<viva::Pixel> pixels((int)t1size.Width * (int)t1size.Height);
+            for (int i = 0; i < t1size.Height ; i++)
+                for (int j = 0; j < t1size.Width ; j++)
+                    pixels[i * (int)t1size.Width + j] = { viva::byte(i), viva::byte(j), 0, 255 };
+            auto t1 = viva::creator->CreateTexture(pixels, t1size, viva::wstring(L""));
             auto s1 = viva::drawManager->AddSprite(t1);
             s1->T()->SetRotation(viva::Math::Deg2Rad(45));
             s1->T()->SetSize(3);
 
-            auto s2 = viva::drawManager->AddSprite(IMG_ANI);
+            /*auto s2 = viva::drawManager->AddSprite(IMG_BRICK);
             s2->T()->SetPosition(-5, 4);
-            s2->SetPixelScale({ 512,512 });
+            s2->SetPixelScale({ 537,800 });*/
+
+            auto s3 = viva::drawManager->AddSprite(IMG_HEX);
+            s3->T()->SetPosition(5, -5);
+            s3->SetPixelScale({ 512, 512 });
                         
-            viva::engine->Run();
+            viva::engine->Run(f);
         }
 
         printf("Exit ?\n");

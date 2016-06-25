@@ -14,12 +14,19 @@ namespace viva
 {
     using std::wstring;
     using std::vector;
+
+    typedef unsigned char byte;
+    typedef unsigned int uint;
 }
 
 #include <viva/error.h>
 #include <viva/types.h>
 #include <viva/resource_manager.h>
 #include <viva/utils.h>
+#include <viva/time.h>
+#include <viva/event_manager.h>
+#include <viva/keys.h>
+#include <viva/input.h>
 #include <viva/math.h>
 #include <viva/transform.h>
 #include <viva/node.h>
@@ -35,11 +42,14 @@ namespace viva
 
 namespace viva
 {
-    extern Core* core;
     extern Engine* engine;
     extern Camera* camera;
     extern Creator* creator;
     extern DrawManager* drawManager;
     extern Window* window;
     extern ResourceManager* resourceManager;
+    extern Input::Mouse* mouse;
+    extern Input::Keyboard* keyboard;
+    extern EventManager* eventManager;
+    extern Time* time;
 }

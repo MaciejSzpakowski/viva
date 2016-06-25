@@ -4,23 +4,23 @@
 namespace viva
 {
     // global objects for faster access
-    Core* core = nullptr;
     Engine* engine = nullptr;
     Camera* camera = nullptr;
     Creator* creator = nullptr;
     DrawManager* drawManager = nullptr;
     Window* window = nullptr;
     ResourceManager* resourceManager = nullptr;
+    Input::Keyboard* keyboard = nullptr;
+    Input::Mouse* mouse = nullptr;
+    EventManager* eventManager = nullptr;
+    Time* time = nullptr;
 
     Core::Core(const wstring& title, const Size& size, const wstring& path)
     {
-        viva::core = this;
-
 #ifdef _WIN32
         engine = new Win32Engine(title, size, path);
 #endif // _WIN32
 
-        viva::engine = this->engine;
         engine->_Init();
     }
 
@@ -28,12 +28,15 @@ namespace viva
     {
         engine->_Destroy();
 
+        keyboard = nullptr;
+        mouse = nullptr;
         resourceManager = nullptr;
-        core = nullptr;
         engine = nullptr;
         camera = nullptr;
         creator = nullptr;
         drawManager = nullptr;
         window = nullptr;
+        eventManager = nullptr;
+        time = nullptr;
     }
 }

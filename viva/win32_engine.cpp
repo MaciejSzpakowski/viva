@@ -220,12 +220,16 @@ namespace viva
         viva::resourceManager = new ResourceManager();
         viva::drawManager = new DrawManager();
         viva::camera = new Camera(clientSize);
+        viva::keyboard = new Input::Win32Keyboard();
+        viva::mouse = new Input::Win32Mouse();
+        viva::time = new Win32Time();
+        viva::eventManager = new EventManager();
 
         ///// CONSTANT BUFFERS ///////
         d3d.constantBufferVS = CreateConstantBuffer(sizeof(Matrix));
         d3d.context->VSSetConstantBuffers(0, 1, &d3d.constantBufferVS);
 
-        d3d.constantBufferUV = CreateConstantBuffer(sizeof(float) * 2);
+        d3d.constantBufferUV = CreateConstantBuffer(sizeof(Rect));
         d3d.context->VSSetConstantBuffers(1, 1, &d3d.constantBufferUV);
 
         d3d.constantBufferPS = CreateConstantBuffer(sizeof(Color));
@@ -257,6 +261,13 @@ namespace viva
 
     void Win32Engine::Activity()
     {
+        // time
+        static_cast<Win32Time*>(time)->Activity();
+
+        // input
+        static_cast<Input::Win32Mouse*>(mouse)->Activity();
+        static_cast<Input::Win32Keyboard*>(keyboard)->Activity();
+
         // render
         drawManager->_DrawNodes();
 
@@ -269,6 +280,8 @@ namespace viva
         d3d.context->PSSetSamplers(0, 1, &d3d.samplerPoint);
         Matrix t;
         Matrix::Identity(&t);
+        Rect surfaceuv(0, 1, 1, 0);
+        d3d.context->UpdateSubresource(d3d.constantBufferUV, 0, 0, &surfaceuv, 0, 0);
         d3d.context->UpdateSubresource(d3d.constantBufferVS, 0, NULL, &t, 0, 0);
 
         drawManager->_DrawSurfaces();
