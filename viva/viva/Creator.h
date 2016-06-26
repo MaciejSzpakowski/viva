@@ -41,5 +41,7 @@ namespace viva
 
         // Create surface to render objects on.
         virtual Surface* CreateSurface() = 0;
+
+        virtual void _Destroy() = 0;
 	};    
 }

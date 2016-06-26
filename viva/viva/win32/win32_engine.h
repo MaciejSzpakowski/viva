@@ -34,13 +34,6 @@ namespace viva
 	class Win32Engine : public Engine
 	{
 	private:
-        // TIME OBJECT
-		/*double frequency;
-		long long startTime;
-		long long prevFrameTime;
-		double gameTime;
-		double frameTime;*/
-
         void Activity() override;
 	public:
         Win32Engine(const wstring& title, const Size& size, const wstring& path);

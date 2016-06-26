@@ -12,7 +12,7 @@ namespace viva
     ResourceManager* resourceManager = nullptr;
     Input::Keyboard* keyboard = nullptr;
     Input::Mouse* mouse = nullptr;
-    EventManager* eventManager = nullptr;
+    RoutineManager* routineManager = nullptr;
     Time* time = nullptr;
 
     Core::Core(const wstring& title, const Size& size, const wstring& path)
@@ -26,17 +26,6 @@ namespace viva
 
     Core::~Core()
     {
-        engine->_Destroy();
-
-        keyboard = nullptr;
-        mouse = nullptr;
-        resourceManager = nullptr;
-        engine = nullptr;
-        camera = nullptr;
-        creator = nullptr;
-        drawManager = nullptr;
-        window = nullptr;
-        eventManager = nullptr;
-        time = nullptr;
+        engine->_Destroy();        
     }
 }

@@ -19,7 +19,15 @@ namespace viva
             return ps;
         }
 
-        void SetPixelShader(PixelShader* _ps) { ps = (Win32PixelShader*)_ps; }
+        void SetPixelShader(PixelShader* _ps)
+        {
+            ps = (Win32PixelShader*)_ps;
+        }
+
+        Node* GetNode() override
+        {
+            return this;
+        }
         
         void _Draw() override;
     };

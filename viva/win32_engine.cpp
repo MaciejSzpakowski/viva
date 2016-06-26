@@ -51,6 +51,30 @@ namespace viva
     {
 		HRESULT hr = 0;
 
+        std::string strPixelShader = "cbuffer cbBufferPS{float4 color;};Texture2D ObjTexture;"
+            "SamplerState ObjSamplerState;struct VS_OUTPUT"
+            "{float4 Pos:SV_POSITION;float3 Col:COLOR;float2 TexCoord:TEXCOORD;};"
+            "float4 main(VS_OUTPUT input):SV_TARGET"
+            "{if(input.Col.r==0){float4 result=ObjTexture.Sample(ObjSamplerState,input.TexCoord);"
+            "clip(result.a-0.001f);return result*color;}else{return color;}}";
+
+        std::string strVertexShader = "cbuffer cbBufferVS{float4x4 transformation;};cbuffer cbBufferUV"
+            "{float4 uv;};struct VS_OUTPUT"
+            "{float4 Pos:SV_POSITION;float3 Col:COLOR;float2 TexCoord:TEXCOORD;};"
+            "VS_OUTPUT main(float4 inPos:POSITION,float3 inCol:COLOR,float2 inTexCoord:TEXCOORD)"
+            "{VS_OUTPUT output;output.Pos=mul(inPos,transformation);output.Col=inCol;"
+            "output.TexCoord=inTexCoord;if(inTexCoord[0]==0&&inTexCoord[1]==0)"
+            "output.TexCoord=float2(uv[0],1-uv[1]);if(inTexCoord[0]==1&&inTexCoord[1]==0)"
+            "output.TexCoord=float2(uv[2],1-uv[1]);if(inTexCoord[0]==0&&inTexCoord[1]==1)"
+            "output.TexCoord=float2(uv[0],1-uv[3]);if(inTexCoord[0]==1&&inTexCoord[1]==1)"
+            "output.TexCoord=float2(uv[2],1-uv[3]);return output;}";
+
+        std::string strPostShader = "cbuffer cbBufferPS{};Texture2D ObjTexture;SamplerState ObjSamplerState;"
+            "struct VS_OUTPUT{float4 Pos:SV_POSITION;float3 Col:COLOR;"
+            "float2 TexCoord:TEXCOORD;};float4 main(VS_OUTPUT input):SV_TARGET"
+            "{float4 result=ObjTexture.Sample(ObjSamplerState,input.TexCoord);"
+            "clip(result.a-0.001f);return result;}";
+
         ////    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
 		DXGI_SWAP_CHAIN_DESC scd;
 		ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -110,8 +134,7 @@ namespace viva
 		////    VS   ////
 		ID3D10Blob *vs; //release vs after CreateInputLayout()
 						//alternative to loading shader from cso file
-        std::string str = util::ReadFileToString(defaultPath + L"vs.hlsl");
-        hr = D3DCompile(str.c_str(), str.length(), 0, 0, 0, "main", "vs_5_0", D3DCOMPILE_DEBUG, 0, &vs, 0);
+        hr = D3DCompile(strVertexShader.c_str(), strVertexShader.length(), 0, 0, 0, "main", "vs_5_0", D3DCOMPILE_DEBUG, 0, &vs, 0);
 		Checkhr(hr, "D3DCompile() vs");
 		hr = d3d.device->CreateVertexShader(vs->GetBufferPointer(), vs->GetBufferSize(), 0,
 			&d3d.defaultVS);
@@ -195,27 +218,14 @@ namespace viva
         D3D11_SUBRESOURCE_DATA srd;
         srd.pSysMem = indices.data();
         d3d.device->CreateBuffer(&indexBufferDesc, &srd, &d3d.indexBuffer);
-        d3d.context->IASetIndexBuffer(d3d.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        		
-		//timer
-		/*LARGE_INTEGER li;
-		if (!QueryPerformanceFrequency(&li))
-			throw std::runtime_error("QueryPerformanceFrequency() failed");
-
-		frequency = double(li.QuadPart);
-		QueryPerformanceCounter(&li);
-		startTime = li.QuadPart;
-		prevFrameTime = startTime;
-		gameTime = 0;
-		frameTime = 0;*/
-
+        d3d.context->IASetIndexBuffer(d3d.indexBuffer, DXGI_FORMAT_R32_UINT, 0);        	
 
         //// GLOBALS ////
         viva::creator = new Win32Creator();
                 
         //////   PS    ///////
-        d3d.defaultPS = (Win32PixelShader*)creator->CreatePixelShader(defaultPath + L"ps.hlsl");
-        d3d.defaultPost = (Win32PixelShader*)creator->CreatePixelShader(defaultPath + L"post.hlsl");
+        d3d.defaultPS = (Win32PixelShader*)creator->CreatePixelShader(strPixelShader);
+        d3d.defaultPost = (Win32PixelShader*)creator->CreatePixelShader(strPostShader);
 
         viva::resourceManager = new ResourceManager();
         viva::drawManager = new DrawManager();
@@ -223,7 +233,7 @@ namespace viva
         viva::keyboard = new Input::Win32Keyboard();
         viva::mouse = new Input::Win32Mouse();
         viva::time = new Win32Time();
-        viva::eventManager = new EventManager();
+        viva::routineManager = new RoutineManager();
 
         ///// CONSTANT BUFFERS ///////
         d3d.constantBufferVS = CreateConstantBuffer(sizeof(Matrix));
@@ -264,6 +274,9 @@ namespace viva
         // time
         static_cast<Win32Time*>(time)->Activity();
 
+        // events
+        routineManager->_Activity();
+
         // input
         static_cast<Input::Win32Mouse*>(mouse)->Activity();
         static_cast<Input::Win32Keyboard*>(keyboard)->Activity();
@@ -291,14 +304,42 @@ namespace viva
 
 	void Win32Engine::_Destroy()
 	{
+        viva::routineManager->_Destroy();
+        viva::time->Destroy();
+        viva::mouse->Destroy();
+        viva::keyboard->Destroy();
+        viva::camera->Destroy();
+        viva::drawManager->_Destroy();
+        viva::resourceManager->_Destroy();
+        viva::creator->_Destroy();
+
+        keyboard = nullptr;
+        mouse = nullptr;
+        resourceManager = nullptr;
+        engine = nullptr;
+        camera = nullptr;
+        creator = nullptr;
+        drawManager = nullptr;
+        window = nullptr;
+        routineManager = nullptr;
+        time = nullptr;
+
+        d3d.defaultPS->Destroy();
+        d3d.defaultPost->Destroy();
+
+        d3d.indexBuffer->Release();
+        d3d.samplerLinear->Release();
+        d3d.samplerPoint->Release();
+        d3d.constantBufferPS->Release();
+        d3d.constantBufferPSExtra->Release();
+        d3d.constantBufferUV->Release();
+        d3d.constantBufferVS->Release();
         d3d.vertexBuffer->Release();
         d3d.blendState->Release();
         d3d.layout->Release();
         d3d.rsSolid->Release();
         d3d.rsWire->Release();
         d3d.defaultVS->Release();
-        d3d.defaultPS->Destroy();
-        d3d.defaultPost->Destroy();
         d3d.depthStencilBuffer->Release();
         d3d.depthStencil->Release();
         d3d.backBuffer->Release();

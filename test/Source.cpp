@@ -33,6 +33,27 @@ int wrapper()
             p2->T()->SetPosition(5.0f, 7.0f);
             p3->T()->SetPosition(5.0f, 9.0f);
 
+            viva::routineManager->AddRoutine([=]()
+            {
+                p1->SetColor(1, 1, p1->GetColor().B ? 0 : 1, 1);
+
+                return 1;
+            }, L"", 0, 0, 1);
+
+            int a = 0;
+            viva::IRoutine* r = viva::routineManager->AddRoutine([&]()
+            {
+                a++;
+
+                if (a > 1000)
+                {
+                    printf("remove\n");
+                    r->Destroy();
+                }
+
+                return 1;
+            });
+
             viva::Size t1size(256, 256);
             viva::Array<viva::Pixel> pixels((int)t1size.Width * (int)t1size.Height);
             for (int i = 0; i < t1size.Height ; i++)

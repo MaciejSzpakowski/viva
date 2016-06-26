@@ -28,5 +28,7 @@ namespace viva
 
         // Clear resource manager. It does not destroy anything.
 		void RemoveAll();
+
+        void _Destroy();
 	};
 }

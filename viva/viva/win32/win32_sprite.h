@@ -18,5 +18,10 @@ namespace viva
         {
             return texture;
         }
+
+        Node* GetNode() override
+        {
+            return this;
+        }
     };
 }

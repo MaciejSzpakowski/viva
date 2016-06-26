@@ -31,7 +31,6 @@ namespace viva
 
     void Win32Polygon::Destroy()
     {
-#pragma message("Polygon ps destroy")
         vertexBuffer->Release();
         delete this;
     }

@@ -9,17 +9,15 @@ namespace viva
         Transform transform;
         int index; // sometimes used by managers
     public:
+        Node() : index(-1) {}
         // Remove from all managers and memory.
         virtual void Destroy() = 0;
 
         // Get transform of the object.
         Transform* T() { return &transform; }
         
-        // Get index.
         int _GetIndex() const { return index; }
 
-        // Set index.
-        // i: index
-        int SetIndex(int i) { index = i; }
+        void _SetIndex(int i) { index = i; }
     };
 }

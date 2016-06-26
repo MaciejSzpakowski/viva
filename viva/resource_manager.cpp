@@ -51,4 +51,10 @@ namespace viva
 
 		resources.clear();
 	}
+
+    void ResourceManager::_Destroy()
+    {
+        RemoveAll();
+        delete this;
+    }
 }

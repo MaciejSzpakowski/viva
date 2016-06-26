@@ -24,13 +24,7 @@ namespace viva
 		void _SetCached(bool _cached) { cached = _cached; }
 		
 		const wstring& GetName() const { return name; }
-	};
-
-    class IDrawable
-    {
-    public:
-        virtual void _Draw() = 0;
-    };
+	};    
 
     struct Point
     {

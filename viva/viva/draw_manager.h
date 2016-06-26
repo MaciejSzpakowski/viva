@@ -6,7 +6,7 @@ namespace viva
 	class DrawManager
 	{
 	private:
-		Surface* defaultRenderTarget;
+		Surface* defaultSurface;
 		//vector<RenderTarget*> renderTargets;
 		//BitmapFont* defaultFont;
 		//TextureFilter defaultFilter;
@@ -29,14 +29,21 @@ namespace viva
 
         // Create and add polygon to be drawn.
         // points: list of points
-        Polygon* AddPolygon(const vector<Point>& points);
+        Polygon* AddPolygon(const vector<Point>& points, Surface* surface = nullptr);
 
         // Create and add sprite to be drawn.
         // t: texture to be used by the sprite
-        Sprite* AddSprite(Texture* t);
+        Sprite* AddSprite(Texture* t, Surface* surface = nullptr);
 
         // Create and add sprite to be drawn. Also, create texture if it doesnt exist.
         // filepath: file path of the image to be used by the texture
-        Sprite* AddSprite(const wstring& filepath);
+        Sprite* AddSprite(const wstring& filepath, Surface* surface = nullptr);
+
+        void Remove(IDrawable* drawable);
+
+        void Add(IDrawable* drawable, Surface* surface = nullptr);
+
+        // Remove and destroy all surfaces and drawables except for default surface.
+        void Clear();
 	};
 }

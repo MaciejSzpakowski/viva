@@ -17,7 +17,9 @@ namespace viva
 
         // Insert drawable onto this surface.
         // d: drawable to add
-        void Add(IDrawable* d) { drawables.push_back(d); }
+        void Add(IDrawable* d);
+
+        void Remove(IDrawable* d);
 
         // Draw all objects this surface contains.
         virtual void _DrawAll() = 0;

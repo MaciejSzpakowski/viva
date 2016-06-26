@@ -51,5 +51,11 @@ namespace viva
         }
 
         ID3D11ShaderResourceView* SrvFromPixels(const Array<Pixel>& pixels, const Size& _size);
+
+        //
+        void _Destroy() override
+        {
+            delete this;
+        }
     };
 }

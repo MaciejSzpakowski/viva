@@ -137,8 +137,6 @@ namespace viva
             {
                 worker();
                 activity();
-                // reset cursor delta
-                // InputManager->_SetCursorDelta(0, 0);
             }
         }
 	}

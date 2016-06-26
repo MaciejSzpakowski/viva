@@ -24,12 +24,13 @@ namespace viva
 #include <viva/resource_manager.h>
 #include <viva/utils.h>
 #include <viva/time.h>
-#include <viva/event_manager.h>
+#include <viva/routine_manager.h>
 #include <viva/keys.h>
 #include <viva/input.h>
 #include <viva/math.h>
 #include <viva/transform.h>
 #include <viva/node.h>
+#include <viva/drawable.h>
 #include <viva/camera.h>
 #include <viva/polygon.h>
 #include <viva/sprite.h>
@@ -50,6 +51,6 @@ namespace viva
     extern ResourceManager* resourceManager;
     extern Input::Mouse* mouse;
     extern Input::Keyboard* keyboard;
-    extern EventManager* eventManager;
+    extern RoutineManager* routineManager;
     extern Time* time;
 }

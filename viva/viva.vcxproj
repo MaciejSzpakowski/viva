@@ -151,10 +151,11 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="core.cpp" />
-    <ClCompile Include="event_manager.cpp" />
+    <ClCompile Include="routine_manager.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="node.cpp" />
     <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="surface.cpp" />
     <ClCompile Include="win32_input.cpp" />
     <ClCompile Include="win32_polygon.cpp" />
     <ClCompile Include="transform.cpp" />
@@ -172,7 +173,8 @@
     <ClInclude Include="viva\camera.h" />
     <ClInclude Include="viva\core.h" />
     <ClInclude Include="viva\creator.h" />
-    <ClInclude Include="viva\event_manager.h" />
+    <ClInclude Include="viva\drawable.h" />
+    <ClInclude Include="viva\routine_manager.h" />
     <ClInclude Include="viva\input.h" />
     <ClInclude Include="viva\keys.h" />
     <ClInclude Include="viva\math.h" />
