@@ -5,7 +5,7 @@
 
 namespace viva
 {
-    void Win32Surface::_DrawAll()
+    void Win32Surface::_Draw()
     {
         d3d.context->ClearDepthStencilView(d3d.depthStencil,
             D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -16,11 +16,11 @@ namespace viva
         float four0[4] = { 0, 0, 0, 0 };
         d3d.context->ClearRenderTargetView(rtv, four0);
 
-        for (int i = 0; i < drawables.size(); i++)
-            drawables[i]->_Draw();
+        for (int i = 0; i < children.size(); i++)
+            children[i]->_Draw();
     }
 
-    void Win32Surface::_Draw()
+    void Win32Surface::_DrawSurface()
     {
         d3d.context->PSSetShader(ps->ps, 0, 0);
         //tex

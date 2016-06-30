@@ -16,7 +16,7 @@ namespace viva
 
     void DrawManager::Remove(IDrawable* drawable)
     {
-        drawable->GetSurface()->Remove(drawable);
+        drawable->GetParent()->Remove(drawable);
     }
 
     void DrawManager::Add(IDrawable* drawable, Surface* surface)
@@ -29,12 +29,12 @@ namespace viva
 
     void DrawManager::_DrawNodes()
     {
-        defaultSurface->_DrawAll();
+        defaultSurface->_Draw();
     }
 
     void DrawManager::_DrawSurfaces()
     {
-        defaultSurface->_Draw();
+        defaultSurface->_DrawSurface();
     }
 
 	void DrawManager::_Destroy()
@@ -46,7 +46,7 @@ namespace viva
 
     void DrawManager::Clear()
     {
-        defaultSurface->Clear();
+        //defaultSurface->Clear();
     }
 
     Sprite* DrawManager::AddSprite(Texture* t, Surface* surface)
