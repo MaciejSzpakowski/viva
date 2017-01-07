@@ -25,7 +25,7 @@ namespace viva
         // pixels: pixels for the texture starting from left top
         // size: size of the image in pixels
         // name: some name, used by resource manager for caching
-		virtual Texture* CreateTexture(const Array<Pixel>& pixels, const Size& size, const wstring& name = wstring(L"")) = 0;
+		virtual Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name = wstring(L"")) = 0;
 
 		// Create sprite from file. Supported files BMP, GIF, JPEG, PNG, TIFF, Exif, WMF, EMF.
         // filepath: file path to image

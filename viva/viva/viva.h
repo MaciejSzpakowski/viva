@@ -21,6 +21,7 @@ namespace viva
 
 #include <viva/error.h>
 #include <viva/types.h>
+#include <viva/font.h>
 #include <viva/resource_manager.h>
 #include <viva/utils.h>
 #include <viva/time.h>
@@ -34,6 +35,7 @@ namespace viva
 #include <viva/camera.h>
 #include <viva/polygon.h>
 #include <viva/sprite.h>
+#include <viva/text.h>
 #include <viva/surface.h>
 #include <viva/creator.h>
 #include <viva/window.h>

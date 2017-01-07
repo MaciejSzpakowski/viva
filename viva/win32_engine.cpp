@@ -228,8 +228,8 @@ namespace viva
         d3d.defaultPost = (Win32PixelShader*)creator->CreatePixelShader(strPostShader);
 
         viva::resourceManager = new ResourceManager();
-        viva::drawManager = new DrawManager();
         viva::camera = new Camera(clientSize);
+        viva::drawManager = new DrawManager();
         viva::keyboard = new Input::Win32Keyboard();
         viva::mouse = new Input::Win32Mouse();
         viva::time = new Win32Time();
@@ -271,6 +271,9 @@ namespace viva
 
     void Win32Engine::Activity()
     {
+        // viewProj
+        camera->_CalcViewProj();
+
         // time
         static_cast<Win32Time*>(time)->Activity();
 
@@ -285,12 +288,17 @@ namespace viva
         drawManager->_DrawNodes();
 
         // this snippet is here because drawmanager is front end/generic non win32 specific
+        // also this is common for all render targets, I need to set this up only once
         float col[4] = { backgroundColor.R,backgroundColor.G,backgroundColor.B,backgroundColor.A };
         d3d.context->ClearRenderTargetView(d3d.backBuffer, col);
         d3d.context->ClearDepthStencilView(d3d.depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
         d3d.context->OMSetRenderTargets(1, &d3d.backBuffer, d3d.depthStencil);
         d3d.context->RSSetState(d3d.rsSolid);
         d3d.context->PSSetSamplers(0, 1, &d3d.samplerPoint);
+        UINT stride = sizeof(Vertex);
+        UINT offset = 0;
+        d3d.context->IASetVertexBuffers(0, 1, &d3d.vertexBuffer, &stride, &offset);
+        d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         Matrix t;
         Matrix::Identity(&t);
         Rect surfaceuv(0, 1, 1, 0);
@@ -320,7 +328,6 @@ namespace viva
         camera = nullptr;
         creator = nullptr;
         drawManager = nullptr;
-        window = nullptr;
         routineManager = nullptr;
         time = nullptr;
 
@@ -348,6 +355,8 @@ namespace viva
         d3d.device->Release();
 
 		window->_Destroy();
+        window = nullptr;
+
 		delete this;
 	}
 

@@ -8,6 +8,7 @@ namespace viva
         Transform transform;
 		Matrix view;
 		Matrix proj;
+        Matrix viewProj;
 		Vector up;
 		float nearPlane;
 		float farPlane;
@@ -28,10 +29,29 @@ namespace viva
 		Size GetFrustumSize(float z);
 
         // Get view matrix.
-        const Matrix& GetView() const { return view; }
+        const Matrix& GetView() const 
+        { 
+            return view; 
+        }
 
         // Get projection matrix.
-        const Matrix& GetProj() const { return proj; }
+        const Matrix& GetProj() const 
+        { 
+            return proj;
+        }
+
+        // Get viewProj matrix. Cached once per frame.
+        const Matrix& GetViewProj() const
+        {
+            return viewProj;
+        }
+        
+        void _CalcViewProj();
+
+        // Returns screen coordinates in pixels of the given world coordinates
+        Point WorldToScreen(const Vector& pos) const;
+
+        Vector ScreenToWorld(const Point& pos, float z) const;
 
         void Destroy();
 	};

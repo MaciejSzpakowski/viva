@@ -15,10 +15,10 @@ int wrapper()
     while (true)
     {
         {
-            viva::Core core(L"Hello", { 800,600 }, L"C:/Users/Szpak/Documents/Visual Studio 2015/Projects/viva/viva/viva/resources/");
+            viva::Core core(L"Hello", { 800,600 }, L"");
             viva::engine->OpenConsole();
             
-            std::vector<viva::Point> v;
+            /*std::vector<viva::Point> v;
             v.push_back({ 0,0 });
             v.push_back({ 1,0 });
             v.push_back({ 0,1 });
@@ -31,46 +31,42 @@ int wrapper()
             p3->SetColor(0, 0, 1, 1);
             p1->T()->SetPosition(5.0f, 5.0f);
             p2->T()->SetPosition(5.0f, 7.0f);
-            p3->T()->SetPosition(5.0f, 9.0f);
+            p3->T()->SetPosition(5.0f, 9.0f);*/
 
-            viva::routineManager->AddRoutine([=]()
-            {
-                p1->SetColor(1, 1, p1->GetColor().B ? 0 : 1, 1);
-
-                return 1;
-            }, L"", 0, 0, 1);
-
-            int a = 0;
-            viva::IRoutine* r = viva::routineManager->AddRoutine([&]()
-            {
-                a++;
-
-                if (a > 1000)
-                {
-                    printf("remove\n");
-                    r->Destroy();
-                }
-
-                return 1;
-            });
-
-            viva::Size t1size(256, 256);
+            /*viva::Size t1size(256, 256);
             viva::Array<viva::Pixel> pixels((int)t1size.Width * (int)t1size.Height);
             for (int i = 0; i < t1size.Height ; i++)
                 for (int j = 0; j < t1size.Width ; j++)
-                    pixels[i * (int)t1size.Width + j] = { viva::byte(i), viva::byte(j), 0, 255 };
-            auto t1 = viva::creator->CreateTexture(pixels, t1size, viva::wstring(L""));
-            auto s1 = viva::drawManager->AddSprite(t1);
-            s1->T()->SetRotation(viva::Math::Deg2Rad(45));
-            s1->T()->SetSize(3);
+                    pixels[i * (int)t1size.Width + j] = { viva::byte(i), viva::byte(j), 0, 255 };*/
+            //auto t1 = viva::creator->CreateTexture(pixels.data(), t1size, viva::wstring(L""));
+            //auto s1 = viva::drawManager->AddSprite(t1);
+            //s1->T()->SetRotation(viva::Math::Deg2Rad(45));
+            //s1->T()->SetSize(3);
 
             /*auto s2 = viva::drawManager->AddSprite(IMG_BRICK);
             s2->T()->SetPosition(-5, 4);
             s2->SetPixelScale({ 537,800 });*/
 
-            auto s3 = viva::drawManager->AddSprite(IMG_HEX);
-            s3->T()->SetPosition(5, -5);
-            s3->SetPixelScale({ 512, 512 });
+            //auto s3 = viva::drawManager->AddSprite(IMG_HEX);
+            //s3->T()->SetPosition(5, -5);
+            //s3->SetPixelScale({ 512, 512 });
+
+            viva::Pixel p11 = { 255,0,255,255 };
+            viva::Texture* t2 = viva::creator->CreateTexture(&p11, viva::Size(1, 1));
+            auto s6 = viva::drawManager->AddSprite(t2);
+            s6->T()->SetCoordMode(viva::Transform::Mode::Screen);
+            s6->T()->SetScale(200, 75);
+            s6->T()->SetPosition(100, 100);
+            s6->T()->SetRotation(viva::Math::Deg2Rad(45));
+
+            std::vector<viva::Point> points1;
+            points1.push_back({ 0,10 });
+            points1.push_back({ 0,-10 });
+            auto c1 = viva::drawManager->AddPolygon(points1);
+            auto c2 = viva::drawManager->AddPolygon(points1);
+            c2->T()->SetRotation(viva::Math::Deg2Rad(90));
+
+
                         
             viva::engine->Run(f);
         }

@@ -7,9 +7,15 @@ namespace viva
     // Transform object responsible for position, rotation, scale etc. of its owner.
     class Transform
     {
+    public:
+        enum class Mode
+        {
+            World, Screen
+        };
     private:
         Transform* parent;
         vector<Transform*> children;
+        Mode mode;
 
         Vector origin;
         Vector position;
@@ -26,13 +32,25 @@ namespace viva
         float angularAcceleration;
         Point scaleAcceleration;
         float sizeAcceleration;
+
     public:
         // Ctor.
         Transform();
 
+        void SetCoordMode(Mode m)
+        {
+            mode = m;
+        }
+
+        Mode GetMode() const
+        {
+            return mode;
+        }
+
         // Converts rotation, scale, position and parent relationship to matrix transformation.
         void GetWorld(Matrix* dst);
         void GetWorldViewProj(Matrix* dst);
+        void GetWorldScreen(Matrix* dst);
 
         //// ORIGIN   //////
         void SetOrigin(float x, float y) { origin.f.x = x; origin.f.y = y; }
@@ -67,7 +85,7 @@ namespace viva
         void Rotate(float angle) { rotation += angle; }
         
         ///////     SCALE    //////
-        void SetScale(float width, float height) { scale.X = height; scale.Y = width; }
+        void SetScale(float width, float height) { scale.X = width; scale.Y = height; }
         void SetScale(const Point& s) { scale = s; }
         void SetScaleX(float x) { scale.X = x; }
         void SetScaleY(float y) { scale.Y = y; }

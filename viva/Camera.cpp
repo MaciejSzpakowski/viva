@@ -28,6 +28,24 @@ namespace viva
         return s;
     }
 
+    void Camera::_CalcViewProj()
+    {
+        Matrix::Multiply(view, proj, &viewProj);
+    }
+
+    Point Camera::WorldToScreen(const Vector& pos) const
+    {
+        Vector res;
+        Matrix::Multiply(viewProj, pos, &res);
+
+        return Point(res.X(), res.Y());
+    }
+
+    Vector Camera::ScreenToWorld(const Point& pos, float z) const
+    {
+        return Vector();
+    }
+
 	void Camera::Destroy()
 	{
 		delete this;

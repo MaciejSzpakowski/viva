@@ -3,7 +3,7 @@
 namespace viva
 {
     // Drawable that consist of lines.
-    class Polygon : public Node, public IDrawable, public IColorable
+    class Polygon : public Node, public Drawable, public Colorable
     {
     protected:
         float span; //distance from origin to the furthest vertex

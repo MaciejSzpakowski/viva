@@ -4,7 +4,7 @@ namespace viva
 {
     Transform::Transform():
         position(), rotation(0), scale({1,1}),size(1),
-        parent(nullptr)
+        parent(nullptr), mode(Mode::World)
         {}
 
     void Transform::GetWorld(Matrix* dst)
@@ -35,12 +35,53 @@ namespace viva
         }*/
     }
 
+    void Transform::GetWorldScreen(Matrix* dst)
+    {
+        auto screenSize = engine->GetClientSize();
+        float w = scale.X * size / screenSize.Width;
+        float h = scale.Y * size / screenSize.Height;
+
+        float ox = origin.X() / screenSize.Width + w;
+        float oy = origin.Y() / screenSize.Height - h;
+
+        float x = position.X() * 2 / screenSize.Width - 1;
+        float y = - position.Y() * 2 / screenSize.Height + 1;
+
+        static float d = 0;
+        if (keyboard->IsKeyDown(Input::KeyboardKey::Left))
+            d += time->GetFrameTime();
+        else if (keyboard->IsKeyDown(Input::KeyboardKey::Right))
+            d -= time->GetFrameTime();
+
+        auto t = std::to_wstring(d);
+        window->SetWindowTitle(t);
+
+        Matrix::Identity(dst);
+
+        Matrix sca, ori, rot, loc;
+
+        Matrix::Translation(Vector(ox, oy, 0), &ori);
+        Matrix::Scaling({ w,h }, &sca);
+        Matrix::Rotation(rotation, &rot);
+        Matrix::Translation(Vector(x, y, position.Z()), &loc);
+
+        Matrix::Multiply(*dst, sca, dst);
+        Matrix::Multiply(*dst, ori, dst);
+        //Matrix::Multiply(*dst, rot, dst);
+        Matrix::Multiply(*dst, loc, dst);
+    }
+
     void Transform::GetWorldViewProj(Matrix* dst)
     {
-        GetWorld(dst);
-
-        Matrix::Multiply(*dst, camera->GetView(), dst);
-        Matrix::Multiply(*dst, camera->GetProj(), dst);
+        if (mode == Mode::World)
+        {
+            GetWorld(dst);
+            Matrix::Multiply(*dst, camera->GetViewProj(), dst);
+        }
+        else
+        {
+            GetWorldScreen(dst);
+        }
     }
 
     void Transform::SetPosition(float x, float y, float z)

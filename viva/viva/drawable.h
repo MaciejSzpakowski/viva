@@ -1,53 +1,38 @@
 #pragma once
 
-#include <viva/viva.h>
-
 namespace viva
 {
-    class IDrawable
+    class Surface;
+
+    class Drawable
     {
     protected:
-        IDrawable* parent;
-        vector<IDrawable*> children;
+        Surface* parent;
         int index;
     public:
-        IDrawable() :parent(nullptr), index(-1) {}
+        Drawable() :parent(nullptr), index(-1) {}
 
         // Draw all objects frm this collection.
         virtual void _Draw() = 0;
 
-        IDrawable* GetParent() const
+        Surface* GetSurface() const
         {
             return parent;
         }
 
-        // Insert drawable into this drawable.
-        // d: drawable to add
-        void Add(IDrawable* d)
+        void _SetSurface(Surface* surface)
         {
-            d->index = (int)children.size();
-            d->parent = this;
-            children.push_back(d);
+            parent = surface;
         }
 
-        void Remove(IDrawable* d)
+        void _SetIndex(int i)
         {
-            if (d->index == -1)
-                return;
+            index = i;
+        }
 
-            if (d->index == children.size() - 1)
-            {
-                children.pop_back();
-                d->index = -1;
-                d->parent = nullptr;
-            }
-            else
-            {
-                children[d->index] = children.back();
-                children.pop_back();
-                d->index = -1;
-                d->parent = nullptr;
-            }
+        int _GetIndex() const
+        {
+            return index;
         }
 
         virtual Node* GetNode() = 0;

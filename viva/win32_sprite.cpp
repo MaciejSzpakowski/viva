@@ -10,7 +10,9 @@ namespace viva
         // transform
         Matrix worldViewProj;
         T()->GetWorldViewProj(&worldViewProj);
+
         worldViewProj.Transpose();
+
         d3d.context->UpdateSubresource(d3d.constantBufferVS, 0, NULL, &worldViewProj, 0, 0);
 
         // uv

@@ -74,6 +74,12 @@
     <ClCompile Include="surface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="viva\error.h">
@@ -170,6 +176,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="viva\drawable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="viva\text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

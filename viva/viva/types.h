@@ -46,7 +46,7 @@ namespace viva
 		Color(float _r, float _g, float _b, float _a): R(_r), G(_g), B(_b), A(_a) {}
 	};
 
-    class IColorable
+    class Colorable
     {
     protected:
         Color color;
@@ -160,4 +160,8 @@ namespace viva
 
 		Size GetSize() const { return size; }
 	};
+
+    struct FontMetrics
+    {
+    };
 }

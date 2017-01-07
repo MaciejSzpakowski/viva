@@ -26,7 +26,7 @@ namespace viva
             ps = (Win32PixelShader*)_ps;
         }
 
-        void _Draw() override;
+        void _DrawAll() override;
 
         void _DrawSurface() override;
 

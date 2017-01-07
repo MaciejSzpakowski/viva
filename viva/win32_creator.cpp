@@ -179,13 +179,13 @@ namespace viva
         return new Win32PixelShader(result);
     }
 
-    ID3D11ShaderResourceView* Win32Creator::SrvFromPixels(const Array<Pixel>& pixels, const Size& _size)
+    ID3D11ShaderResourceView* Win32Creator::SrvFromPixels(const Pixel* pixels, const Size& _size)
     {
         ID3D11Texture2D *tex;
         ID3D11ShaderResourceView* srv;
 
         D3D11_SUBRESOURCE_DATA sub;
-        sub.pSysMem = pixels.data();
+        sub.pSysMem = pixels;
         sub.SysMemPitch = (UINT)_size.Width * 4;
         sub.SysMemSlicePitch = (UINT)_size.Height*(UINT)_size.Width * 4;
 

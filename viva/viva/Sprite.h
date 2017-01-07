@@ -3,7 +3,7 @@
 namespace viva
 {
     // Drawable picture.
-	class Sprite : public Node, public IDrawable, public IColorable
+	class Sprite : public Node, public Drawable, public Colorable
 	{
 	protected:
 		TextureFilter filter;

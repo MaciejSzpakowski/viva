@@ -17,6 +17,8 @@ namespace viva
 
 		void Win32Window::_Destroy() override;
 
+        void SetWindowTitle(const wstring& title) override;
+
 		// start win32 message pump
 		// gameloop: user's function that runs every frame
 		// intloop: engine function that runs every frame

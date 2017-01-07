@@ -36,6 +36,11 @@ namespace viva
     {
         result->m = DirectX::XMMatrixMultiply(m1.m, m2.m);
     }
+
+    void Matrix::Multiply(const Matrix& m, const Vector& v, Vector* result)
+    {
+        result->v = DirectX::XMVector3Transform(v.v, m.m);
+    }
     
     void Matrix::Identity(Matrix* result)
     {

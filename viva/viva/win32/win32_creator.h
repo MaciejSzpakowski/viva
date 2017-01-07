@@ -23,7 +23,7 @@ namespace viva
         Sprite* CreateSprite(const wstring& filepath);
 
         /// TEXTURE ///
-        Texture* CreateTexture(const Array<Pixel>& pixels, const Size& size, const wstring& name) override
+        Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) override
         {
             return CreateTextureWin32(pixels, size, name, false);
         }
@@ -37,10 +37,10 @@ namespace viva
         {
             Array<Pixel> pixels;
             Size size = util::ReadImageToPixels(filepath, pixels);
-            return CreateTextureWin32(pixels, size, filepath, cached);
+            return CreateTextureWin32(pixels.data(), size, filepath, cached);
         }
 
-        Win32Texture* CreateTextureWin32(const Array<Pixel>& pixels, const Size& size, const wstring& name, bool cached)
+        Win32Texture* CreateTextureWin32(const Pixel* pixels, const Size& size, const wstring& name, bool cached)
         {
             Win32Texture* tex = new Win32Texture(name, SrvFromPixels(pixels, size), size);
 
@@ -50,7 +50,7 @@ namespace viva
             return tex;
         }
 
-        ID3D11ShaderResourceView* SrvFromPixels(const Array<Pixel>& pixels, const Size& _size);
+        ID3D11ShaderResourceView* SrvFromPixels(const Pixel* pixels, const Size& _size);
 
         //
         void _Destroy() override

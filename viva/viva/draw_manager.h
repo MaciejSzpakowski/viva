@@ -6,6 +6,7 @@ namespace viva
 	class DrawManager
 	{
 	private:
+        Sprite* defaultFont;
 		Surface* defaultSurface;
 		//vector<RenderTarget*> renderTargets;
 		//BitmapFont* defaultFont;
@@ -39,9 +40,14 @@ namespace viva
         // filepath: file path of the image to be used by the texture
         Sprite* AddSprite(const wstring& filepath, Surface* surface = nullptr);
 
-        void Remove(IDrawable* drawable);
+        void Remove(Drawable* drawable);
 
-        void Add(IDrawable* drawable, Surface* surface = nullptr);
+        void Add(Drawable* drawable, Surface* surface = nullptr);
+
+        Sprite* GetDefaultFont() const
+        {
+            return defaultFont;
+        }
 
         // Remove and destroy all surfaces and drawables except for default surface.
         void Clear();

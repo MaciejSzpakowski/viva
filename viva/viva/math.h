@@ -88,6 +88,8 @@ namespace viva
         static void Scaling(const Point& scale, Matrix* result);
 
         static void Multiply(const Matrix& m1, const Matrix& m2, Matrix* result);
+
+        static void Multiply(const Matrix& m, const Vector& v, Vector* result);
         
         static void Identity(Matrix* result);
 

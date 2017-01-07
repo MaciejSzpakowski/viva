@@ -151,11 +151,13 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="core.cpp" />
+    <ClCompile Include="font.cpp" />
     <ClCompile Include="routine_manager.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="node.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="surface.cpp" />
+    <ClCompile Include="text.cpp" />
     <ClCompile Include="win32_input.cpp" />
     <ClCompile Include="win32_polygon.cpp" />
     <ClCompile Include="transform.cpp" />
@@ -174,12 +176,14 @@
     <ClInclude Include="viva\core.h" />
     <ClInclude Include="viva\creator.h" />
     <ClInclude Include="viva\drawable.h" />
+    <ClInclude Include="viva\font.h" />
     <ClInclude Include="viva\routine_manager.h" />
     <ClInclude Include="viva\input.h" />
     <ClInclude Include="viva\keys.h" />
     <ClInclude Include="viva\math.h" />
     <ClInclude Include="viva\node.h" />
     <ClInclude Include="viva\polygon.h" />
+    <ClInclude Include="viva\text.h" />
     <ClInclude Include="viva\time.h" />
     <ClInclude Include="viva\viva.h" />
     <ClInclude Include="viva\transform.h" />

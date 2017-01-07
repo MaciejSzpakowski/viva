@@ -105,6 +105,11 @@ namespace viva
 		return handle;
 	}
 
+    void Win32Window::SetWindowTitle(const wstring& title)
+    {
+        ::SetWindowText(handle, title.c_str());
+    }
+
 	void Win32Window::_Destroy()
 	{
         DestroyWindow(handle);

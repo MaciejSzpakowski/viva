@@ -3,14 +3,17 @@
 namespace viva
 {
     // Special drawable where all of its objects are drawn on it.
-	class Surface : public IDrawable
+	class Surface
 	{
 	protected:
 		//PixelShader* pixelShader;
-
+        vector<Drawable*> drawables;
 	public:
         // Ctor.
         Surface() {  }
+
+        // 
+        virtual void _DrawAll() = 0;
 
 		// Draw surface itself.
 		virtual void _DrawSurface() = 0;
@@ -40,12 +43,30 @@ namespace viva
 		// unsed by draw manager to remove
 		////void Remove();
 
+        // Insert drawable into this drawable.
+        // d: drawable to add
+        void Add(Drawable* d)
+        {
+            d->_SetIndex((int)drawables.size());
+            d->_SetSurface(this);
+            drawables.push_back(d);
+        }
+
+        void Remove(Drawable* d)
+        {
+            if (d->_GetIndex() == -1)
+                return;
+
+            if (d->_GetIndex() != drawables.size() - 1)
+                drawables[d->_GetIndex()] = drawables.back();
+
+            drawables.pop_back();
+            d->_SetIndex(-1);
+            d->_SetSurface(nullptr);
+        }
+
 		// Destroy the surface and all drawables it contains.
 		virtual void Destroy() = 0;
 
-        Node* GetNode() override
-        {
-            return nullptr;
-        }
 	};
 }
