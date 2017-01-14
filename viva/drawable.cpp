@@ -1,16 +1,16 @@
-#pragma once
+#include "viva.h"
 
 namespace viva
 {
-    class Surface;
-
     class Drawable
     {
     protected:
         Surface* parent;
         int index;
     public:
-        Drawable() :parent(nullptr), index(-1) {}
+        Drawable() :parent(nullptr), index(-1) 
+        {
+        }
 
         // Draw all objects frm this collection.
         virtual void _Draw() = 0;

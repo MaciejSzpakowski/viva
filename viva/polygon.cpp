@@ -1,4 +1,4 @@
-#pragma once
+#include "viva.h"
 
 namespace viva
 {
@@ -11,7 +11,10 @@ namespace viva
     public:
         // Ctor.
         // count: vertex count
-        Polygon(int count) :vertexCount(count) {}
+        Polygon(int count) :vertexCount(count) 
+        {
+        }
+
         //XMMATRIX _GetScaleMatrix() override;
 
         //float GetSpan() const { return span; }
@@ -28,6 +31,9 @@ namespace viva
         virtual void SetPixelShader(PixelShader* ps) = 0;
 
         // Get vertex count.
-        int GetVertexCount() const { return vertexCount; }
+        int GetVertexCount() const 
+        { 
+            return vertexCount; 
+        }
     };
 }

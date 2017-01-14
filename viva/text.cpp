@@ -1,18 +1,27 @@
-#include <viva/viva.h>
+#include "viva.h"
 
 namespace viva
 {
-    Text::Text(Font* font)
+    class Text : public Drawable, public Node, public Colorable
     {
+    private:
+        FontMetrics metrics;
+        wstring text;
+        TextureFilter texFilter;
+        Sprite* sprite;
+    public:
+        Text(Font* font)
+        {
 
-    }
+        }
 
-    void Text::Destroy()
-    {
-        sprite->Destroy();
-    }
+        void Destroy() override
+        {
+            sprite->Destroy();
+        }
 
-    void Text::_Draw()
-    {
-    }
+        void _Draw() override
+        {
+        }
+    };
 }

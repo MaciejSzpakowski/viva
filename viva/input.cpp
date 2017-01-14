@@ -1,8 +1,9 @@
-#pragma once
+#include "viva.h"
 
-namespace viva {
-    namespace Input {
-
+namespace viva 
+{
+    namespace Input 
+    {
         class Mouse
         {
         protected:
@@ -127,6 +128,5 @@ namespace viva {
             //virtual bool GamepadDisconnected() const;
             //virtual void Destroy();
         };
-
     }
 }

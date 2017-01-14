@@ -12,9 +12,6 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{86caa8e8-2717-43d0-a96d-2f4868c9637a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\win32">
-      <UniqueIdentifier>{2bb5b099-a8a5-4341-b71e-60e7c166fd59}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="win32_window.cpp">
@@ -80,120 +77,55 @@
     <ClCompile Include="text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="creator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="drawable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="error.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="keys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="polygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="viva.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_types.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="monolith.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="viva\error.h">
+    <ClInclude Include="viva.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="viva\core.h">
+    <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="viva\engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\polygon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\creator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\draw_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\surface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\node.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\sprite.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\viva.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_creator.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_engine.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_polygon.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_sprite.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_surface.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_types.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_window.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\resource_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\keys.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_input.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\win32\win32_time.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\routine_manager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\drawable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\font.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="viva\text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="viva\resources\post.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="viva\resources\ps.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="viva\resources\vs.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>
