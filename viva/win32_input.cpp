@@ -108,7 +108,7 @@ namespace viva
                 return !curState.at(mappedKey) && prevState.at(mappedKey);
             }
 
-            void Activity()
+            void _Activity() override
             {
                 // get cursor pos and delta from os
                 window->GetHandle();
@@ -123,19 +123,19 @@ namespace viva
                 curState.swap(prevState);
 
                 // get button states
-                curState[ARR_LBUTTON] = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) && true;
-                curState[ARR_RBUTTON] = (GetAsyncKeyState(VK_RBUTTON) & 0x8000) && true;
-                curState[ARR_MBUTTON] = (GetAsyncKeyState(VK_MBUTTON) & 0x8000) && true;
+                curState.at(ARR_LBUTTON) = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) && true;
+                curState.at(ARR_RBUTTON) = (GetAsyncKeyState(VK_RBUTTON) & 0x8000) && true;
+                curState.at(ARR_MBUTTON) = (GetAsyncKeyState(VK_MBUTTON) & 0x8000) && true;
             }
 
             void ResetKey(MouseKey key) override
             {
                 int mappedKey = GetMappedKey(key);
-                curState[mappedKey] = false;
-                prevState[mappedKey] = false;
+                curState.at(mappedKey) = false;
+                prevState.at(mappedKey) = false;
             }
 
-            void Destroy() override
+            void _Destroy() override
             {
                 delete this;
             }
@@ -157,7 +157,7 @@ namespace viva
             {
             }
 
-            void Activity()
+            void _Activity() override
             {
                 capslockActive = GetKeyState((int)KeyboardKey::CapsLock) & 1;
 
@@ -166,7 +166,7 @@ namespace viva
 
                 // get button states
                 for (int i = 0; i<keyNumber; i++)
-                    curState[i] = (GetAsyncKeyState(i) & 0x8000) && true;
+                    curState.at(i) = (GetAsyncKeyState(i) & 0x8000) && true;
             }
 
             bool IsKeyDown(KeyboardKey key) const override
@@ -202,7 +202,7 @@ namespace viva
                 // from combination of capslock and shit, figure out what is the case
                 char mod = (enableShift && IsKeyDown(KeyboardKey::Shift)) + (enableCapslock && capslockActive);
 
-                for (int i = 0; i < sizeof(input); i++)
+                for (uint i = 0; i < sizeof(input); i++)
                 {
                     if (IsKeyPressed((KeyboardKey)input[i]))
                     {
@@ -226,11 +226,11 @@ namespace viva
 
             void ResetKey(KeyboardKey key) override
             {
-                curState[(int)key] = false;
-                prevState[(int)key] = false;
+                curState.at((int)key) = false;
+                prevState.at((int)key) = false;
             }
 
-            void Destroy() override
+            void _Destroy() override
             {
                 delete this;
             }

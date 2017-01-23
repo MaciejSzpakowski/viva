@@ -59,7 +59,7 @@ namespace viva
             d3d.device->CreateBuffer(&bd, &sd, &vertexBuffer);
             delete[] temp;//*/
 
-            Win32Polygon* poly = new Win32Polygon(vertexBuffer, (int)points.size());
+            Win32Polygon* poly = new Win32Polygon(vertexBuffer, points.size());
             poly->SetPixelShader(d3d.defaultPS);
             return poly;
         }
@@ -175,10 +175,10 @@ namespace viva
 
         Sprite* CreateSprite(const wstring& filepath)
         {
-            Win32Texture* tex = static_cast<Win32Texture*>(resourceManager->GetTexture(filepath));
+            Texture* tex = resourceManager->GetTexture(filepath);
 
             if (tex == nullptr)
-                tex = CreateTextureWin32(filepath, true);
+                tex = Creator::CreateTexture(filepath);
 
             return CreateSprite(tex);
         }
@@ -186,34 +186,12 @@ namespace viva
         /// TEXTURE ///
         Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) override
         {
-            return CreateTextureWin32(pixels, size, name, false);
-        }
+            Texture* t = new Win32Texture(name, SrvFromPixels(pixels, size), size);
 
-        Texture* CreateTexture(const wstring& filepath, bool cached)
-        {
-            return CreateTextureWin32(filepath, cached);
-        }
+            if(name.size() != 0)
+                resourceManager->AddResource(t);
 
-        Win32Texture* CreateTextureWin32(const wstring& filepath, bool cached)
-        {
-            Pixel* pixels = nullptr;
-            Size size = util::ReadImageToPixels(filepath, &pixels);
-            Win32Texture* tex = CreateTextureWin32(pixels, size, filepath, cached);
-
-            if(pixels != nullptr)
-                free(pixels);
-
-            return tex;
-        }
-
-        Win32Texture* CreateTextureWin32(const Pixel* pixels, const Size& size, const wstring& name, bool cached)
-        {
-            Win32Texture* tex = new Win32Texture(name, SrvFromPixels(pixels, size), size);
-
-            if (cached)
-                resourceManager->AddResource(tex);
-
-            return tex;
+            return t;
         }
 
         //

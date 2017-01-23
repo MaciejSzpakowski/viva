@@ -15,6 +15,8 @@ namespace viva
         // You don't have to call thi method at the beginning because
         // by default all new routines are executed.
         virtual void Resume() = 0;
+
+        virtual const wstring& GetName() = 0;
     };
 
     struct Routine : public IRoutine
@@ -28,6 +30,11 @@ namespace viva
         double lastPulse;
         bool remove;
         bool pause;
+
+        Routine(const std::function<int()>& activity, wstring name)
+            : Activity(activity), Name(name)
+        {
+        }
 
         void Destroy() override
         {
@@ -43,6 +50,11 @@ namespace viva
         {
             pause = false;
         }
+
+        const wstring& GetName() override
+        {
+            return Name;
+        }
     };
 
     class RoutineManager
@@ -55,26 +67,29 @@ namespace viva
         {
             double gameTime = time->GetGameTime();
 
+            if (routines.size() == 0)
+                return;
+
             //might be removed so backwards iteration
-            for (int i = (int)routines.size() - 1; i >= 0; i--)
+            for (uint i = routines.size() - 1; i >= 0; i--)
             {
                 // destroy if remove flag is up
-                if (routines[i] != nullptr && routines[i]->remove)
+                if (routines.at(i) != nullptr && routines.at(i)->remove)
                 {
-                    delete routines[i];
-                    routines[i] = nullptr;
+                    delete routines.at(i);
+                    routines.at(i) = nullptr;
                 }
 
                 //pop if last routine is empty
-                if (routines[i] == nullptr && i == routines.size() - 1)
+                if (routines.at(i) == nullptr && i == routines.size() - 1)
                 {
                     routines.pop_back();
                     continue;
                 }
                 //if its empty but not last
-                else if (routines[i] == nullptr)
+                else if (routines.at(i) == nullptr)
                 {
-                    routines[i] = routines.back();
+                    routines.at(i) = routines.back();
                     routines.pop_back();
                     continue;
                 }
@@ -82,20 +97,20 @@ namespace viva
                 int ret = 1;
 
                 //if delay time has passed...
-                if (gameTime - routines[i]->startTime > routines[i]->delay && !routines[i]->pause)
+                if (gameTime - routines.at(i)->startTime > routines.at(i)->delay && !routines.at(i)->pause)
                     //...and it's time for next pulse then run
-                    if (routines[i]->tick == 0 ||
-                        (gameTime - routines[i]->lastPulse > routines[i]->tick))
+                    if (routines.at(i)->tick == 0 ||
+                        (gameTime - routines.at(i)->lastPulse > routines.at(i)->tick))
                     {
-                        ret = routines[i]->Activity();
-                        routines[i]->lastPulse = gameTime;
+                        ret = routines.at(i)->Activity();
+                        routines.at(i)->lastPulse = gameTime;
                     }
                 //if returned 0 or expired then remove
-                if (ret == 0 || (routines[i]->lifeTime > 0 &&
-                    gameTime - routines[i]->startTime > routines[i]->lifeTime))
+                if (ret == 0 || (routines.at(i)->lifeTime > 0 &&
+                    gameTime - routines.at(i)->startTime > routines.at(i)->lifeTime))
                 {
-                    delete routines[i];
-                    routines[i] = routines.back();
+                    delete routines.at(i);
+                    routines.at(i) = routines.back();
                     routines.pop_back();
                 }
             }
@@ -108,9 +123,9 @@ namespace viva
         //delay: how long to wait before start running
         //lifeTime: destroy event after that time, 0 to never destroy
         //tick: run event once every tick seconds, 0 to run every frame
-        IRoutine* AddRoutine(std::function<int()> func, wstring name, double delay, double lifeTime, double tick)
+        IRoutine* AddRoutine(const std::function<int()>& func, const wstring& name, double delay, double lifeTime, double tick)
         {
-            Routine* newRoutine = new Routine;
+            Routine* newRoutine = new Routine(func, name);
             newRoutine->tick = tick;
             newRoutine->lifeTime = lifeTime;
             newRoutine->delay = delay;
@@ -131,10 +146,10 @@ namespace viva
         IRoutine* FindRoutine(wstring name)
         {
             for (int i = 0; i<routines.size(); i++)
-                if (routines[i] && routines[i]->Name == name)
-                    return routines[i];
+                if (routines.at(i) && routines.at(i)->Name == name)
+                    return routines.at(i);
 
-            throw Error("RoutineManager::RemoveRoutine()", "Routine not found");
+            throw Error(__FUNCTION__, "Routine not found");
         }
 
         void Trigger(wstring _event)
@@ -148,7 +163,7 @@ namespace viva
                 handler();
         }
 
-        void AddHandler(wstring _event, std::function<void()> handler)
+        void AddHandler(wstring _event, const std::function<void()>& handler)
         {
             handlers[_event].push_back(handler);
         }
@@ -174,8 +189,8 @@ namespace viva
         // Don't call it from inside a routine.
         void ClearRoutines()
         {
-            for (int i = 0; i < routines.size(); i++)
-                delete routines[i];
+            for (uint i = 0; i < routines.size(); i++)
+                delete routines.at(i);
 
             routines.clear();
         }

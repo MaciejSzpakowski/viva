@@ -67,15 +67,15 @@ namespace viva
                     b = b == 0 ? 255 : 0;
                 }
 
-                Texture* t = creator->CreateTexture(reinterpret_cast<Pixel*>(data2.data()), Size(190, 95), L"");
+                //Texture* t = creator->CreateTexture(reinterpret_cast<Pixel*>(data2.data()), Size(190, 95), L"__vivaDefaultFontTexture", true);
 
-                defaultFont = creator->CreateSprite(t);
-                defaultFont->SetScale2TextureSize();
-                defaultFont->SetFlipVertically(true);
+                //defaultFont = creator->CreateSprite(t);
+                //defaultFont->SetScale2TextureSize();
+                //defaultFont->SetFlipVertically(true);
             }
 
             Pixel p[] = { Pixel(255,255,255,255) };
-            whitePixel = creator->CreateTexture(p, Size(1, 1), L"");
+            whitePixel = creator->CreateTexture(p, Size(1, 1), L"__whitePixel");
 
             //Add(defaultFont);
         }
@@ -83,8 +83,8 @@ namespace viva
         // Destroys DrawManager and all drawables.
         void _Destroy()
         {
-            Clear();
             defaultSurface->Destroy();
+            //defaultFont->Destroy();
             delete this;
         }
 
@@ -106,6 +106,7 @@ namespace viva
 
         // Create and add polygon to be drawn.
         // points: list of points
+        // surface: which surface
         Polygon* AddPolygon(const vector<Point>& points, Surface* surface)
         {
             Polygon* p = creator->CreatePolygon(points);
@@ -113,14 +114,28 @@ namespace viva
             return p;
         }
 
+        // Create and add polygon to be drawn.
+        // points: list of points
+        Polygon* AddPolygon(const vector<Point>& points)
+        {
+            return AddPolygon(points, defaultSurface);
+        }
+
         // Create and add sprite to be drawn.
         // t: texture to be used by the sprite
-        // surface: which surface,nullptr for default
+        // surface: which surface
         Sprite* AddSprite(Texture* t, Surface* surface)
         {
             Sprite* s = creator->CreateSprite(t);
             Add(s, surface);
             return s;
+        }
+
+        // Create and add sprite to be drawn.
+        // t: texture to be used by the sprite
+        Sprite* AddSprite(Texture* t)
+        {
+            return AddSprite(t, defaultSurface);
         }
 
         // Create and add a unicolor rectangle to be drawn.
@@ -129,6 +144,12 @@ namespace viva
         {
             Sprite* s = AddSprite(whitePixel, surface);
             return s;
+        }
+
+        // Create and add a unicolor rectangle to be drawn.
+        Sprite* AddRectangle()
+        {
+            return AddRectangle(defaultSurface);
         }
 
         // Create and add sprite to be drawn. Also, create texture if it doesnt exist.
@@ -141,6 +162,13 @@ namespace viva
             return s;
         }
 
+        // Create and add sprite to be drawn. Also, create texture if it doesnt exist.
+        // filepath: file path of the image to be used by the texture
+        Sprite* AddSprite(const wstring& filepath)
+        {
+            return AddSprite(filepath, defaultSurface);
+        }
+
         void Remove(Drawable* drawable)
         {
             drawable->GetSurface()->Remove(drawable);
@@ -148,21 +176,17 @@ namespace viva
 
         void Add(Drawable* drawable, Surface* surface)
         {
-            if (surface == nullptr)
-                surface = defaultSurface;
-
             surface->Add(drawable);
+        }
+
+        void Add(Drawable* drawable)
+        {
+            defaultSurface->Add(drawable);
         }
 
         Sprite* GetDefaultFont() const
         {
             return defaultFont;
-        }
-
-        // Remove and destroy all surfaces and drawables except for default surface.
-        void Clear()
-        {
-            //defaultSurface->Clear();
         }
     };
 }

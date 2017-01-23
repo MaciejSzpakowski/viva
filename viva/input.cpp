@@ -54,7 +54,9 @@ namespace viva
             // Sets key state to up.
             virtual void ResetKey(MouseKey key) = 0;
 
-            virtual void Destroy() = 0;
+            virtual void _Destroy() = 0;
+
+            virtual void _Activity() = 0;
         };
 
         class Keyboard
@@ -89,7 +91,9 @@ namespace viva
             virtual void ResetKey(KeyboardKey key) = 0;
 
             // Destroys keyboard object.
-            virtual void Destroy() = 0;
+            virtual void _Destroy() = 0;
+
+            virtual void _Activity() = 0;
         };
 
         class Gamepad

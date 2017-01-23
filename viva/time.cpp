@@ -24,12 +24,14 @@ namespace viva
             return frameTime;
         }
 
+        virtual void _Activity() = 0;
+
         // Frames per second.
         double GetFps() const
         {
             return 1 / frameTime;
         }
 
-        virtual void Destroy() = 0;
+        virtual void _Destroy() = 0;
     };
 }

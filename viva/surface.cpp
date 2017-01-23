@@ -11,7 +11,7 @@ namespace viva
     public:
         // Ctor.
         Surface() 
-        {  
+        {
         }
 
         // 
@@ -26,45 +26,49 @@ namespace viva
         // Set pixel shader.
         // ps: ps
         virtual void SetPixelShader(PixelShader* ps) = 0;
-
-        //// move to the top of the stack
-        //void MoveToTop();
-
-        //// move to the bottom of the stack
-        //void MoveToBottom();
-
-        //// move one place up i.e. swap with one above
-        //void MoveUp();
-
-        //// move one place down i.e. swap with one below
-        //void MoveDown();
-
-        //// used by draw manager to insert
-        //void Insert(vector<RenderTarget*>* _parentContainer);
-
-        // unsed by draw manager to remove
-        ////void Remove();
-
-        // Insert drawable into this drawable.
+                
+        // Add drawable into this surface.
         // d: drawable to add
         void Add(Drawable* d)
         {
-            d->_SetIndex((int)drawables.size());
+            d->_SetIndex(drawables.size());
             d->_SetSurface(this);
             drawables.push_back(d);
         }
 
+        // Remove all drawables from the surface without destroying them.
+        void RemoveAll()
+        {
+            for (uint i = 0; i < drawables.size(); i++)
+            {
+                drawables.at(i)->_SetIndex(-1);
+                drawables.at(i)->_SetSurface(nullptr);
+            }
+
+            drawables.clear();
+        }
+
+        //
         void Remove(Drawable* d)
         {
             if (d->_GetIndex() == -1)
                 return;
 
             if (d->_GetIndex() != drawables.size() - 1)
-                drawables[d->_GetIndex()] = drawables.back();
+                drawables.at(d->_GetIndex()) = drawables.back();
 
             drawables.pop_back();
             d->_SetIndex(-1);
             d->_SetSurface(nullptr);
+        }
+
+        // Destroy all drawables from this surface.
+        void Clear()
+        {
+            for (uint i = 0; i < drawables.size(); i++)
+                drawables.at(i)->GetNode()->Destroy();
+
+            drawables.clear();
         }
 
         // Destroy the surface and all drawables it contains.

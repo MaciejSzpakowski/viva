@@ -6,7 +6,7 @@ namespace viva
     {
     protected:
         Surface* parent;
-        int index;
+        uint index;
     public:
         Drawable() :parent(nullptr), index(-1) 
         {
@@ -25,7 +25,7 @@ namespace viva
             parent = surface;
         }
 
-        void _SetIndex(int i)
+        void _SetIndex(uint i)
         {
             index = i;
         }

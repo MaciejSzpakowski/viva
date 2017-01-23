@@ -256,7 +256,7 @@ class Drawable
 {
 protected:
 Surface* parent;
-int index;
+uint index;
 public:
 Drawable();
 
@@ -265,7 +265,7 @@ Surface* GetSurface() const;
 
 void _SetSurface(Surface* surface);
 
-void _SetIndex(int i);
+void _SetIndex(uint i);
 
 int _GetIndex() const;
 
@@ -610,7 +610,7 @@ Point WorldToScreen(const Vector& pos) const;
 
 Vector ScreenToWorld(const Point& pos, float z) const;
 
-void Destroy();
+void _Destroy();
 
 };}
 
@@ -632,8 +632,11 @@ class Creator
 public:
 virtual PixelShader* CreatePixelShader(const wstring& filepath) = 0;
 virtual PixelShader* CreatePixelShader(const std::string& str) = 0;
-virtual Texture* CreateTexture(const wstring& filepath, bool cached) = 0;
+Texture* CreateTexture(const wstring& filepath);
+
 virtual Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) = 0;
+Texture* CreateTexture(const Pixel* pixels, const Size& size);
+
 virtual Sprite* CreateSprite(const wstring& filepath) = 0;
 virtual Sprite* CreateSprite(Texture* texture) = 0;
 virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
@@ -685,19 +688,27 @@ void _DrawSurfaces();
 
 Polygon* AddPolygon(const vector<Point>& points, Surface* surface);
 
+Polygon* AddPolygon(const vector<Point>& points);
+
 Sprite* AddSprite(Texture* t, Surface* surface);
+
+Sprite* AddSprite(Texture* t);
 
 Sprite* AddRectangle(Surface* surface);
 
+Sprite* AddRectangle();
+
 Sprite* AddSprite(const wstring& filepath, Surface* surface);
+
+Sprite* AddSprite(const wstring& filepath);
 
 void Remove(Drawable* drawable);
 
 void Add(Drawable* drawable, Surface* surface);
 
-Sprite* GetDefaultFont() const;
+void Add(Drawable* drawable);
 
-void Clear();
+Sprite* GetDefaultFont() const;
 
 };}
 
@@ -755,7 +766,8 @@ virtual bool IsButtonDown(MouseKey key) const = 0;
 virtual bool IsButtonPressed(MouseKey key) const = 0;
 virtual bool IsButtonReleased(MouseKey key) const = 0;
 virtual void ResetKey(MouseKey key) = 0;
-virtual void Destroy() = 0;
+virtual void _Destroy() = 0;
+virtual void _Activity() = 0;
 };}
 
 namespace viva {
@@ -776,6 +788,7 @@ void _SetCached(bool _cached);
 
 const wstring& GetName() const;
 
+virtual void Destroy() = 0;
 };}
 
 namespace viva {
@@ -786,7 +799,6 @@ Size size;
 public:
 Texture(const wstring& _name);
 
-virtual void Destroy() = 0;
 Size GetSize() const;
 
 };}
@@ -801,7 +813,8 @@ virtual bool IsKeyReleased(KeyboardKey key) const = 0;
 virtual char GetChar(bool enableShift = true, bool enableCapslock = true) const = 0;
 virtual bool IsCapslockActive() const = 0;
 virtual void ResetKey(KeyboardKey key) = 0;
-virtual void Destroy() = 0;
+virtual void _Destroy() = 0;
+virtual void _Activity() = 0;
 };}
 
 namespace viva::Input {
@@ -814,9 +827,11 @@ class Polygon : public Node, public Drawable, public Colorable
 {
 protected:
 float span;
-int vertexCount;
+uint vertexCount;
 public:
 Polygon(int count);
+
+Node* GetNode() override;
 
 virtual PixelShader* GetPixelShader() const = 0;
 virtual void SetPixelShader(PixelShader* ps) = 0;
@@ -850,6 +865,8 @@ Sprite* SetFlipHorizontally(bool _flipHorizontally);
 bool IsFlippedVertically() const;
 
 Sprite* SetFlipVertically(bool _flipVertically);
+
+Node* GetNode() override;
 
 const Rect& GetUV() const;
 
@@ -902,12 +919,6 @@ Sprite* CreateSprite(const wstring& filepath);
 
 Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) override;
 
-Texture* CreateTexture(const wstring& filepath, bool cached);
-
-Win32Texture* CreateTextureWin32(const wstring& filepath, bool cached);
-
-Win32Texture* CreateTextureWin32(const Pixel* pixels, const Size& size, const wstring& name, bool cached);
-
 void _Destroy() override;
 
 };}
@@ -918,6 +929,7 @@ struct IRoutine
 virtual void Destroy() = 0;
 virtual void Pause() = 0;
 virtual void Resume() = 0;
+virtual const wstring& GetName() = 0;
 };}
 
 namespace viva {
@@ -932,11 +944,15 @@ wstring Name;
 double lastPulse;
 bool remove;
 bool pause;
+Routine(std::function<int()> activity, wstring name);
+
 void Destroy() override;
 
 void Pause() override;
 
 void Resume() override;
+
+const wstring& GetName() override;
 
 };}
 
@@ -949,7 +965,7 @@ std::map<wstring, vector<std::function<void()>>> handlers;
 public:
 void _Activity();
 
-IRoutine* AddRoutine(std::function<int()> func, wstring name, double delay, double lifeTime, double tick);
+IRoutine* AddRoutine(std::function<int()> func, const wstring& name, double delay, double lifeTime, double tick);
 
 IRoutine* FindRoutine(wstring name);
 
@@ -981,7 +997,11 @@ virtual PixelShader* GetPixelShader() const = 0;
 virtual void SetPixelShader(PixelShader* ps) = 0;
 void Add(Drawable* d);
 
+void RemoveAll();
+
 void Remove(Drawable* d);
+
+void Clear();
 
 virtual void Destroy() = 0;
 };}
@@ -999,9 +1019,10 @@ double GetGameTime();
 
 double GetFrameTime() const;
 
+virtual void _Activity() = 0;
 double GetFps() const;
 
-virtual void Destroy() = 0;
+virtual void _Destroy() = 0;
 };}
 
 namespace viva {
@@ -1088,11 +1109,11 @@ bool IsButtonPressed(MouseKey key) const;
 
 bool IsButtonReleased(MouseKey key) const;
 
-void Activity();
+void _Activity() override;
 
 void ResetKey(MouseKey key) override;
 
-void Destroy() override;
+void _Destroy() override;
 
 };}
 
@@ -1126,7 +1147,7 @@ bool capslockActive;
 public:
 Win32Keyboard();
 
-void Activity();
+void _Activity() override;
 
 bool IsKeyDown(KeyboardKey key) const override;
 
@@ -1140,7 +1161,7 @@ bool IsCapslockActive() const override;
 
 void ResetKey(KeyboardKey key) override;
 
-void Destroy() override;
+void _Destroy() override;
 
 };}
 
@@ -1158,8 +1179,6 @@ void Destroy() override;
 PixelShader* GetPixelShader() const override;
 
 void SetPixelShader(PixelShader* _ps);
-
-Node* GetNode() override;
 
 void _Draw() override;
 
@@ -1179,8 +1198,6 @@ void _Draw() override;
 void Destroy() override;
 
 Texture* GetTexture() override;
-
-Node* GetNode() override;
 
 PixelShader* GetPixelShader() const override;
 
@@ -1221,9 +1238,9 @@ long long prevFrameTime;
 public:
 Win32Time();
 
-void Destroy() override;
+void _Destroy() override;
 
-void Activity();
+void _Activity() override;
 
 };}
 
@@ -1255,9 +1272,6 @@ Size ReadImageToPixels(const std::wstring& filepath, Pixel** dst);}
 
 namespace viva::util {
 bool EndsWith(const wstring& s, const wstring& end);}
-
-namespace viva::util {
-Size ReadTgaToPixels(const std::wstring& filepath, vector<Pixel>& dst);}
 
 namespace viva {
 void intloop();}
@@ -1299,7 +1313,7 @@ namespace viva {
     extern RoutineManager* routineManager ;}
 
 namespace viva {
-    extern Time* time;}
+    extern Time* time ;}
 
 namespace viva {
     extern D3D11 d3d;}

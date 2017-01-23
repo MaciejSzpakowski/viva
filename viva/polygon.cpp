@@ -7,12 +7,17 @@ namespace viva
     {
     protected:
         float span; //distance from origin to the furthest vertex
-        int vertexCount;
+        uint vertexCount;
     public:
         // Ctor.
         // count: vertex count
         Polygon(int count) :vertexCount(count) 
         {
+        }
+
+        Node* GetNode() override
+        {
+            return this;
         }
 
         //XMMATRIX _GetScaleMatrix() override;

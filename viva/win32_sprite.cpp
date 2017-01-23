@@ -49,18 +49,15 @@ namespace viva
 
         void Destroy() override
         {
-            texture->Destroy();
+            if(!texture->IsCached())
+                texture->Destroy();
+
             delete this;
         }
 
         Texture* GetTexture() override
         {
             return texture;
-        }
-
-        Node* GetNode() override
-        {
-            return this;
         }
 
         // Get PS.

@@ -56,14 +56,14 @@ namespace viva
             camera->_CalcViewProj();
 
             // time
-            static_cast<Win32Time*>(time)->Activity();
+            time->_Activity();
 
             // events
             routineManager->_Activity();
 
             // input
-            static_cast<Input::Win32Mouse*>(mouse)->Activity();
-            static_cast<Input::Win32Keyboard*>(keyboard)->Activity();
+            mouse->_Activity();
+            keyboard->_Activity();
 
             // render
             drawManager->_DrawNodes();
@@ -102,15 +102,16 @@ namespace viva
             if(routineManager != nullptr)
                 routineManager->_Destroy();
             if (time != nullptr)
-                time->Destroy();
+                time->_Destroy();
             if (mouse != nullptr)
-                mouse->Destroy();
+                mouse->_Destroy();
             if (keyboard != nullptr)
-                keyboard->Destroy();
+                keyboard->_Destroy();
             if (camera != nullptr)
-                camera->Destroy();
+                camera->_Destroy();
             if (drawManager != nullptr)
                 drawManager->_Destroy();
+            // destroy resource manager after drawmanager
             if (resourceManager != nullptr)
                 resourceManager->_Destroy();
             if (creator != nullptr)
@@ -118,29 +119,31 @@ namespace viva
 
             keyboard = nullptr;
             mouse = nullptr;
-            resourceManager = nullptr;
             engine = nullptr;
             camera = nullptr;
             creator = nullptr;
             drawManager = nullptr;
+            resourceManager = nullptr;
             routineManager = nullptr;
             time = nullptr;
 
+            // destroy objects
             d3d.defaultPS->Destroy();
             d3d.defaultPost->Destroy();
 
-            d3d.indexBuffer->Release();
-            d3d.samplerLinear->Release();
-            d3d.samplerPoint->Release();
+            // release interfaces
             d3d.constantBufferPS->Release();
             d3d.constantBufferPSExtra->Release();
             d3d.constantBufferUV->Release();
             d3d.constantBufferVS->Release();
             d3d.vertexBuffer->Release();
+            d3d.samplerLinear->Release();
+            d3d.samplerPoint->Release();
+            d3d.indexBuffer->Release();
             d3d.blendState->Release();
-            d3d.layout->Release();
             d3d.rsSolid->Release();
             d3d.rsWire->Release();
+            d3d.layout->Release();
             d3d.defaultVS->Release();
             d3d.depthStencilBuffer->Release();
             d3d.depthStencil->Release();
@@ -149,6 +152,7 @@ namespace viva
             d3d.context->Release();
             d3d.device->Release();
 
+            // destroy window last
             window->_Destroy();
             window = nullptr;
 
@@ -183,7 +187,7 @@ namespace viva
                 "{float4 result=ObjTexture.Sample(ObjSamplerState,input.TexCoord);"
                 "clip(result.a-0.001f);return result;}";
 
-            ////    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
+            //    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
             DXGI_SWAP_CHAIN_DESC scd;
             ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
             scd.BufferCount = 1;                                    // one back buffer
@@ -318,7 +322,7 @@ namespace viva
             D3D11_BUFFER_DESC indexBufferDesc;
             ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
             indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-            indexBufferDesc.ByteWidth = sizeof(int) * 6;
+            indexBufferDesc.ByteWidth = sizeof(int) * (UINT)indices.size();
             indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
             indexBufferDesc.CPUAccessFlags = 0;
             indexBufferDesc.MiscFlags = 0;
@@ -332,8 +336,8 @@ namespace viva
             viva::creator = new Win32Creator();
 
             //////   PS    ///////
-            d3d.defaultPS = (Win32PixelShader*)creator->CreatePixelShader(strPixelShader);
-            d3d.defaultPost = (Win32PixelShader*)creator->CreatePixelShader(strPostShader);
+            d3d.defaultPS = static_cast<Win32PixelShader*>(creator->CreatePixelShader(strPixelShader));
+            d3d.defaultPost = static_cast<Win32PixelShader*>(creator->CreatePixelShader(strPostShader));
 
             viva::resourceManager = new ResourceManager();
             viva::camera = new Camera(clientSize);
@@ -343,7 +347,7 @@ namespace viva
             viva::time = new Win32Time();
             viva::routineManager = new RoutineManager();
 
-            ///// CONSTANT BUFFERS ///////
+            /////// CONSTANT BUFFERS ///////
             d3d.constantBufferVS = CreateConstantBuffer(sizeof(Matrix));
             d3d.context->VSSetConstantBuffers(0, 1, &d3d.constantBufferVS);
 
@@ -356,7 +360,7 @@ namespace viva
             d3d.constantBufferPSExtra = CreateConstantBuffer(16);
             d3d.context->PSSetConstantBuffers(1, 1, &d3d.constantBufferPSExtra);
 
-            ///// SQUARE VERTEX BUFFER //////
+            /////// SQUARE VERTEX BUFFER //////
             vector<Vertex> v({
                 Vertex(-1.0f, -1.0f, 0, 0, 0, 0, 0, 1),
                 Vertex(1.0f, -1.0f, 0, 0, 0, 0, 1, 1),

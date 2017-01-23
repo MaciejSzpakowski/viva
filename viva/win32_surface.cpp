@@ -38,7 +38,7 @@ namespace viva
             d3d.context->ClearRenderTargetView(rtv, four0);
 
             for (int i = 0; i < drawables.size(); i++)
-                drawables[i]->_Draw();
+                drawables.at(i)->_Draw();
         }
 
         void _DrawSurface() override
@@ -52,6 +52,8 @@ namespace viva
 
         void Destroy() override
         {
+            Clear();
+
             tex->Release();
             rtv->Release();
             srv->Release();

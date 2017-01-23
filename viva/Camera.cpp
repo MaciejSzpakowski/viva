@@ -87,7 +87,7 @@ namespace viva
             return Vector();
         }
 
-        void Destroy()
+        void _Destroy()
         {
             delete this;
         }

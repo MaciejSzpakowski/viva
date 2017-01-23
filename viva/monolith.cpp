@@ -21,7 +21,7 @@ parent = surface;
 }
 
 namespace viva{
-void Drawable::_SetIndex(int i)
+void Drawable::_SetIndex(uint i)
 {
 index = i;
 }
@@ -624,14 +624,14 @@ void Win32Engine::Activity()
 camera->_CalcViewProj();
 
 // time
-static_cast<Win32Time*>(time)->Activity();
+time->_Activity();
 
 // events
 routineManager->_Activity();
 
 // input
-static_cast<Input::Win32Mouse*>(mouse)->Activity();
-static_cast<Input::Win32Keyboard*>(keyboard)->Activity();
+mouse->_Activity();
+keyboard->_Activity();
 
 // render
 drawManager->_DrawNodes();
@@ -673,15 +673,16 @@ void Win32Engine::_Destroy()
 if(routineManager != nullptr)
 routineManager->_Destroy();
 if (time != nullptr)
-time->Destroy();
+time->_Destroy();
 if (mouse != nullptr)
-mouse->Destroy();
+mouse->_Destroy();
 if (keyboard != nullptr)
-keyboard->Destroy();
+keyboard->_Destroy();
 if (camera != nullptr)
-camera->Destroy();
+camera->_Destroy();
 if (drawManager != nullptr)
 drawManager->_Destroy();
+// destroy resource manager after drawmanager
 if (resourceManager != nullptr)
 resourceManager->_Destroy();
 if (creator != nullptr)
@@ -689,29 +690,31 @@ creator->_Destroy();
 
 keyboard = nullptr;
 mouse = nullptr;
-resourceManager = nullptr;
 engine = nullptr;
 camera = nullptr;
 creator = nullptr;
 drawManager = nullptr;
+resourceManager = nullptr;
 routineManager = nullptr;
 time = nullptr;
 
+// destroy objects
 d3d.defaultPS->Destroy();
 d3d.defaultPost->Destroy();
 
-d3d.indexBuffer->Release();
-d3d.samplerLinear->Release();
-d3d.samplerPoint->Release();
+// release interfaces
 d3d.constantBufferPS->Release();
 d3d.constantBufferPSExtra->Release();
 d3d.constantBufferUV->Release();
 d3d.constantBufferVS->Release();
 d3d.vertexBuffer->Release();
+d3d.samplerLinear->Release();
+d3d.samplerPoint->Release();
+d3d.indexBuffer->Release();
 d3d.blendState->Release();
-d3d.layout->Release();
 d3d.rsSolid->Release();
 d3d.rsWire->Release();
+d3d.layout->Release();
 d3d.defaultVS->Release();
 d3d.depthStencilBuffer->Release();
 d3d.depthStencil->Release();
@@ -720,6 +723,7 @@ d3d.swapChain->Release();
 d3d.context->Release();
 d3d.device->Release();
 
+// destroy window last
 window->_Destroy();
 window = nullptr;
 
@@ -756,7 +760,7 @@ std::string strPostShader = "cbuffer cbBufferPS{};Texture2D ObjTexture;SamplerSt
 "{float4 result=ObjTexture.Sample(ObjSamplerState,input.TexCoord);"
 "clip(result.a-0.001f);return result;}";
 
-////    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
+//    DEVICE, DEVICE CONTEXT AND SWAP CHAIN    ////
 DXGI_SWAP_CHAIN_DESC scd;
 ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
 scd.BufferCount = 1;                                    // one back buffer
@@ -891,7 +895,7 @@ vector<int> indices({ 0, 1, 2, 0, 2, 3, });
 D3D11_BUFFER_DESC indexBufferDesc;
 ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
 indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-indexBufferDesc.ByteWidth = sizeof(int) * 6;
+indexBufferDesc.ByteWidth = sizeof(int) * (UINT)indices.size();
 indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 indexBufferDesc.CPUAccessFlags = 0;
 indexBufferDesc.MiscFlags = 0;
@@ -905,8 +909,8 @@ d3d.context->IASetIndexBuffer(d3d.indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 viva::creator = new Win32Creator();
 
 //////   PS    ///////
-d3d.defaultPS = (Win32PixelShader*)creator->CreatePixelShader(strPixelShader);
-d3d.defaultPost = (Win32PixelShader*)creator->CreatePixelShader(strPostShader);
+d3d.defaultPS = static_cast<Win32PixelShader*>(creator->CreatePixelShader(strPixelShader));
+d3d.defaultPost = static_cast<Win32PixelShader*>(creator->CreatePixelShader(strPostShader));
 
 viva::resourceManager = new ResourceManager();
 viva::camera = new Camera(clientSize);
@@ -916,7 +920,7 @@ viva::mouse = new Input::Win32Mouse();
 viva::time = new Win32Time();
 viva::routineManager = new RoutineManager();
 
-///// CONSTANT BUFFERS ///////
+/////// CONSTANT BUFFERS ///////
 d3d.constantBufferVS = CreateConstantBuffer(sizeof(Matrix));
 d3d.context->VSSetConstantBuffers(0, 1, &d3d.constantBufferVS);
 
@@ -929,7 +933,7 @@ d3d.context->PSSetConstantBuffers(0, 1, &d3d.constantBufferPS);
 d3d.constantBufferPSExtra = CreateConstantBuffer(16);
 d3d.context->PSSetConstantBuffers(1, 1, &d3d.constantBufferPSExtra);
 
-///// SQUARE VERTEX BUFFER //////
+/////// SQUARE VERTEX BUFFER //////
 vector<Vertex> v({
 Vertex(-1.0f, -1.0f, 0, 0, 0, 0, 0, 1),
 Vertex(1.0f, -1.0f, 0, 0, 0, 0, 1, 1),
@@ -1159,7 +1163,7 @@ return Vector();
 }
 
 namespace viva{
-void Camera::Destroy()
+void Camera::_Destroy()
 {
 delete this;
 }
@@ -1180,6 +1184,27 @@ Pixel::Pixel(byte r, byte g, byte b, byte a): R(r), G(g), B(b), A(a)
 namespace viva{
 Pixel::Pixel(const Color& color): R((int)(color.R * 255)),G((int)(color.G * 255)),B((int)(color.B * 255)),A((int)(color.A * 255))
 {
+}
+}
+
+namespace viva{
+Texture* Creator::CreateTexture(const wstring& filepath)
+{
+Pixel* pixels = nullptr;
+Size size = util::ReadImageToPixels(filepath, &pixels);
+Texture* tex = CreateTexture(pixels, size, filepath);
+
+if (pixels != nullptr)
+free(pixels);
+
+return tex;
+}
+}
+
+namespace viva{
+Texture* Creator::CreateTexture(const Pixel* pixels, const Size& size)
+{
+return CreateTexture(pixels, size, L"");
 }
 }
 
@@ -1237,15 +1262,15 @@ data2.push_back(b);
 b = b == 0 ? 255 : 0;
 }
 
-Texture* t = creator->CreateTexture(reinterpret_cast<Pixel*>(data2.data()), Size(190, 95), L"");
+//Texture* t = creator->CreateTexture(reinterpret_cast<Pixel*>(data2.data()), Size(190, 95), L"__vivaDefaultFontTexture", true);
 
-defaultFont = creator->CreateSprite(t);
-defaultFont->SetScale2TextureSize();
-defaultFont->SetFlipVertically(true);
+//defaultFont = creator->CreateSprite(t);
+//defaultFont->SetScale2TextureSize();
+//defaultFont->SetFlipVertically(true);
 }
 
 Pixel p[] = { Pixel(255,255,255,255) };
-whitePixel = creator->CreateTexture(p, Size(1, 1), L"");
+whitePixel = creator->CreateTexture(p, Size(1, 1), L"__whitePixel");
 
 //Add(defaultFont);
 }
@@ -1254,8 +1279,8 @@ whitePixel = creator->CreateTexture(p, Size(1, 1), L"");
 namespace viva{
 void DrawManager::_Destroy()
 {
-Clear();
 defaultSurface->Destroy();
+//defaultFont->Destroy();
 delete this;
 }
 }
@@ -1284,6 +1309,13 @@ return p;
 }
 
 namespace viva{
+Polygon* DrawManager::AddPolygon(const vector<Point>& points)
+{
+return AddPolygon(points, defaultSurface);
+}
+}
+
+namespace viva{
 Sprite* DrawManager::AddSprite(Texture* t, Surface* surface)
 {
 Sprite* s = creator->CreateSprite(t);
@@ -1293,10 +1325,24 @@ return s;
 }
 
 namespace viva{
+Sprite* DrawManager::AddSprite(Texture* t)
+{
+return AddSprite(t, defaultSurface);
+}
+}
+
+namespace viva{
 Sprite* DrawManager::AddRectangle(Surface* surface)
 {
 Sprite* s = AddSprite(whitePixel, surface);
 return s;
+}
+}
+
+namespace viva{
+Sprite* DrawManager::AddRectangle()
+{
+return AddRectangle(defaultSurface);
 }
 }
 
@@ -1310,6 +1356,13 @@ return s;
 }
 
 namespace viva{
+Sprite* DrawManager::AddSprite(const wstring& filepath)
+{
+return AddSprite(filepath, defaultSurface);
+}
+}
+
+namespace viva{
 void DrawManager::Remove(Drawable* drawable)
 {
 drawable->GetSurface()->Remove(drawable);
@@ -1319,10 +1372,14 @@ drawable->GetSurface()->Remove(drawable);
 namespace viva{
 void DrawManager::Add(Drawable* drawable, Surface* surface)
 {
-if (surface == nullptr)
-surface = defaultSurface;
-
 surface->Add(drawable);
+}
+}
+
+namespace viva{
+void DrawManager::Add(Drawable* drawable)
+{
+defaultSurface->Add(drawable);
 }
 }
 
@@ -1330,13 +1387,6 @@ namespace viva{
 Sprite* DrawManager::GetDefaultFont() const
 {
 return defaultFont;
-}
-}
-
-namespace viva{
-void DrawManager::Clear()
-{
-//defaultSurface->Clear();
 }
 }
 
@@ -1405,7 +1455,8 @@ return cursorVisibility;
 namespace viva{
 Resource::Resource(const wstring& _name, ResourceType t)
 {
-name = _name; type = t;
+name = _name;
+type = t;
 }
 }
 
@@ -1453,6 +1504,13 @@ return size;
 namespace viva{
 Polygon::Polygon(int count):vertexCount(count)
 {
+}
+}
+
+namespace viva{
+Node* Polygon::GetNode() 
+{
+return this;
 }
 }
 
@@ -1539,6 +1597,13 @@ return this;
 }
 
 namespace viva{
+Node* Sprite::GetNode() 
+{
+return this;
+}
+}
+
+namespace viva{
 const Rect& Sprite::GetUV() const
 {
 return uv;
@@ -1565,7 +1630,7 @@ void ResourceManager::AddResource(Resource* res)
 auto it = resources.find(res->GetName());
 
 if (it != resources.end())
-throw Error("ResourceManager::AddResource()", "Resource of that name already exists");
+throw Error(__FUNCTION__, "Resource of that name already exists");
 
 res->_SetCached(true);
 resources[res->GetName()] = res;
@@ -1578,7 +1643,7 @@ Resource* ResourceManager::GetResource(const wstring& name) const
 auto it = resources.find(name);
 
 if (it == resources.end())
-return nullptr;
+return nullptr;        // DONT CHANGE THAT to error
 
 return it->second;
 }
@@ -1590,7 +1655,7 @@ Texture* ResourceManager::GetTexture(const wstring& name) const
 auto it = resources.find(name);
 
 if (it == resources.end() || it->second->GetType() != ResourceType::Texture)
-return nullptr;
+return nullptr;             // DONT CHANGE THAT to error
 
 return (Texture*)it->second;
 }
@@ -1602,7 +1667,7 @@ void ResourceManager::RemoveResource(const wstring& name)
 auto it = resources.find(name);
 
 if (it == resources.end())
-throw Error("ResourceManager::RemoveResource()", "Resource not found");
+throw Error(__FUNCTION__, "Resource not found");
 
 it->second->_SetCached(false);
 resources.erase(it);
@@ -1622,7 +1687,9 @@ resources.clear();
 namespace viva{
 void ResourceManager::_Destroy()
 {
-RemoveAll();
+for (auto& r : resources)
+r.second->Destroy();
+
 delete this;
 }
 }
@@ -1680,7 +1747,7 @@ ID3D11Buffer* vertexBuffer;
 d3d.device->CreateBuffer(&bd, &sd, &vertexBuffer);
 delete[] temp;//*/
 
-Win32Polygon* poly = new Win32Polygon(vertexBuffer, (int)points.size());
+Win32Polygon* poly = new Win32Polygon(vertexBuffer, points.size());
 poly->SetPixelShader(d3d.defaultPS);
 return poly;
 }
@@ -1805,10 +1872,10 @@ return new Win32Sprite(tex, ps);
 namespace viva{
 Sprite* Win32Creator::CreateSprite(const wstring& filepath)
 {
-Win32Texture* tex = static_cast<Win32Texture*>(resourceManager->GetTexture(filepath));
+Texture* tex = resourceManager->GetTexture(filepath);
 
 if (tex == nullptr)
-tex = CreateTextureWin32(filepath, true);
+tex = Creator::CreateTexture(filepath);
 
 return CreateSprite(tex);
 }
@@ -1817,40 +1884,12 @@ return CreateSprite(tex);
 namespace viva{
 Texture* Win32Creator::CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) 
 {
-return CreateTextureWin32(pixels, size, name, false);
-}
-}
+Texture* t = new Win32Texture(name, SrvFromPixels(pixels, size), size);
 
-namespace viva{
-Texture* Win32Creator::CreateTexture(const wstring& filepath, bool cached)
-{
-return CreateTextureWin32(filepath, cached);
-}
-}
+if(name.size() != 0)
+resourceManager->AddResource(t);
 
-namespace viva{
-Win32Texture* Win32Creator::CreateTextureWin32(const wstring& filepath, bool cached)
-{
-Pixel* pixels = nullptr;
-Size size = util::ReadImageToPixels(filepath, &pixels);
-Win32Texture* tex = CreateTextureWin32(pixels, size, filepath, cached);
-
-if(pixels != nullptr)
-free(pixels);
-
-return tex;
-}
-}
-
-namespace viva{
-Win32Texture* Win32Creator::CreateTextureWin32(const Pixel* pixels, const Size& size, const wstring& name, bool cached)
-{
-Win32Texture* tex = new Win32Texture(name, SrvFromPixels(pixels, size), size);
-
-if (cached)
-resourceManager->AddResource(tex);
-
-return tex;
+return t;
 }
 }
 
@@ -1858,6 +1897,12 @@ namespace viva{
 void Win32Creator::_Destroy() 
 {
 delete this;
+}
+}
+
+namespace viva{
+Routine::Routine(std::function<int()> activity, wstring name): Activity(activity), Name(name)
+{
 }
 }
 
@@ -1883,30 +1928,40 @@ pause = false;
 }
 
 namespace viva{
+const wstring& Routine::GetName() 
+{
+return Name;
+}
+}
+
+namespace viva{
 void RoutineManager::_Activity()
 {
 double gameTime = time->GetGameTime();
 
+if (routines.size() == 0)
+return;
+
 //might be removed so backwards iteration
-for (int i = (int)routines.size() - 1; i >= 0; i--)
+for (uint i = routines.size() - 1; i >= 0; i--)
 {
 // destroy if remove flag is up
-if (routines[i] != nullptr && routines[i]->remove)
+if (routines.at(i) != nullptr && routines.at(i)->remove)
 {
-delete routines[i];
-routines[i] = nullptr;
+delete routines.at(i);
+routines.at(i) = nullptr;
 }
 
 //pop if last routine is empty
-if (routines[i] == nullptr && i == routines.size() - 1)
+if (routines.at(i) == nullptr && i == routines.size() - 1)
 {
 routines.pop_back();
 continue;
 }
 //if its empty but not last
-else if (routines[i] == nullptr)
+else if (routines.at(i) == nullptr)
 {
-routines[i] = routines.back();
+routines.at(i) = routines.back();
 routines.pop_back();
 continue;
 }
@@ -1914,20 +1969,20 @@ continue;
 int ret = 1;
 
 //if delay time has passed...
-if (gameTime - routines[i]->startTime > routines[i]->delay && !routines[i]->pause)
+if (gameTime - routines.at(i)->startTime > routines.at(i)->delay && !routines.at(i)->pause)
 //...and it's time for next pulse then run
-if (routines[i]->tick == 0 ||
-(gameTime - routines[i]->lastPulse > routines[i]->tick))
+if (routines.at(i)->tick == 0 ||
+(gameTime - routines.at(i)->lastPulse > routines.at(i)->tick))
 {
-ret = routines[i]->Activity();
-routines[i]->lastPulse = gameTime;
+ret = routines.at(i)->Activity();
+routines.at(i)->lastPulse = gameTime;
 }
 //if returned 0 or expired then remove
-if (ret == 0 || (routines[i]->lifeTime > 0 &&
-gameTime - routines[i]->startTime > routines[i]->lifeTime))
+if (ret == 0 || (routines.at(i)->lifeTime > 0 &&
+gameTime - routines.at(i)->startTime > routines.at(i)->lifeTime))
 {
-delete routines[i];
-routines[i] = routines.back();
+delete routines.at(i);
+routines.at(i) = routines.back();
 routines.pop_back();
 }
 }
@@ -1935,9 +1990,9 @@ routines.pop_back();
 }
 
 namespace viva{
-IRoutine* RoutineManager::AddRoutine(std::function<int()> func, wstring name, double delay, double lifeTime, double tick)
+IRoutine* RoutineManager::AddRoutine(std::function<int()> func, const wstring& name, double delay, double lifeTime, double tick)
 {
-Routine* newRoutine = new Routine;
+Routine* newRoutine = new Routine(func, name);
 newRoutine->tick = tick;
 newRoutine->lifeTime = lifeTime;
 newRoutine->delay = delay;
@@ -1957,10 +2012,10 @@ namespace viva{
 IRoutine* RoutineManager::FindRoutine(wstring name)
 {
 for (int i = 0; i<routines.size(); i++)
-if (routines[i] && routines[i]->Name == name)
-return routines[i];
+if (routines.at(i) && routines.at(i)->Name == name)
+return routines.at(i);
 
-throw Error("RoutineManager::RemoveRoutine()", "Routine not found");
+throw Error(__FUNCTION__, "Routine not found");
 }
 }
 
@@ -2006,8 +2061,8 @@ handlers.clear();
 namespace viva{
 void RoutineManager::ClearRoutines()
 {
-for (int i = 0; i < routines.size(); i++)
-delete routines[i];
+for (uint i = 0; i < routines.size(); i++)
+delete routines.at(i);
 
 routines.clear();
 }
@@ -2032,9 +2087,22 @@ Surface::Surface()
 namespace viva{
 void Surface::Add(Drawable* d)
 {
-d->_SetIndex((int)drawables.size());
+d->_SetIndex(drawables.size());
 d->_SetSurface(this);
 drawables.push_back(d);
+}
+}
+
+namespace viva{
+void Surface::RemoveAll()
+{
+for (uint i = 0; i < drawables.size(); i++)
+{
+drawables.at(i)->_SetIndex(-1);
+drawables.at(i)->_SetSurface(nullptr);
+}
+
+drawables.clear();
 }
 }
 
@@ -2045,11 +2113,21 @@ if (d->_GetIndex() == -1)
 return;
 
 if (d->_GetIndex() != drawables.size() - 1)
-drawables[d->_GetIndex()] = drawables.back();
+drawables.at(d->_GetIndex()) = drawables.back();
 
 drawables.pop_back();
 d->_SetIndex(-1);
 d->_SetSurface(nullptr);
+}
+}
+
+namespace viva{
+void Surface::Clear()
+{
+for (uint i = 0; i < drawables.size(); i++)
+drawables.at(i)->GetNode()->Destroy();
+
+drawables.clear();
 }
 }
 
@@ -2107,6 +2185,8 @@ throw viva::Error("Win32Window()", "Window Class failed to register");
 }
 
 RECT rect = { 0, 0, (int)size.Width, (int)size.Height };
+
+// this is to enforce the correct size of window client
 AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS, FALSE, 0);
 
 handle = CreateWindowEx(0, className, title.c_str(), WS_OVERLAPPEDWINDOW,
@@ -2160,7 +2240,7 @@ void Win32Window::Run(const std::function<void()>& gameloop, const std::function
 ShowWindow(handle, SW_SHOW);
 UpdateWindow(handle);
 
-win32mouse = (Input::Win32Mouse*)mouse;
+win32mouse = static_cast<Input::Win32Mouse*>(mouse);
 activity = gameloop;
 worker = intloop;
 
@@ -2304,7 +2384,7 @@ return !curState.at(mappedKey) && prevState.at(mappedKey);
 }
 
 namespace viva::Input{
-void Win32Mouse::Activity()
+void Win32Mouse::_Activity() 
 {
 // get cursor pos and delta from os
 window->GetHandle();
@@ -2319,9 +2399,9 @@ lastCursorPos.Y = (float)p.y;
 curState.swap(prevState);
 
 // get button states
-curState[ARR_LBUTTON] = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) && true;
-curState[ARR_RBUTTON] = (GetAsyncKeyState(VK_RBUTTON) & 0x8000) && true;
-curState[ARR_MBUTTON] = (GetAsyncKeyState(VK_MBUTTON) & 0x8000) && true;
+curState.at(ARR_LBUTTON) = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) && true;
+curState.at(ARR_RBUTTON) = (GetAsyncKeyState(VK_RBUTTON) & 0x8000) && true;
+curState.at(ARR_MBUTTON) = (GetAsyncKeyState(VK_MBUTTON) & 0x8000) && true;
 }
 }
 
@@ -2329,13 +2409,13 @@ namespace viva::Input{
 void Win32Mouse::ResetKey(MouseKey key) 
 {
 int mappedKey = GetMappedKey(key);
-curState[mappedKey] = false;
-prevState[mappedKey] = false;
+curState.at(mappedKey) = false;
+prevState.at(mappedKey) = false;
 }
 }
 
 namespace viva::Input{
-void Win32Mouse::Destroy() 
+void Win32Mouse::_Destroy() 
 {
 delete this;
 }
@@ -2368,7 +2448,7 @@ Win32Keyboard::Win32Keyboard(): keyNumber(256),curState(keyNumber),prevState(key
 }
 
 namespace viva::Input{
-void Win32Keyboard::Activity()
+void Win32Keyboard::_Activity() 
 {
 capslockActive = GetKeyState((int)KeyboardKey::CapsLock) & 1;
 
@@ -2377,7 +2457,7 @@ curState.swap(prevState);
 
 // get button states
 for (int i = 0; i<keyNumber; i++)
-curState[i] = (GetAsyncKeyState(i) & 0x8000) && true;
+curState.at(i) = (GetAsyncKeyState(i) & 0x8000) && true;
 }
 }
 
@@ -2421,7 +2501,7 @@ byte output2[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(', 'Q', 'W', '
 // from combination of capslock and shit, figure out what is the case
 char mod = (enableShift && IsKeyDown(KeyboardKey::Shift)) + (enableCapslock && capslockActive);
 
-for (int i = 0; i < sizeof(input); i++)
+for (uint i = 0; i < sizeof(input); i++)
 {
 if (IsKeyPressed((KeyboardKey)input[i]))
 {
@@ -2445,13 +2525,13 @@ return capslockActive;
 namespace viva::Input{
 void Win32Keyboard::ResetKey(KeyboardKey key) 
 {
-curState[(int)key] = false;
-prevState[(int)key] = false;
+curState.at((int)key) = false;
+prevState.at((int)key) = false;
 }
 }
 
 namespace viva::Input{
-void Win32Keyboard::Destroy() 
+void Win32Keyboard::_Destroy() 
 {
 delete this;
 }
@@ -2483,13 +2563,6 @@ namespace viva{
 void Win32Polygon::SetPixelShader(PixelShader* _ps)
 {
 ps = (Win32PixelShader*)_ps;
-}
-}
-
-namespace viva{
-Node* Win32Polygon::GetNode() 
-{
-return this;
 }
 }
 
@@ -2558,7 +2631,9 @@ d3d.context->DrawIndexed(6, 0, 0);
 namespace viva{
 void Win32Sprite::Destroy() 
 {
+if(!texture->IsCached())
 texture->Destroy();
+
 delete this;
 }
 }
@@ -2567,13 +2642,6 @@ namespace viva{
 Texture* Win32Sprite::GetTexture() 
 {
 return texture;
-}
-}
-
-namespace viva{
-Node* Win32Sprite::GetNode() 
-{
-return this;
 }
 }
 
@@ -2625,7 +2693,7 @@ float four0[4] = { 0, 0, 0, 0 };
 d3d.context->ClearRenderTargetView(rtv, four0);
 
 for (int i = 0; i < drawables.size(); i++)
-drawables[i]->_Draw();
+drawables.at(i)->_Draw();
 }
 }
 
@@ -2643,6 +2711,8 @@ d3d.context->DrawIndexed(6, 0, 0);
 namespace viva{
 void Win32Surface::Destroy() 
 {
+Clear();
+
 tex->Release();
 rtv->Release();
 srv->Release();
@@ -2663,14 +2733,14 @@ prevFrameTime = startTime;
 }
 
 namespace viva{
-void Win32Time::Destroy() 
+void Win32Time::_Destroy() 
 {
 delete this;
 }
 }
 
 namespace viva{
-void Win32Time::Activity()
+void Win32Time::_Activity() 
 {
 LARGE_INTEGER currentTime;
 long long frameTickCount;
@@ -2774,69 +2844,6 @@ return s.rfind(end) == (s.length() - end.length());
 }
 }
 
-namespace viva::util {
-Size ReadTgaToPixels(const std::wstring& filepath, vector<Pixel>& dst)
-{
-Size size;
-std::ifstream file(filepath, std::ios::binary);
-int imageSize;
-int colorMode;
-byte imageTypeCode;
-byte bitCount;
-
-// Open the TGA file.
-if (!file)
-throw viva::Error("ReadTgaToPixels()", L"could not open the file " + filepath);
-
-// Read the two first bytes we don't need.
-file.get();
-file.get();
-
-// Which type of image gets stored in imageTypeCode.
-imageTypeCode = file.get();
-
-// For our purposes, the type code should be 2 (uncompressed RGB image)
-// or 3 (uncompressed black-and-white images).
-if (imageTypeCode != 2 && imageTypeCode != 3)
-throw viva::Error("ReadTgaToPixels()", "unsupported tga format");
-
-// Read 9 bytes of data we don't need.
-for (int i = 0; i < 9; i++)
-file.get();
-
-// Read the image's width and height
-size.Width = (float)(file.get() + (file.get() << 8));
-size.Height = (float)(file.get() + (file.get() << 8));
-
-// Read the bit depth.
-bitCount = file.get();
-
-// Read one byte of data we don't need.
-file.get();
-
-// Color mode -> 3 = BGR, 4 = BGRA.
-colorMode = bitCount / 8;
-imageSize = (int)(size.Height * size.Width);
-
-// Allocate memory for the image data.
-dst.resize(size.Width * size.Height);
-
-// Read the image data.
-for (int i = 0; i < imageSize; i++)
-{
-byte b = (byte)file.get();
-byte g = (byte)file.get();
-byte r = (byte)file.get();
-if (colorMode == 3)
-dst.at(i) = { r, g, b, 255 };
-else if (colorMode == 4)
-dst.at(i) = { r, g, b, (byte)file.get() };
-}
-
-return size;
-}
-}
-
 namespace viva {
 void intloop()
 {
@@ -2922,7 +2929,7 @@ namespace viva {
 Engine* engine = nullptr;}
 
 namespace viva {
-Camera* camera = nullptr;;}
+Camera* camera = nullptr;}
 
 namespace viva {
 Creator* creator = nullptr;}
@@ -2946,7 +2953,7 @@ namespace viva {
 RoutineManager* routineManager = nullptr;}
 
 namespace viva {
-Time* time;}
+Time* time = nullptr;}
 
 namespace viva {
 D3D11 d3d;}

@@ -53,20 +53,20 @@ int wrapper()
             //s3->T()->SetPosition(5, -5);
             //s3->SetPixelScale({ 512, 512 });
 
-            auto s6 = viva::drawManager->AddRectangle(nullptr);
+            auto s6 = viva::drawManager->AddRectangle();
             s6->T()
                 ->SetCoordMode(viva::TransformMode::Screen)
                 ->SetScale(200, 75)
                 ->SetPosition(100, 100);
             s6->SetColor(1, 0, 0, 1);
 
-            auto s7 = viva::drawManager->AddRectangle(nullptr);
+            auto s7 = viva::drawManager->AddRectangle();
             s7->T()->SetCoordMode(viva::TransformMode::Screen)
                 ->SetScale(88, 88)
                 ->SetPosition(600, 250);
             s7->SetColor(0, 1, 0, 1);
 
-            auto s8 = viva::drawManager->AddRectangle(nullptr);
+            auto s8 = viva::drawManager->AddRectangle();
             s8->T()->SetCoordMode(viva::TransformMode::Screen)
                 ->SetScale(2, 49)
                 ->SetPosition(3, 333);
@@ -75,17 +75,16 @@ int wrapper()
             std::vector<viva::Point> points1;
             points1.push_back({ 0,10 });
             points1.push_back({ 0,-10 });
-            auto c1 = viva::drawManager->AddPolygon(points1, nullptr);
-            auto c2 = viva::drawManager->AddPolygon(points1, nullptr);
+            auto c1 = viva::drawManager->AddPolygon(points1);
+            auto c2 = viva::drawManager->AddPolygon(points1);
             c2->T()->SetRotation(viva::Math::Deg2Rad(90));
             
-            viva::Sprite* s9 = viva::drawManager->AddRectangle(nullptr);
+            viva::Sprite* s9 = viva::drawManager->AddRectangle();
             //auto s9 = viva::drawManager->AddSprite(L"asdasd", nullptr);
             s9->SetColor(1, 0, 1, 1);
 
             viva::engine->Run(f);
         }
-
 
         printf("Exit ?\n");
         int c = getchar();

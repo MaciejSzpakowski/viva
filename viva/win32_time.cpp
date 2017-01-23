@@ -20,12 +20,12 @@ namespace viva
             prevFrameTime = startTime;
         }
 
-        void Destroy() override
+        void _Destroy() override
         {
             delete this;
         }
 
-        void Activity()
+        void _Activity() override
         {
             LARGE_INTEGER currentTime;
             long long frameTickCount;

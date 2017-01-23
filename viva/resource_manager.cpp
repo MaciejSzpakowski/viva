@@ -12,14 +12,14 @@ namespace viva
         { 
         }
 
-        // Add resource. No duplicate name allowed. Exception will be thrown.
+        // Add resource. Throws exception if duplicate name.
         // res: resource to add
         void AddResource(Resource* res)
         {
             auto it = resources.find(res->GetName());
 
             if (it != resources.end())
-                throw Error("ResourceManager::AddResource()", "Resource of that name already exists");
+                throw Error(__FUNCTION__, "Resource of that name already exists");
 
             res->_SetCached(true);
             resources[res->GetName()] = res;
@@ -32,7 +32,7 @@ namespace viva
             auto it = resources.find(name);
 
             if (it == resources.end())
-                return nullptr;
+                return nullptr;        // DONT CHANGE THAT to error
 
             return it->second;
         }
@@ -44,7 +44,7 @@ namespace viva
             auto it = resources.find(name);
 
             if (it == resources.end() || it->second->GetType() != ResourceType::Texture)
-                return nullptr;
+                return nullptr;             // DONT CHANGE THAT to error
 
             return (Texture*)it->second;
         }
@@ -56,7 +56,7 @@ namespace viva
             auto it = resources.find(name);
 
             if (it == resources.end())
-                throw Error("ResourceManager::RemoveResource()", "Resource not found");
+                throw Error(__FUNCTION__, "Resource not found");
 
             it->second->_SetCached(false);
             resources.erase(it);
@@ -71,9 +71,12 @@ namespace viva
             resources.clear();
         }
 
+        // Called only when viva is being destroyed.
         void _Destroy()
         {
-            RemoveAll();
+            for (auto& r : resources)
+                r.second->Destroy();
+
             delete this;
         }
     };

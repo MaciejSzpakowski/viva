@@ -80,6 +80,11 @@ namespace viva
             return this;
         }
 
+        Node* GetNode() override
+        {
+            return this;
+        }
+
         // Get uv.
         const Rect& GetUV() const 
         { 

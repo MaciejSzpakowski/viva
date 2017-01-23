@@ -20,8 +20,9 @@ namespace viva
         ResourceType type;
     public:
         Resource(const wstring& _name, ResourceType t)
-        { 
-            name = _name; type = t; 
+        {
+            name = _name; 
+            type = t; 
         }
 
         bool IsCached() const 
@@ -31,7 +32,7 @@ namespace viva
 
         ResourceType GetType() const
         { 
-            return type; 
+            return type;
         }
 
         void _SetCached(bool _cached)
@@ -43,6 +44,8 @@ namespace viva
         {
             return name; 
         }
+
+        virtual void Destroy() = 0;
     };
 
     struct Point
@@ -211,11 +214,6 @@ namespace viva
         POINT, LINEAR
     };
 
-    //enum class ViewMode
-    //{
-    //	WIREFRAME, TEXTURED //, SOLID <-- maybe i can figure it out later
-    //};
-
     class Texture : public Resource
     {
     protected:
@@ -225,8 +223,6 @@ namespace viva
             : Resource(_name, ResourceType::Texture) 
         { 
         }
-
-        virtual void Destroy() = 0;
 
         Size GetSize() const 
         { 

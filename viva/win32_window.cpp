@@ -87,6 +87,8 @@ namespace viva
             }
 
             RECT rect = { 0, 0, (int)size.Width, (int)size.Height };
+
+            // this is to enforce the correct size of window client
             AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS, FALSE, 0);
 
             handle = CreateWindowEx(0, className, title.c_str(), WS_OVERLAPPEDWINDOW,
@@ -135,7 +137,7 @@ namespace viva
             ShowWindow(handle, SW_SHOW);
             UpdateWindow(handle);
 
-            win32mouse = (Input::Win32Mouse*)mouse;
+            win32mouse = static_cast<Input::Win32Mouse*>(mouse);
             activity = gameloop;
             worker = intloop;
 

@@ -17,7 +17,7 @@ namespace viva
     typedef unsigned int uint;
 
     Engine* engine = nullptr;
-    Camera* camera = nullptr;;
+    Camera* camera = nullptr;
     Creator* creator = nullptr;
     DrawManager* drawManager = nullptr;
     Window* window = nullptr;
@@ -25,5 +25,5 @@ namespace viva
     Input::Mouse* mouse = nullptr;
     Input::Keyboard* keyboard = nullptr;
     RoutineManager* routineManager = nullptr;
-    Time* time;
+    Time* time = nullptr;
 }
