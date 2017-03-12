@@ -5,18 +5,24 @@ namespace viva
     class Win32Polygon : public Polygon
     {
     private:
-        ID3D11Buffer* vertexBuffer;
+        Win32VertexBuffer* vertexBuffer;
         Win32PixelShader* ps;
     public:
-        Win32Polygon(ID3D11Buffer* _vertexBuffer, int count) 
-            : Polygon(count)
+        Win32Polygon(VertexBuffer* vb)
+            : vertexBuffer((Win32VertexBuffer*)vb)
         {
-            vertexBuffer = _vertexBuffer;
+            vertexCount = vb->GetVertexCount();
+            ps = d3d.defaultPS;
         }
 
         void Destroy() override
         {
-            vertexBuffer->Release();
+            if(!vertexBuffer->IsShared())
+                vertexBuffer->Destroy();
+
+            if (index != -1)
+                parent->Remove(this);
+
             delete this;
         }
 
@@ -44,8 +50,10 @@ namespace viva
             d3d.context->RSSetState(d3d.rsWire);
             UINT stride = sizeof(Vertex);
             UINT offset = 0;
-            d3d.context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-            d3d.context->Draw(vertexCount, 0);
+            d3d.context->IASetVertexBuffers(0, 1, &(vertexBuffer->vertexBuffer), &stride, &offset);
+
+            if(visible)
+                d3d.context->Draw(vertexCount, 0);
         }
     };
 }

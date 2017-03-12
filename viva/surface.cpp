@@ -51,11 +51,18 @@ namespace viva
         //
         void Remove(Drawable* d)
         {
-            if (d->_GetIndex() == -1)
-                return;
+            int indexOfd = d->_GetIndex();
 
-            if (d->_GetIndex() != drawables.size() - 1)
-                drawables.at(d->_GetIndex()) = drawables.back();
+            if (indexOfd == -1)
+                return;
+            
+            // if d is not at the end
+            if (indexOfd != drawables.size() - 1)
+            {
+                // move back to where d is and update its index
+                drawables.back()->_SetIndex(indexOfd);
+                drawables.at(indexOfd) = drawables.back();
+            }
 
             drawables.pop_back();
             d->_SetIndex(-1);

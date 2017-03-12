@@ -30,6 +30,7 @@
 #include <cstdarg>
 #include <map>
 #include <array>
+#include <random>
 #include "viva.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -51,18 +52,12 @@
 #include "viva.h"
 #include "viva.h"
 #include "viva.h"
+#include "viva.h"
+#include "viva.h"
+#include "viva.h"
 
 namespace viva {
 class Drawable;}
-
-namespace viva {
-union Vector;}
-
-namespace viva {
-struct Point;}
-
-namespace viva {
-class Transform;}
 
 namespace viva {
 class Node;}
@@ -75,6 +70,15 @@ class Colorable;}
 
 namespace viva {
 struct FontMetrics;}
+
+namespace viva {
+union Vector;}
+
+namespace viva {
+struct Point;}
+
+namespace viva {
+class Transform;}
 
 namespace viva {
 class Text;}
@@ -155,6 +159,12 @@ namespace viva {
 class RoutineManager;}
 
 namespace viva {
+class VertexBuffer;}
+
+namespace viva {
+class Win32VertexBuffer;}
+
+namespace viva {
 class Surface;}
 
 namespace viva {
@@ -176,13 +186,19 @@ namespace viva {
 class PixelShader;}
 
 namespace viva {
-struct Win32PixelShader;}
+class Win32PixelShader;}
 
 namespace viva::Input {
 class Win32Keyboard;}
 
 namespace viva {
 class Win32Polygon;}
+
+namespace viva {
+struct Action;}
+
+namespace viva {
+class Animation;}
 
 namespace viva {
 class Win32Sprite;}
@@ -214,6 +230,12 @@ namespace viva{
 namespace viva{
     typedef unsigned int uint;}
 
+
+namespace viva
+{
+enum class CloseReason : int
+{WindowClose = 1,EngineClose};
+}
 
 namespace viva::Input
 {
@@ -248,28 +270,73 @@ enum class ResourceType
 namespace viva
 {
 enum class TextureFilter
-{POINT, LINEAR};
+{Point, Linear};
 }
 
 namespace viva {
 class Drawable
 {
-protected:
-Surface* parent;
-uint index;
 public:
 Drawable();
 
 virtual void _Draw() = 0;
-Surface* GetSurface() const;
-
-void _SetSurface(Surface* surface);
-
-void _SetIndex(uint i);
-
-int _GetIndex() const;
-
+virtual Surface* GetSurface() const = 0;
+virtual bool IsVisible() const = 0;
+virtual Drawable* SetVisible(bool val) = 0;
+virtual void _SetSurface(Surface* surface) = 0;
+virtual void _SetIndex(uint i) = 0;
+virtual int _GetIndex() const = 0;
 virtual Node* GetNode() = 0;
+};}
+
+namespace viva {
+class Node
+{
+public:
+Node();
+
+virtual void Destroy() = 0;
+virtual Transform* T() = 0;
+virtual Transform* GetTransform() = 0;
+};}
+
+namespace viva {
+struct Color
+{
+float R, G, B, A;
+Color();
+
+Color(float _r, float _g, float _b, float _a);
+
+Color(const Pixel& pixel);
+
+};}
+
+namespace viva {
+class Colorable
+{
+protected:
+Color color;
+public:
+const Color& GetColor() const;
+
+Colorable* SetColor(float r, float g, float b, float a);
+
+Colorable* SetColor(const Color& c);
+
+Colorable* SetR(float r);
+
+Colorable* SetG(float g);
+
+Colorable* SetB(float b);
+
+Colorable* SetA(float a);
+
+};}
+
+namespace viva {
+struct FontMetrics
+{
 };}
 
 namespace viva {
@@ -286,23 +353,23 @@ static Vector Zero();
 
 static Vector One();
 
-float X() const;
+float GetX() const;
 
-float Y() const;
+float GetY() const;
 
-float Z() const;
+float GetZ() const;
 
-float W() const;
+float GetW() const;
 
-void X(float x);
+Vector* SetX(float x);
 
-void Y(float y);
+Vector* SetY(float y);
 
-void Z(float z);
+Vector* SetZ(float z);
 
-void W(float w);
+Vector* SetW(float w);
 
-void Add(const Vector& rhs);
+Vector* Add(const Vector& rhs);
 
 Vector operator+(const Vector& rhs);
 
@@ -324,6 +391,7 @@ class Transform
 private:
 Transform* parent;
 vector<Transform*> children;
+uint index;
 TransformMode mode;
 Vector origin;
 Vector position;
@@ -361,11 +429,11 @@ Transform* SetPosition(float x, float y, float z);
 
 Transform* SetPosition(float x, float y);
 
-Transform* SetPositionX(float x);
+Transform* SetX(float x);
 
-Transform* SetPositionY(float y);
+Transform* SetY(float y);
 
-Transform* SetPositionZ(float z);
+Transform* SetZ(float z);
 
 Transform* SetPosition(const Vector& v);
 
@@ -401,60 +469,12 @@ Transform* Grow(float factor);
 
 Transform* Shrink(float factor);
 
-};}
+Transform* SetParent(Transform* p);
 
-namespace viva {
-class Node
-{
-protected:
-Transform transform;
-public:
-Node();
+Transform* GetParent();
 
-virtual void Destroy() = 0;
-Transform* T();
+Transform* RemoveChild(Transform* child);
 
-Transform* GetTransform();
-
-};}
-
-namespace viva {
-struct Color
-{
-float R, G, B, A;
-Color();
-
-Color(float _r, float _g, float _b, float _a);
-
-Color(const Pixel& pixel);
-
-};}
-
-namespace viva {
-class Colorable
-{
-protected:
-Color color;
-public:
-const Color& GetColor() const;
-
-void SetColor(float r, float g, float b, float a);
-
-void SetColor(const Color& c);
-
-void SetColorR(float r);
-
-void SetColorG(float g);
-
-void SetColorB(float b);
-
-void SetColorA(float a);
-
-};}
-
-namespace viva {
-struct FontMetrics
-{
 };}
 
 namespace viva {
@@ -464,13 +484,41 @@ private:
 FontMetrics metrics;
 wstring text;
 TextureFilter texFilter;
-Sprite* sprite;
+Font* font;
+Transform transform;
+Surface* parent;
+uint index;
+bool visible;
 public:
-Text(Font* font);
+Text(const wstring& str, Font* f, FontMetrics m);
+
+Text(const wstring& str);
+
+Text(const wstring& str, Font* f);
+
+Transform* T() override;
+
+Transform* GetTransform() override;
+
+TextureFilter GetTextureFilter() const;
+
+Text* SetTexFilter(TextureFilter filter);
 
 void Destroy() override;
 
 void _Draw() override;
+
+Surface* GetSurface() const override;
+
+bool IsVisible() const override;
+
+Drawable* SetVisible(bool val) override;
+
+void _SetSurface(Surface* surface) override;
+
+void _SetIndex(uint i) override;
+
+int _GetIndex() const override;
 
 };}
 
@@ -508,7 +556,7 @@ Engine(const std::wstring& path, const Size& size);
 
 virtual void _Init() = 0;
 virtual void _Destroy() = 0;
-virtual void Run(const std::function<void()>& gameloop = []() {}) = 0;
+virtual CloseReason Run(const std::function<void()>& gameloop = []() {}) = 0;
 const Color& GetBackgroundColor() const;
 
 void SetBackgroundColor(const Color& color);
@@ -543,7 +591,7 @@ void CloseConsole() override;
 
 void Exit() override;
 
-void Run(const std::function<void()>& gameloop) override;
+CloseReason Run(const std::function<void()>& gameloop) override;
 
 ID3D11Buffer* CreateConstantBuffer(UINT size);
 
@@ -634,12 +682,20 @@ virtual PixelShader* CreatePixelShader(const wstring& filepath) = 0;
 virtual PixelShader* CreatePixelShader(const std::string& str) = 0;
 Texture* CreateTexture(const wstring& filepath);
 
+Font* CreateFontV(const wstring& filename);
+
+Font* CreateFontV(Texture* tex, const vector<Rect>& glyphs);
+
+Font* CreateFontV(Texture* tex);
+
 virtual Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) = 0;
 Texture* CreateTexture(const Pixel* pixels, const Size& size);
 
 virtual Sprite* CreateSprite(const wstring& filepath) = 0;
 virtual Sprite* CreateSprite(Texture* texture) = 0;
 virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
+virtual Polygon* CreatePolygon(VertexBuffer* vb) = 0;
+virtual VertexBuffer* CreateVertexBuffer(const vector<Point>& points) = 0;
 virtual Surface* CreateSurface() = 0;
 virtual void _Destroy() = 0;
 };}
@@ -674,9 +730,13 @@ namespace viva {
 class DrawManager
 {
 private:
-Sprite* defaultFont;
 Surface* defaultSurface;
 Texture* whitePixel;
+FontMetrics defaultMetrics;
+Font* defaultFont;
+TextureFilter defaultFilter;
+VertexBuffer* rectVertexBuffer;
+VertexBuffer* circleVertexBuffer;
 public:
 DrawManager();
 
@@ -688,15 +748,31 @@ void _DrawSurfaces();
 
 Polygon* AddPolygon(const vector<Point>& points, Surface* surface);
 
+Polygon* AddPolygon(VertexBuffer* vb, Surface* surface);
+
+Polygon* AddRectangle();
+
+Polygon* AddRectangle(Surface* surface);
+
+Polygon* AddCircle();
+
+Polygon* AddCircle(Surface* surface);
+
+Polygon* AddCircle(uint vertices);
+
+Polygon* AddCircle(uint vertices, Surface* surface);
+
 Polygon* AddPolygon(const vector<Point>& points);
+
+Polygon* AddPolygon(VertexBuffer* vb);
 
 Sprite* AddSprite(Texture* t, Surface* surface);
 
 Sprite* AddSprite(Texture* t);
 
-Sprite* AddRectangle(Surface* surface);
+Sprite* AddFillRectangle(Surface* surface);
 
-Sprite* AddRectangle();
+Sprite* AddFillRectangle();
 
 Sprite* AddSprite(const wstring& filepath, Surface* surface);
 
@@ -708,7 +784,19 @@ void Add(Drawable* drawable, Surface* surface);
 
 void Add(Drawable* drawable);
 
-Sprite* GetDefaultFont() const;
+TextureFilter GetDefaultTextureFilter() const;
+
+void SetDefaultTextureFilter(TextureFilter filter);
+
+const FontMetrics& GetDefaultFontMetrics() const;
+
+void SetDefaultFontMetrics(const FontMetrics& metrics);
+
+Texture* GetPixel();
+
+Font* GetDefaultFont() const;
+
+void Clear();
 
 };}
 
@@ -740,9 +828,19 @@ private:
 Texture* texture;
 vector<Rect> charsUv;
 public:
-Font::Font(Texture* tex, const Size& letterSize, int charsPerRow);
+Font(Texture* tex, const vector<Rect>& glyphs);
 
-void Font::Destroy();
+Font(Texture* tex);
+
+Font(const wstring& filename);
+
+Font* SetGlyphs(const vector<Rect>& glyphs);
+
+Font* CalcGlyphs(const Size& letterSize, uint charsPerRow);
+
+const Rect& GetChar(uint code) const;
+
+void Destroy();
 
 };}
 
@@ -806,10 +904,21 @@ Size GetSize() const;
 namespace viva::Input {
 class Keyboard
 {
+protected:
+vector<std::function<void(KeyboardKey)>> onKeyPressedHandlers;
+vector<std::function<void(KeyboardKey)>> onKeyReleasedHandlers;
 public:
 virtual bool IsKeyDown(KeyboardKey key) const = 0;
 virtual bool IsKeyPressed(KeyboardKey key) const = 0;
 virtual bool IsKeyReleased(KeyboardKey key) const = 0;
+void OnKeyPressed(const std::function<void(KeyboardKey)>& handler);
+
+void OnKeyReleased(const std::function<void(KeyboardKey)>& handler);
+
+void ClearOnKeyPressed();
+
+void ClearOnKeyReleased();
+
 virtual char GetChar(bool enableShift = true, bool enableCapslock = true) const = 0;
 virtual bool IsCapslockActive() const = 0;
 virtual void ResetKey(KeyboardKey key) = 0;
@@ -826,16 +935,35 @@ namespace viva {
 class Polygon : public Node, public Drawable, public Colorable
 {
 protected:
-float span;
 uint vertexCount;
+Transform transform;
+Surface* parent;
+uint index;
+bool visible;
 public:
-Polygon(int count);
+Polygon();
+
+Transform* T() override;
+
+Transform* GetTransform() override;
 
 Node* GetNode() override;
 
 virtual PixelShader* GetPixelShader() const = 0;
 virtual void SetPixelShader(PixelShader* ps) = 0;
-int GetVertexCount() const;
+uint GetVertexCount() const;
+
+Surface* GetSurface() const override;
+
+bool IsVisible() const override;
+
+Drawable* SetVisible(bool val) override;
+
+void _SetSurface(Surface* surface) override;
+
+void _SetIndex(uint i) override;
+
+int _GetIndex() const override;
 
 };}
 
@@ -847,14 +975,24 @@ TextureFilter filter;
 Rect uv;
 bool flipHorizontally;
 bool flipVertically;
+Transform transform;
+Surface* parent;
+uint index;
+bool visible;
 public:
 Sprite();
 
-Sprite* SetFilterType(TextureFilter _filter);
+Transform* T() override;
 
-TextureFilter GetFilterType() const;
+Transform* GetTransform() override;
 
-Sprite* SetPixelScale(const viva::Size& _size);
+Sprite* SetTextureFilter(TextureFilter _filter);
+
+TextureFilter GetTextureFilter() const;
+
+Sprite* SetPixelScale(const viva::Size& size);
+
+Sprite* SetPixelScale(uint width, uint height);
 
 Sprite* SetScale2TextureSize();
 
@@ -874,7 +1012,21 @@ virtual PixelShader* GetPixelShader() const = 0;
 virtual Sprite* SetPixelShader(PixelShader* _ps) = 0;
 Sprite* SetUV(const Rect& _uv);
 
+Sprite* SetUV(float left, float top, float right, float bottom);
+
 virtual Texture* GetTexture() = 0;
+Surface* GetSurface() const override;
+
+bool IsVisible() const override;
+
+Drawable* SetVisible(bool val) override;
+
+void _SetSurface(Surface* surface) override;
+
+void _SetIndex(uint i) override;
+
+int _GetIndex() const override;
+
 };}
 
 namespace viva {
@@ -891,7 +1043,7 @@ Resource* GetResource(const wstring& name) const;
 
 Texture* GetTexture(const wstring& name) const;
 
-void RemoveResource(const wstring& name);
+void Remove(const wstring& name);
 
 void RemoveAll();
 
@@ -904,6 +1056,10 @@ class Win32Creator : public Creator
 {
 public:
 Polygon* CreatePolygon(const vector<Point>& points);
+
+Polygon* CreatePolygon(VertexBuffer* vb);
+
+VertexBuffer* CreateVertexBuffer(const vector<Point>& points) override;
 
 Surface* CreateSurface() override;
 
@@ -944,7 +1100,7 @@ wstring Name;
 double lastPulse;
 bool remove;
 bool pause;
-Routine(std::function<int()> activity, wstring name);
+Routine(const std::function<int()>& activity, wstring name);
 
 void Destroy() override;
 
@@ -961,25 +1117,54 @@ class RoutineManager
 {
 private:
 vector<Routine*> routines;
-std::map<wstring, vector<std::function<void()>>> handlers;
+std::map<int, vector<std::function<void(int)>>> handlers;
 public:
 void _Activity();
 
-IRoutine* AddRoutine(std::function<int()> func, const wstring& name, double delay, double lifeTime, double tick);
+IRoutine* AddRoutine(const std::function<int()>& func, const wstring& name, double delay, double lifeTime, double tick);
 
 IRoutine* FindRoutine(wstring name);
 
-void Trigger(wstring _event);
+void Trigger(int _event, int data);
 
-void AddHandler(wstring _event, std::function<void()> handler);
+void AddHandler(int _event, const std::function<void(int)>& handler);
 
-void ClearHandlers(wstring _event);
+void ClearHandlers(int _event);
 
 void ClearHandlers();
 
 void ClearRoutines();
 
 void _Destroy();
+
+};}
+
+namespace viva {
+class VertexBuffer
+{
+protected:
+uint vertexCount;
+bool shared;
+public:
+virtual void Destroy() = 0;
+int GetVertexCount() const;
+
+VertexBuffer(uint vertexCount);
+
+bool IsShared() const;
+
+void _MakeShared();
+
+};}
+
+namespace viva {
+class Win32VertexBuffer : public VertexBuffer
+{
+public:
+ID3D11Buffer* vertexBuffer;
+Win32VertexBuffer(ID3D11Buffer* vb, uint vertexCount);
+
+void Destroy() override;
 
 };}
 
@@ -1054,7 +1239,7 @@ void _Destroy() override;
 
 void SetWindowTitle(const wstring& title) override;
 
-void Run(const std::function<void()>& gameloop, const std::function<void()>& intloop);
+CloseReason Run(const std::function<void()>& gameloop, const std::function<void()>& intloop);
 
 };}
 
@@ -1125,11 +1310,10 @@ virtual void Destroy() = 0;
 };}
 
 namespace viva {
-struct Win32PixelShader : public PixelShader
+class Win32PixelShader : public PixelShader
 {
+public:
 ID3D11PixelShader* ps;
-Win32PixelShader();
-
 Win32PixelShader(ID3D11PixelShader* _ps);
 
 void Destroy() override;
@@ -1169,10 +1353,10 @@ namespace viva {
 class Win32Polygon : public Polygon
 {
 private:
-ID3D11Buffer* vertexBuffer;
+Win32VertexBuffer* vertexBuffer;
 Win32PixelShader* ps;
 public:
-Win32Polygon(ID3D11Buffer* _vertexBuffer, int count);
+Win32Polygon(VertexBuffer* vb);
 
 void Destroy() override;
 
@@ -1181,6 +1365,88 @@ PixelShader* GetPixelShader() const override;
 void SetPixelShader(PixelShader* _ps);
 
 void _Draw() override;
+
+};}
+
+namespace viva {
+struct Action
+{
+vector<Rect> uvTable;
+wstring name;
+double speed;
+Action(const vector<Rect>& _uvTable, const wstring& _name, double _speed);
+
+};}
+
+namespace viva {
+class Animation : public Node, public Drawable
+{
+protected:
+vector<Action> actions;
+vector<std::function<void(int)>> onFrameChangedhandlers;
+vector<std::function<void(int)>> onActionLoopedHandlers;
+Action* currentAction;
+Sprite* sprite;
+double indicator;
+int currentFrame;
+public:
+Animation();
+
+Transform* T() override;
+
+Transform* GetTransform() override;
+
+void _Play();
+
+int GetFrameCount() const;
+
+void NextFrame();
+
+void PreviousFrame();
+
+double GetSpeed() const;
+
+void SetSpeed(double speed);
+
+void SetSpeed(double speed, const wstring& action);
+
+int GetFrame() const;
+
+void SetFrame(int _currentFrame);
+
+void SetAction(const wstring& name);
+
+const wstring& GetAction() const;
+
+void AddAction(const wstring& name, double speed, int columns, int rows, int first, int last);
+
+void AddAction(const wstring& name, double speed, const vector<Rect>& uvTable);
+
+void AddOnFrameChangeHandler(const std::function<void(int)>& fun);
+
+void AddOnActionLoopedHandler(const std::function<void(int)>& fun);
+
+void ClearOnFrameChangeHandlers();
+
+void ClearAddOnActionLoopedHandlers();
+
+void _Draw() override;
+
+Surface* GetSurface() const override;
+
+bool IsVisible() const override;
+
+Drawable* SetVisible(bool val) override;
+
+void _SetSurface(Surface* surface) override;
+
+void _SetIndex(uint i) override;
+
+int _GetIndex() const override;
+
+void Destroy() override;
+
+Node* GetNode() override;
 
 };}
 
@@ -1272,6 +1538,12 @@ Size ReadImageToPixels(const std::wstring& filepath, Pixel** dst);}
 
 namespace viva::util {
 bool EndsWith(const wstring& s, const wstring& end);}
+
+namespace viva::util {
+double RandomDouble();}
+
+namespace viva::util {
+int RandomInt(int min, int max);}
 
 namespace viva {
 void intloop();}

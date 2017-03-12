@@ -94,37 +94,44 @@ namespace viva
             return color;
         }
 
-        void SetColor(float r, float g, float b, float a)
+        Colorable* SetColor(float r, float g, float b, float a)
         {
             color.A = a;
             color.B = b;
             color.G = g;
             color.R = r;
+
+            return this;
         }
 
-        void SetColor(const Color& c)
+        Colorable* SetColor(const Color& c)
         {
             color = c;
+            return this;
         }
 
-        void SetColorR(float r)
+        Colorable* SetR(float r)
         {
             color.R = r;
+            return this;
         }
 
-        void SetColorG(float g)
+        Colorable* SetG(float g)
         {
             color.G = g;
+            return this;
         }
 
-        void SetColorB(float b)
+        Colorable* SetB(float b)
         {
             color.B = b;
+            return this;
         }
 
-        void SetColorA(float a)
+        Colorable* SetA(float a)
         {
             color.A = a;
+            return this;
         }
     };
 
@@ -211,7 +218,7 @@ namespace viva
 
     enum class TextureFilter
     {
-        POINT, LINEAR
+        Point, Linear
     };
 
     class Texture : public Resource

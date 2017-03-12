@@ -79,7 +79,7 @@ namespace viva
             Vector res;
             Matrix::Multiply(viewProj, pos, &res);
 
-            return Point(res.X(), res.Y());
+            return Point(res.GetX(), res.GetY());
         }
 
         Vector ScreenToWorld(const Point& pos, float z) const

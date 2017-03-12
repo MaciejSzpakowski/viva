@@ -44,13 +44,18 @@ namespace viva
             d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             // texture
             d3d.context->PSSetShaderResources(0, 1, &texture->shaderResource);
-            d3d.context->DrawIndexed(6, 0, 0);
+
+            if(visible)
+                d3d.context->DrawIndexed(6, 0, 0);
         }
 
         void Destroy() override
         {
             if(!texture->IsCached())
                 texture->Destroy();
+
+            if (index != -1)
+                drawManager->Remove(this);
 
             delete this;
         }

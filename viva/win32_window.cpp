@@ -20,7 +20,12 @@ namespace viva
         case WM_CLOSE:
         {
             ShowWindow(hwnd, false);
-            PostQuitMessage(0);
+
+            if(wParam == 0)
+                PostQuitMessage((int)CloseReason::WindowClose);
+            else if(wParam == (int)CloseReason::EngineClose)
+                PostQuitMessage((int)CloseReason::EngineClose);
+
             break;
         }
         case WM_COMMAND:
@@ -132,7 +137,7 @@ namespace viva
         // start win32 message pump
         // gameloop: user's function that runs every frame
         // intloop: engine function that runs every frame
-        void Run(const std::function<void()>& gameloop, const std::function<void()>& intloop)
+        CloseReason Run(const std::function<void()>& gameloop, const std::function<void()>& intloop)
         {
             ShowWindow(handle, SW_SHOW);
             UpdateWindow(handle);
@@ -147,8 +152,9 @@ namespace viva
                 {
                     if (msg.message == WM_QUIT)
                     {
+                        CloseReason code = (CloseReason)msg.wParam;
                         ZeroMemory(&msg, sizeof(msg));
-                        break;
+                        return code;
                     }
                     TranslateMessage(&msg);
                     DispatchMessage(&msg);

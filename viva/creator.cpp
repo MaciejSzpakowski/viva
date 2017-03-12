@@ -28,6 +28,21 @@ namespace viva
 
             return tex;
         }
+        
+        Font* CreateFontV(const wstring& filename)
+        {
+            return new Font(filename);
+        }
+
+        Font* CreateFontV(Texture* tex, const vector<Rect>& glyphs)
+        {
+            return new Font(tex, glyphs);
+        }
+
+        Font* CreateFontV(Texture* tex)
+        {
+            return new Font(tex);
+        }
 
         // Create texture from pixels.
         // Named textures are stored in resource manager automatically. Can be removed by resourceManager::Remove()
@@ -43,7 +58,7 @@ namespace viva
         {
             return CreateTexture(pixels, size, L"");
         }
-
+        
         // Create sprite from file. Supported files BMP, GIF, JPEG, PNG, TGA.
         // filepath: file path to image
         virtual Sprite* CreateSprite(const wstring& filepath) = 0;
@@ -55,6 +70,12 @@ namespace viva
         // Create polygon from points.
         // points: vector of points where each point is x,y in world coordinates
         virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
+
+        // Create polygon from vertex buffer.
+        virtual Polygon* CreatePolygon(VertexBuffer* vb) = 0;
+
+        // Create shared vertex buffer. That can be used by multiple polygons.
+        virtual VertexBuffer* CreateVertexBuffer(const vector<Point>& points) = 0;
 
         // Create surface to render objects on.
         virtual Surface* CreateSurface() = 0;

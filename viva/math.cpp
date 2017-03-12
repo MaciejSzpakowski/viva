@@ -43,54 +43,59 @@ namespace viva
             return Vector(1, 1, 1, 1);
         }
 
-        float X() const 
+        float GetX() const 
         { 
             return f.x; 
         }
 
-        float Y() const 
+        float GetY() const 
         { 
             return f.y; 
         }
 
-        float Z() const 
+        float GetZ() const 
         { 
             return f.z; 
         }
 
-        float W() const 
+        float GetW() const 
         { 
             return f.w; 
         }
 
-        void X(float x) 
+        Vector* SetX(float x)
         { 
-            f.x = x; 
+            f.x = x;
+            return this;
         }
 
-        void Y(float y) 
+        Vector* SetY(float y)
         { 
-            f.y = y; 
+            f.y = y;
+            return this;
         }
 
-        void Z(float z) 
+        Vector* SetZ(float z)
         { 
-            f.z = z; 
+            f.z = z;
+            return this;
         }
 
-        void W(float w) 
+        Vector* SetW(float w)
         { 
-            f.w = w; 
+            f.w = w;
+            return this;
         }
 
-        // Adds rhs to itself.
+        // Adds rhs to this.
         // rhs: another vector
-        void Add(const Vector& rhs)
+        Vector* Add(const Vector& rhs)
         {
             f.x += rhs.f.x;
             f.y += rhs.f.y;
             f.z += rhs.f.z;
             f.w += rhs.f.w;
+            return this;
         }
 
         // Adds two vectors and returns a new one.

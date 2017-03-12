@@ -1,36 +1,91 @@
 #include "viva.h"
 
 namespace viva{
-Drawable::Drawable():parent(nullptr), index(-1)
+Drawable::Drawable()
 {
 }
 }
 
 namespace viva{
-Surface* Drawable::GetSurface() const
+Node::Node()
 {
-return parent;
 }
 }
 
 namespace viva{
-void Drawable::_SetSurface(Surface* surface)
+Color::Color(): R(1), G(1), B(1), A(1)
 {
-parent = surface;
 }
 }
 
 namespace viva{
-void Drawable::_SetIndex(uint i)
+Color::Color(float _r, float _g, float _b, float _a): R(_r), G(_g), B(_b), A(_a)
 {
-index = i;
 }
 }
 
 namespace viva{
-int Drawable::_GetIndex() const
+Color::Color(const Pixel& pixel): R(pixel.R / 255.0f),G(pixel.G / 255.0f),B(pixel.B / 255.0f),A(pixel.A / 255.0f)
 {
-return index;
+}
+}
+
+namespace viva{
+const Color& Colorable::GetColor() const
+{
+return color;
+}
+}
+
+namespace viva{
+Colorable* Colorable::SetColor(float r, float g, float b, float a)
+{
+color.A = a;
+color.B = b;
+color.G = g;
+color.R = r;
+
+return this;
+}
+}
+
+namespace viva{
+Colorable* Colorable::SetColor(const Color& c)
+{
+color = c;
+return this;
+}
+}
+
+namespace viva{
+Colorable* Colorable::SetR(float r)
+{
+color.R = r;
+return this;
+}
+}
+
+namespace viva{
+Colorable* Colorable::SetG(float g)
+{
+color.G = g;
+return this;
+}
+}
+
+namespace viva{
+Colorable* Colorable::SetB(float b)
+{
+color.B = b;
+return this;
+}
+}
+
+namespace viva{
+Colorable* Colorable::SetA(float a)
+{
+color.A = a;
+return this;
 }
 }
 
@@ -61,68 +116,73 @@ return Vector(1, 1, 1, 1);
 }
 
 namespace viva{
-float Vector::X() const
+float Vector::GetX() const
 {
 return f.x;
 }
 }
 
 namespace viva{
-float Vector::Y() const
+float Vector::GetY() const
 {
 return f.y;
 }
 }
 
 namespace viva{
-float Vector::Z() const
+float Vector::GetZ() const
 {
 return f.z;
 }
 }
 
 namespace viva{
-float Vector::W() const
+float Vector::GetW() const
 {
 return f.w;
 }
 }
 
 namespace viva{
-void Vector::X(float x)
+Vector* Vector::SetX(float x)
 {
 f.x = x;
+return this;
 }
 }
 
 namespace viva{
-void Vector::Y(float y)
+Vector* Vector::SetY(float y)
 {
 f.y = y;
+return this;
 }
 }
 
 namespace viva{
-void Vector::Z(float z)
+Vector* Vector::SetZ(float z)
 {
 f.z = z;
+return this;
 }
 }
 
 namespace viva{
-void Vector::W(float w)
+Vector* Vector::SetW(float w)
 {
 f.w = w;
+return this;
 }
 }
 
 namespace viva{
-void Vector::Add(const Vector& rhs)
+Vector* Vector::Add(const Vector& rhs)
 {
 f.x += rhs.f.x;
 f.y += rhs.f.y;
 f.z += rhs.f.z;
 f.w += rhs.f.w;
+return this;
 }
 }
 
@@ -146,7 +206,7 @@ Point::Point(float x, float y):X(x), Y(y)
 }
 
 namespace viva{
-Transform::Transform(): position(), rotation(0), scale({ 1,1 }), size(1),parent(nullptr), mode(TransformMode::World)
+Transform::Transform(): position(), rotation(0), scale({ 1,1 }), size(1),parent(nullptr), mode(TransformMode::World), index(-1)
 {
 }
 }
@@ -218,11 +278,11 @@ auto screenSize = engine->GetClientSize();
 float w = scale.X * size / screenSize.Width;
 float h = scale.Y * size / screenSize.Height;
 
-float ox = origin.X() / screenSize.Width + w;
-float oy = origin.Y() / screenSize.Height - h;
+float ox = origin.GetX() / screenSize.Width + w;
+float oy = origin.GetY() / screenSize.Height - h;
 
-float x = position.X() * 2 / screenSize.Width - 1;
-float y = -position.Y() * 2 / screenSize.Height + 1;
+float x = position.GetX() * 2 / screenSize.Width - 1;
+float y = -position.GetY() * 2 / screenSize.Height + 1;
 
 Matrix::Identity(dst);
 Matrix sca, ori, rot, loc;
@@ -230,7 +290,7 @@ Matrix sca, ori, rot, loc;
 Matrix::Translation(Vector(ox, oy, 0, 0), &ori);
 Matrix::Scaling({ w,h }, &sca);
 Matrix::Rotation(rotation, &rot);
-Matrix::Translation(Vector(x, y, position.Z(), 0), &loc);
+Matrix::Translation(Vector(x, y, position.GetZ(), 0), &loc);
 
 Matrix::Multiply(*dst, sca, dst);
 Matrix::Multiply(*dst, ori, dst);
@@ -265,9 +325,9 @@ return origin;
 namespace viva{
 Transform* Transform::SetPosition(float x, float y, float z)
 {
-position.X(x);
-position.Y(y);
-position.Z(z);
+position.SetX(x);
+position.SetY(y);
+position.SetZ(z);
 return this;
 }
 }
@@ -275,32 +335,32 @@ return this;
 namespace viva{
 Transform* Transform::SetPosition(float x, float y)
 {
-position.X(x);
-position.Y(y);
+position.SetX(x);
+position.SetY(y);
 return this;
 }
 }
 
 namespace viva{
-Transform* Transform::SetPositionX(float x)
+Transform* Transform::SetX(float x)
 {
-position.X(x);
+position.SetX(x);
 return this;
 }
 }
 
 namespace viva{
-Transform* Transform::SetPositionY(float y)
+Transform* Transform::SetY(float y)
 {
-position.Y(y);
+position.SetY(y);
 return this;
 }
 }
 
 namespace viva{
-Transform* Transform::SetPositionZ(float z)
+Transform* Transform::SetZ(float z)
 {
-position.Z(z);
+position.SetZ(z);
 return this;
 }
 }
@@ -323,9 +383,8 @@ return position;
 namespace viva{
 Transform* Transform::Translate(float x, float y, float z)
 {
-position.X(position.X() + x);
-position.Y(position.Y() + y);
-position.Z(position.Z() + z);
+position.Add(Vector(x, y, z, 0));
+
 return this;
 }
 }
@@ -364,7 +423,8 @@ return this;
 namespace viva{
 Transform* Transform::SetScale(float width, float height)
 {
-scale.X = width; scale.Y = height;
+scale.X = width;
+scale.Y = height;
 return this;
 }
 }
@@ -440,112 +500,144 @@ return this;
 }
 
 namespace viva{
-Node::Node()
+Transform* Transform::SetParent(Transform* p)
+{
+if (index != -1)
+throw Error(__FUNCTION__, "Object can have only one parent");
+
+parent = p;
+index = parent->children.size();
+parent->children.push_back(this);
+
+return this;
+}
+}
+
+namespace viva{
+Transform* Transform::GetParent()
+{
+return parent;
+}
+}
+
+namespace viva{
+Transform* Transform::RemoveChild(Transform* child)
+{
+if (child->index == -1)
+throw Error(__FUNCTION__, "Object doesn't have a parent");
+
+if(children.at(child->index) != child)
+throw Error(__FUNCTION__, "Wrong index");
+
+children.erase(children.begin() + child->index);
+child->index = -1;
+child->parent = nullptr;
+
+return this;
+}
+}
+
+namespace viva{
+Text::Text(const wstring& str, Font* f, FontMetrics m): metrics(m), font(f), text(str), texFilter(drawManager->GetDefaultTextureFilter()),parent(nullptr), index(-1), visible(true)
 {
 }
 }
 
 namespace viva{
-Transform* Node::T()
+Text::Text(const wstring& str): Text(str, drawManager->GetDefaultFont(), drawManager->GetDefaultFontMetrics())
+{
+}
+}
+
+namespace viva{
+Text::Text(const wstring& str, Font* f): Text(str, f, drawManager->GetDefaultFontMetrics())
+{
+}
+}
+
+namespace viva{
+Transform* Text::T() 
 {
 return &transform;
 }
 }
 
 namespace viva{
-Transform* Node::GetTransform()
+Transform* Text::GetTransform() 
 {
 return &transform;
 }
 }
 
 namespace viva{
-Color::Color(): R(1), G(1), B(1), A(1)
+TextureFilter Text::GetTextureFilter() const
 {
+return texFilter;
 }
 }
 
 namespace viva{
-Color::Color(float _r, float _g, float _b, float _a): R(_r), G(_g), B(_b), A(_a)
+Text* Text::SetTexFilter(TextureFilter filter)
 {
-}
-}
+texFilter = filter;
 
-namespace viva{
-Color::Color(const Pixel& pixel): R(pixel.R / 255.0f),G(pixel.G / 255.0f),B(pixel.B / 255.0f),A(pixel.A / 255.0f)
-{
-}
-}
-
-namespace viva{
-const Color& Colorable::GetColor() const
-{
-return color;
-}
-}
-
-namespace viva{
-void Colorable::SetColor(float r, float g, float b, float a)
-{
-color.A = a;
-color.B = b;
-color.G = g;
-color.R = r;
-}
-}
-
-namespace viva{
-void Colorable::SetColor(const Color& c)
-{
-color = c;
-}
-}
-
-namespace viva{
-void Colorable::SetColorR(float r)
-{
-color.R = r;
-}
-}
-
-namespace viva{
-void Colorable::SetColorG(float g)
-{
-color.G = g;
-}
-}
-
-namespace viva{
-void Colorable::SetColorB(float b)
-{
-color.B = b;
-}
-}
-
-namespace viva{
-void Colorable::SetColorA(float a)
-{
-color.A = a;
-}
-}
-
-namespace viva{
-Text::Text(Font* font)
-{
-
+return this;
 }
 }
 
 namespace viva{
 void Text::Destroy() 
 {
-sprite->Destroy();
+delete this;
 }
 }
 
 namespace viva{
 void Text::_Draw() 
 {
+}
+}
+
+namespace viva{
+Surface* Text::GetSurface() const 
+{
+return parent;
+}
+}
+
+namespace viva{
+bool Text::IsVisible() const 
+{
+return visible;
+}
+}
+
+namespace viva{
+Drawable* Text::SetVisible(bool val) 
+{
+visible = val;
+return this;
+}
+}
+
+namespace viva{
+void Text::_SetSurface(Surface* surface) 
+{
+parent = surface;
+}
+}
+
+namespace viva{
+void Text::_SetIndex(uint i) 
+{
+index = i;
+}
+}
+
+namespace viva{
+int Text::_GetIndex() const 
+{
+return index;
 }
 }
 
@@ -650,7 +742,7 @@ d3d.context->IASetVertexBuffers(0, 1, &d3d.vertexBuffer, &stride, &offset);
 d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 Matrix t;
 Matrix::Identity(&t);
-Rect surfaceuv(0, 1, 1, 0);
+Rect surfaceuv(0, 0, 1, 1);
 d3d.context->UpdateSubresource(d3d.constantBufferUV, 0, 0, &surfaceuv, 0, 0);
 d3d.context->UpdateSubresource(d3d.constantBufferVS, 0, NULL, &t, 0, 0);
 
@@ -975,14 +1067,14 @@ FreeConsole();
 namespace viva{
 void Win32Engine::Exit() 
 {
-PostMessage((HWND)window->GetHandle(), WM_CLOSE, 0, 0);
+PostMessage((HWND)window->GetHandle(), WM_CLOSE, (int)CloseReason::EngineClose, 0);
 }
 }
 
 namespace viva{
-void Win32Engine::Run(const std::function<void()>& gameloop) 
+CloseReason Win32Engine::Run(const std::function<void()>& gameloop) 
 {
-static_cast<Win32Window*>(window)->Run(gameloop, [&]() {Activity(); });
+return static_cast<Win32Window*>(window)->Run(gameloop, [&]() {Activity(); });
 }
 }
 
@@ -1151,7 +1243,7 @@ Point Camera::WorldToScreen(const Vector& pos) const
 Vector res;
 Matrix::Multiply(viewProj, pos, &res);
 
-return Point(res.X(), res.Y());
+return Point(res.GetX(), res.GetY());
 }
 }
 
@@ -1202,6 +1294,27 @@ return tex;
 }
 
 namespace viva{
+Font* Creator::CreateFontV(const wstring& filename)
+{
+return new Font(filename);
+}
+}
+
+namespace viva{
+Font* Creator::CreateFontV(Texture* tex, const vector<Rect>& glyphs)
+{
+return new Font(tex, glyphs);
+}
+}
+
+namespace viva{
+Font* Creator::CreateFontV(Texture* tex)
+{
+return new Font(tex);
+}
+}
+
+namespace viva{
 Texture* Creator::CreateTexture(const Pixel* pixels, const Size& size)
 {
 return CreateTexture(pixels, size, L"");
@@ -1211,68 +1324,106 @@ return CreateTexture(pixels, size, L"");
 namespace viva{
 DrawManager::DrawManager()
 {
+defaultFilter = TextureFilter::Point;
 defaultSurface = creator->CreateSurface();
 
 // create default font
 {
-vector<int> data = {
-421,3,12,3,71,5,97,1,14,1,75,1,21,1,8,1,9,1,57,1,14,1,76,1,19,1,9,1,10,1,15,7,2,3,1,2,1,2,2,3,2,3,4,3,6,1,1,3,6,3,1,1,4,5,4,6,6,4,6,3,1,2,5,2,7,1,3,1,3,3,2,3,5,1,6,7,6,1,9,1,10,1,18
-,1,6,1,2,1,2,1,4,1,4,1,4,1,3,1,5,2,3,1,4,1,3,2,5,1,7,1,5,1,4,1,4,1,4,1,3,2,6,2,6,1,1,1,1,1,1,1,3,1,4,1,5,1,1,1,6,1,4,1,6,1,9,1,10,1,18,1,6,1,2,1,2,1,4,1,4,1,3,1,5,1,4,1,5,1,2,1,5,
-1,5,1,13,1,4,1,9,1,4,1,5,1,2,1,5,1,1,1,1,1,1,1,4,1,2,1,6,1,1,1,7,1,10,1,9,1,10,1,18,1,6,1,2,1,2,1,4,1,4,1,3,1,5,1,4,1,5,1,2,1,5,1,5,1,8,5,5,1,9,1,4,1,5,1,2,1,5,1,1,1,1,1,1,1,5,2,6,
-1,3,1,7,1,8,1,10,1,11,1,8,2,7,1,6,1,2,1,2,1,4,1,4,1,3,1,5,1,4,1,5,1,2,1,5,1,5,1,7,1,10,1,9,1,4,1,5,1,2,1,4,1,3,1,3,1,3,1,2,1,5,1,3,1,8,1,8,1,9,1,10,1,5,1,2,1,2,1,6,1,6,2,1,2,1,1,4,
-2,3,1,4,1,3,1,5,2,3,1,4,1,3,2,5,3,5,1,4,2,4,1,9,1,4,1,4,1,4,1,3,1,3,1,3,1,2,1,4,1,3,1,5,1,3,1,4,1,7,1,9,1,10,1,6,2,10,1,5,2,1,1,2,1,4,2,1,3,6,3,5,2,1,3,6,3,1,2,3,2,2,3,3,4,1,1,2,7,
-4,2,3,2,3,3,2,3,1,3,5,2,1,3,2,3,1,3,3,3,2,7,6,1,9,1,10,1,18,1,77,1,71,1,9,1,10,1,18,1,77,1,72,1,8,1,9,1,17,3,159,1,1035,10,262,5,24,5,38,3,15,3,102,1,28,1,37,1,11,1,7,1,102,1,28,1,
-15,5,5,6,6,1,10,1,8,1,37,4,1,2,2,2,1,3,6,5,5,3,1,2,4,4,5,5,6,3,1,1,3,3,2,3,2,7,8,1,4,2,2,4,5,1,7,1,4,1,6,1,10,1,8,1,36,1,4,2,4,2,3,1,4,1,5,1,3,1,3,2,4,1,4,1,5,1,8,1,3,2,4,1,4,1,6,1
-,11,1,5,1,3,1,7,1,8,1,3,1,6,1,9,1,9,1,36,1,5,1,4,1,5,1,2,1,9,1,5,1,3,1,11,1,7,1,5,1,4,1,4,1,6,1,11,1,5,1,2,1,8,1,9,1,9,1,9,1,9,1,37,6,4,1,5,1,2,1,9,1,5,1,3,7,5,1,7,1,5,1,4,1,4,1,6,
-1,11,1,5,3,9,1,10,1,8,1,8,1,10,1,42,1,4,1,5,1,2,1,9,1,5,1,3,1,5,1,5,1,7,1,5,1,4,1,4,1,6,1,11,1,5,1,1,1,8,1,1,1,9,1,8,1,8,1,10,1,37,1,4,1,4,2,3,1,4,1,4,2,3,1,3,2,4,1,3,1,6,1,8,1,3,2
-,4,2,3,1,6,1,11,1,5,1,2,1,6,1,3,1,9,1,7,1,8,1,10,1,6,1,5,1,25,4,5,1,1,3,6,4,1,1,4,3,1,1,5,3,5,7,5,3,1,2,3,1,1,3,5,3,7,5,5,1,2,3,3,1,5,1,4,1,4,1,6,1,7,1,11,1,7,1,3,1,18,1,16,1,24,1,
-15,1,18,1,29,1,7,3,3,3,3,6,6,1,7,1,11,1,8,1,1,1,18,1,17,1,24,1,15,1,18,1,29,1,31,3,4,1,10,3,9,1,18,1,17,2,23,2,16,5,12,2,11,1,10,1,5,2,38,1,22,1,109,1,10,1,1458,5,72,5,7,5,3,3,2,3,
-2,7,4,4,5,3,3,2,2,8,1,3,3,3,1,3,3,2,5,4,5,5,6,4,4,3,3,2,3,1,1,3,5,5,6,4,7,2,6,1,3,1,3,3,3,3,3,1,9,1,5,1,3,1,4,1,6,1,6,1,4,1,5,1,4,1,5,1,4,1,2,1,5,1,3,1,4,2,4,1,4,1,5,1,8,1,4,1,4,1,
-4,1,4,2,3,1,6,1,7,1,4,1,6,2,5,1,1,1,1,1,1,1,3,1,5,1,4,1,8,1,6,1,3,1,4,1,6,1,6,1,4,1,5,1,3,1,6,1,4,1,2,1,5,1,3,1,3,1,1,1,3,1,6,1,4,1,7,1,6,1,3,1,3,1,5,1,4,1,6,1,7,1,4,1,5,1,2,1,4,1,
-1,1,1,1,1,1,4,1,3,1,5,1,2,1,5,1,3,5,2,1,4,1,6,1,6,1,4,1,5,1,3,1,6,1,4,1,2,1,2,1,2,1,3,1,3,1,1,1,3,1,6,1,4,5,3,1,6,1,3,1,2,1,11,1,6,1,7,1,4,1,5,1,2,1,4,1,1,1,1,1,1,1,5,1,1,1,6,4,5,1
-,10,6,6,1,11,1,5,4,7,1,7,1,1,1,1,1,1,1,3,1,2,1,2,1,3,1,6,1,4,1,4,1,2,1,6,1,3,5,6,4,7,1,7,1,4,1,5,1,2,1,4,1,1,1,1,1,1,1,6,1,7,1,2,1,5,1,10,1,4,1,6,1,11,1,5,1,1,1,8,1,7,1,1,1,1,1,1,1
-,3,1,1,1,3,1,3,1,6,1,4,1,4,1,2,1,6,1,3,1,4,1,4,1,8,1,2,1,2,1,4,1,4,1,4,1,4,1,3,1,2,1,2,1,5,1,1,1,6,1,4,1,3,1,10,1,4,1,6,1,11,1,5,1,2,1,7,1,7,1,1,1,1,1,1,1,3,1,1,1,3,1,3,1,6,1,4,1,4
-,1,2,1,6,1,3,1,4,1,4,1,4,1,3,1,2,1,2,1,4,1,4,1,4,1,4,1,3,1,2,1,2,1,4,1,3,1,5,1,4,1,4,1,4,2,3,1,4,1,6,1,11,1,5,1,3,1,6,1,7,2,3,2,3,2,4,1,4,1,4,1,5,1,4,1,3,1,4,1,4,1,4,1,4,1,3,2,3,1,
-2,1,2,1,4,1,4,1,3,1,6,1,2,1,5,1,3,1,5,1,3,7,5,4,1,1,2,3,2,3,2,7,5,6,2,3,1,4,2,5,4,3,3,3,1,3,3,3,4,4,5,6,5,4,4,6,6,3,1,1,3,7,3,3,2,3,1,3,4,7,1,4,1,3,3,3,1794,1,50,3,55,5,7,4,4,5,6,5
-,6,1,8,4,5,3,8,2,8,2,12,2,12,2,11,2,7,1,3,1,2,3,4,3,1,6,6,5,3,6,4,7,3,1,5,1,8,1,4,1,5,1,4,1,5,1,5,1,7,1,4,1,7,1,7,2,9,1,11,1,16,1,10,2,6,1,8,1,6,1,3,1,4,1,4,1,5,1,3,1,4,1,4,1,4,1,9
-,1,8,1,10,1,4,1,5,1,6,1,6,1,4,1,8,1,17,2,8,2,18,2,16,1,3,3,3,1,4,1,4,1,4,1,3,1,10,1,5,1,3,1,4,1,9,1,4,6,9,1,4,1,5,1,6,1,6,1,4,1,9,1,25,1,7,8,7,1,8,1,6,1,2,1,2,1,3,6,4,1,4,1,3,1,10,
-1,5,1,3,1,2,1,10,1,5,1,3,1,10,1,4,2,4,1,6,1,6,1,4,1,5,3,1,1,23,2,24,2,7,1,5,1,2,1,2,1,4,1,2,1,5,5,4,1,10,1,5,1,3,4,8,3,6,1,2,1,5,5,5,1,1,4,8,1,6,4,5,1,3,2,5,2,9,2,7,1,22,1,10,1,4,1
-,2,1,2,1,4,1,2,1,5,1,4,1,3,1,10,1,5,1,3,1,2,1,11,1,5,1,2,1,5,1,9,1,13,1,5,1,4,1,4,1,4,1,5,2,9,2,8,2,5,8,5,2,6,1,4,1,4,1,3,3,4,1,2,1,5,1,4,1,3,1,6,1,3,1,5,1,3,1,4,1,9,1,6,1,1,1,5,1,
-10,1,13,1,4,1,4,1,4,1,4,1,28,1,16,1,8,1,4,1,4,1,5,1,5,2,6,1,4,1,4,1,4,2,3,1,4,1,4,1,4,1,3,2,4,1,7,2,5,1,11,1,6,1,5,1,4,1,4,1,4,1,4,1,29,2,12,2,10,4,6,1,4,1,4,3,5,6,6,4,1,1,2,6,4,7,
-5,4,9,1,5,5,8,4,2,7,5,4,6,4,67,4,1426,1,42,1,4,1,29,1,99,1,2,1,8,1,41,1,6,1,28,1,28,1,51,3,16,1,2,1,6,5,8,2,6,5,18,1,6,1,20,1,7,2,19,2,6,1,11,4,5,7,2,7,15,3,17,1,2,1,5,1,4,1,6,1,2,
-1,4,1,3,1,18,1,8,1,19,1,8,1,19,2,7,1,9,1,4,1,7,1,5,1,5,1,35,1,2,1,10,1,6,1,2,1,4,1,2,2,18,1,8,1,19,1,8,2,27,1,9,1,4,1,7,1,6,1,21,1,16,8,8,1,7,2,5,1,1,1,2,1,17,1,8,1,19,1,38,1,8,1,4
-,1,7,1,7,1,20,1,18,1,2,1,10,1,4,3,8,2,20,1,8,1,7,1,3,1,4,7,13,7,15,1,8,1,4,1,7,1,8,2,18,1,18,1,2,1,6,4,8,3,5,1,10,1,10,1,8,1,8,1,1,1,8,1,39,1,7,1,4,1,7,1,10,1,17,1,8,1,2,1,4,8,3,1,
-10,2,8,1,10,1,10,1,8,1,9,1,9,1,39,1,7,1,4,1,7,1,11,1,16,1,8,1,2,1,6,1,2,1,5,1,9,1,2,1,8,3,7,1,11,1,6,1,7,7,6,1,40,1,6,1,4,1,7,1,5,1,5,1,16,1,8,2,1,2,5,1,2,1,5,1,4,1,4,1,2,1,17,3,10
-,1,6,1,10,1,9,1,40,1,6,1,4,1,4,2,1,1,5,1,5,1,16,1,8,2,1,2,6,1,2,1,5,5,5,2,18,3,11,1,4,1,11,1,51,1,6,4,7,2,6,5,37,1,2,1,6,1,111,1,603
+vector<int> data =
+{
+604,1,2,1,6,1,111,1,47,1,8,2,1,2,6,1,2,1,5,5,5,2,18,3,11,1,4,1,11,1,51,1,6,4,7,2,6,5,17,1,
+8,2,1,2,5,1,2,1,5,1,4,1,4,1,2,1,17,3,10,1,6,1,10,1,9,1,40,1,6,1,4,1,4,2,1,1,5,1,5,1,
+16,1,8,1,2,1,6,1,2,1,5,1,9,1,2,1,8,3,7,1,11,1,6,1,7,7,6,1,40,1,6,1,4,1,7,1,5,1,5,1,
+16,1,8,1,2,1,4,8,3,1,10,2,8,1,10,1,10,1,8,1,9,1,9,1,39,1,7,1,4,1,7,1,11,1,16,1,18,1,2,1,
+6,4,8,3,5,1,10,1,10,1,8,1,8,1,1,1,8,1,39,1,7,1,4,1,7,1,10,1,17,1,18,1,2,1,10,1,4,3,8,2,
+20,1,8,1,7,1,3,1,4,7,13,7,15,1,8,1,4,1,7,1,8,2,18,1,16,8,8,1,7,2,5,1,1,1,2,1,17,1,8,1,
+19,1,38,1,8,1,4,1,7,1,7,1,39,1,2,1,10,1,6,1,2,1,4,1,2,2,18,1,8,1,19,1,8,2,27,1,9,1,4,1,
+7,1,6,1,20,3,17,1,2,1,5,1,4,1,6,1,2,1,4,1,3,1,18,1,8,1,19,1,8,1,19,2,7,1,9,1,4,1,7,1,
+5,1,5,1,15,3,16,1,2,1,6,5,8,2,6,5,18,1,6,1,20,1,7,2,19,2,6,1,11,4,5,7,2,7,34,1,2,1,8,1,
+41,1,6,1,28,1,28,1,82,1,42,1,4,1,29,1,1400,4,9,1,5,5,8,4,2,7,5,4,6,4,67,4,53,2,4,1,7,2,5,1,
+11,1,6,1,5,1,4,1,4,1,4,1,4,1,29,2,12,2,10,4,6,1,4,1,4,3,5,6,6,4,1,1,2,6,4,7,9,1,6,1,
+1,1,5,1,10,1,13,1,4,1,4,1,4,1,4,1,28,1,16,1,8,1,4,1,4,1,5,1,5,2,6,1,4,1,4,1,4,2,3,1,
+4,1,4,1,4,1,9,1,5,1,2,1,5,1,9,1,13,1,5,1,4,1,4,1,4,1,5,2,9,2,8,2,5,8,5,2,6,1,4,1,
+4,1,3,3,4,1,2,1,5,1,4,1,3,1,6,1,3,1,5,1,3,1,4,1,6,3,6,1,2,1,5,5,5,1,1,4,8,1,6,4,
+5,1,3,2,5,2,9,2,7,1,22,1,10,1,4,1,2,1,2,1,4,1,2,1,5,1,4,1,3,1,10,1,5,1,3,1,2,1,10,1,
+5,1,3,1,10,1,4,2,4,1,6,1,6,1,4,1,5,3,1,1,23,2,24,2,7,1,5,1,2,1,2,1,4,1,2,1,5,5,4,1,
+10,1,5,1,3,4,11,1,4,6,9,1,4,1,5,1,6,1,6,1,4,1,9,1,25,1,7,8,7,1,8,1,6,1,2,1,2,1,3,6,
+4,1,4,1,3,1,10,1,5,1,3,1,2,1,11,1,8,1,10,1,4,1,5,1,6,1,6,1,4,1,8,1,17,2,8,2,18,2,16,1,
+3,3,3,1,4,1,4,1,4,1,3,1,10,1,5,1,3,1,4,1,3,1,5,1,8,1,4,1,5,1,4,1,5,1,5,1,7,1,4,1,
+7,1,7,2,9,1,11,1,16,1,10,2,6,1,8,1,6,1,3,1,4,1,4,1,5,1,3,1,4,1,4,1,4,1,4,5,7,4,4,5,
+6,5,6,1,8,4,5,3,8,2,8,2,12,2,12,2,11,2,7,1,3,1,2,3,4,3,1,6,6,5,3,6,4,7,85,1,50,3,1764,7,
+5,4,1,1,2,3,2,3,2,7,5,6,2,3,1,4,2,5,4,3,3,3,1,3,3,3,4,4,5,6,5,4,4,6,6,3,1,1,3,7,
+3,3,2,3,1,3,4,7,1,4,1,3,3,3,3,1,4,1,4,1,4,2,3,1,4,1,6,1,11,1,5,1,3,1,6,1,7,2,3,2,
+3,2,4,1,4,1,4,1,5,1,4,1,3,1,4,1,4,1,4,1,4,1,3,2,3,1,2,1,2,1,4,1,4,1,3,1,6,1,2,1,
+5,1,3,1,5,1,4,1,4,1,3,1,10,1,4,1,6,1,11,1,5,1,2,1,7,1,7,1,1,1,1,1,1,1,3,1,1,1,3,1,
+3,1,6,1,4,1,4,1,2,1,6,1,3,1,4,1,4,1,4,1,3,1,2,1,2,1,4,1,4,1,4,1,4,1,3,1,2,1,2,1,
+4,1,3,1,5,1,2,1,5,1,10,1,4,1,6,1,11,1,5,1,1,1,8,1,7,1,1,1,1,1,1,1,3,1,1,1,3,1,3,1,
+6,1,4,1,4,1,2,1,6,1,3,1,4,1,4,1,8,1,2,1,2,1,4,1,4,1,4,1,4,1,3,1,2,1,2,1,5,1,1,1,
+6,4,5,1,10,6,6,1,11,1,5,4,7,1,7,1,1,1,1,1,1,1,3,1,2,1,2,1,3,1,6,1,4,1,4,1,2,1,6,1,
+3,5,6,4,7,1,7,1,4,1,5,1,2,1,4,1,1,1,1,1,1,1,6,1,7,1,2,1,5,1,3,5,2,1,4,1,6,1,6,1,
+4,1,5,1,3,1,6,1,4,1,2,1,2,1,2,1,3,1,3,1,1,1,3,1,6,1,4,5,3,1,6,1,3,1,2,1,11,1,6,1,
+7,1,4,1,5,1,2,1,4,1,1,1,1,1,1,1,5,1,1,1,6,1,8,1,6,1,3,1,4,1,6,1,6,1,4,1,5,1,3,1,
+6,1,4,1,2,1,5,1,3,1,3,1,1,1,3,1,6,1,4,1,7,1,6,1,3,1,3,1,5,1,4,1,6,1,7,1,4,1,5,1,
+2,1,4,1,1,1,1,1,1,1,4,1,3,1,5,1,9,1,5,1,3,1,4,1,6,1,6,1,4,1,5,1,4,1,5,1,4,1,2,1,
+5,1,3,1,4,2,4,1,4,1,5,1,8,1,4,1,4,1,4,1,4,2,3,1,6,1,7,1,4,1,6,2,5,1,1,1,1,1,1,1,
+3,1,5,1,3,5,7,5,3,3,2,3,2,7,4,4,5,3,3,2,2,8,1,3,3,3,1,3,3,2,5,4,5,5,6,4,4,3,3,2,
+3,1,1,3,5,5,6,4,7,2,6,1,3,1,3,3,3,3,115,5,1432,1,22,1,109,1,10,1,38,3,4,1,10,3,9,1,18,1,17,2,
+23,2,16,5,12,2,11,1,10,1,5,2,7,3,3,3,3,6,6,1,7,1,11,1,8,1,1,1,18,1,17,1,24,1,15,1,18,1,29,1,
+8,1,5,1,4,1,4,1,6,1,7,1,11,1,7,1,3,1,18,1,16,1,24,1,15,1,18,1,29,1,9,1,3,1,9,1,7,1,8,1,
+10,1,6,1,5,1,25,4,5,1,1,3,6,4,1,1,4,3,1,1,5,3,5,7,5,3,1,2,3,1,1,3,5,3,7,5,5,1,2,3,
+5,1,1,1,9,1,8,1,8,1,10,1,37,1,4,1,4,2,3,1,4,1,4,2,3,1,3,2,4,1,3,1,6,1,8,1,3,2,4,2,
+3,1,6,1,11,1,5,1,2,1,8,1,10,1,8,1,8,1,10,1,42,1,4,1,5,1,2,1,9,1,5,1,3,1,5,1,5,1,7,1,
+5,1,4,1,4,1,6,1,11,1,5,1,1,1,9,1,9,1,9,1,9,1,9,1,37,6,4,1,5,1,2,1,9,1,5,1,3,7,5,1,
+7,1,5,1,4,1,4,1,6,1,11,1,5,3,9,1,8,1,3,1,6,1,9,1,9,1,36,1,5,1,4,1,5,1,2,1,9,1,5,1,
+3,1,11,1,7,1,5,1,4,1,4,1,6,1,11,1,5,1,2,1,8,1,7,1,4,1,6,1,10,1,8,1,36,1,4,2,4,2,3,1,
+4,1,5,1,3,1,3,2,4,1,4,1,5,1,8,1,3,2,4,1,4,1,6,1,11,1,5,1,3,1,5,5,5,6,6,1,10,1,8,1,
+37,4,1,2,2,2,1,3,6,5,5,3,1,2,4,4,5,5,6,3,1,1,3,3,2,3,2,7,8,1,4,2,2,4,25,1,11,1,7,1,
+102,1,28,1,37,3,15,3,102,1,28,1,155,5,24,5,74,10,1072,3,159,1,29,1,77,1,72,1,8,1,9,1,19,1,77,1,71,1,9,1,
+10,1,18,1,5,2,1,1,2,1,4,2,1,3,6,3,5,2,1,3,6,3,1,2,3,2,2,3,3,4,1,1,2,7,4,2,3,2,3,3,
+2,3,1,3,5,2,1,3,2,3,1,3,3,3,2,7,6,1,9,1,10,1,18,1,6,2,1,2,1,1,4,2,3,1,4,1,3,1,5,2,
+3,1,4,1,3,2,5,3,5,1,4,2,4,1,9,1,4,1,4,1,4,1,3,1,3,1,3,1,2,1,4,1,3,1,5,1,3,1,4,1,
+7,1,9,1,10,1,6,2,10,1,6,1,2,1,2,1,4,1,4,1,3,1,5,1,4,1,5,1,2,1,5,1,5,1,7,1,10,1,9,1,
+4,1,5,1,2,1,4,1,3,1,3,1,3,1,2,1,5,1,3,1,8,1,8,1,9,1,10,1,5,1,2,1,2,1,6,1,6,1,2,1,
+2,1,4,1,4,1,3,1,5,1,4,1,5,1,2,1,5,1,5,1,8,5,5,1,9,1,4,1,5,1,2,1,5,1,1,1,1,1,1,1,
+5,2,6,1,3,1,7,1,8,1,10,1,11,1,8,2,7,1,6,1,2,1,2,1,4,1,4,1,3,1,5,1,4,1,5,1,2,1,5,1,
+5,1,13,1,4,1,9,1,4,1,5,1,2,1,5,1,1,1,1,1,1,1,4,1,2,1,6,1,1,1,7,1,10,1,9,1,10,1,18,1,
+6,1,2,1,2,1,4,1,4,1,4,1,3,1,5,2,3,1,4,1,3,2,5,1,7,1,5,1,4,1,4,1,4,1,3,2,6,2,6,1,
+1,1,1,1,1,1,3,1,4,1,5,1,1,1,6,1,4,1,6,1,9,1,10,1,15,7,2,3,1,2,1,2,2,3,2,3,4,3,6,1,
+1,3,6,3,1,1,4,5,4,6,6,4,6,3,1,2,5,2,7,1,3,1,3,3,2,3,5,1,6,7,6,1,9,1,10,1,56,1,14,1,
+76,1,19,1,9,1,10,1,56,1,14,1,75,1,21,1,8,1,9,1,56,3,12,3,71,5,435
 };
 
-vector<byte> data2;
-byte b = 0;
+// here's how above encoding works, each number represents how many consecutive pixels in a row are transparent or white
+// they simply alternate between white or transparent
+// e.g. 4,7,2 means 4 pixels transparent then 7 pixels white then 2 pixels transparent
+vector<Pixel> data2;
+Pixel current = Pixel(0,0,0,0);
 
 for (auto i : data)
 {
 for (int j = 0; j < i; j++)
-{
-data2.push_back(b);
-data2.push_back(b);
-data2.push_back(b);
-data2.push_back(b);
+data2.push_back(current);
+
+current = current.R == 0 ? Pixel(255, 255, 255, 255) : Pixel(0, 0, 0, 0);
 }
 
-b = b == 0 ? 255 : 0;
-}
-
-//Texture* t = creator->CreateTexture(reinterpret_cast<Pixel*>(data2.data()), Size(190, 95), L"__vivaDefaultFontTexture", true);
-
-//defaultFont = creator->CreateSprite(t);
-//defaultFont->SetScale2TextureSize();
-//defaultFont->SetFlipVertically(true);
+Texture* t = creator->CreateTexture(data2.data(), Size(190, 95), L"?vivaDefaultFontTexture");
+resourceManager->Remove(L"?vivaDefaultFontTexture");
+defaultFont = creator->CreateFontV(t);
+defaultFont->CalcGlyphs({ 15,15 }, 18);
 }
 
 Pixel p[] = { Pixel(255,255,255,255) };
-whitePixel = creator->CreateTexture(p, Size(1, 1), L"__whitePixel");
+whitePixel = creator->CreateTexture(p, Size(1, 1), L"?whitePixel");
+resourceManager->Remove(L"?whitePixel");
 
-//Add(defaultFont);
+vector<Point> square({Point(-1,-1),Point(-1,1) ,Point(1,1) ,Point(1,-1) ,Point(-1,-1) });
+rectVertexBuffer = creator->CreateVertexBuffer(square);
+
+vector<Point> circle;
+for (int i = 0; i < 21; i++)
+circle.push_back(Point(sinf(2 * Math::Pi / 20.0f * i), cosf(2 * Math::Pi / 20.0f * i)));
+circleVertexBuffer = creator->CreateVertexBuffer(circle);
 }
 }
 
@@ -1280,7 +1431,10 @@ namespace viva{
 void DrawManager::_Destroy()
 {
 defaultSurface->Destroy();
-//defaultFont->Destroy();
+defaultFont->Destroy();
+whitePixel->Destroy();
+rectVertexBuffer->Destroy();
+circleVertexBuffer->Destroy();
 delete this;
 }
 }
@@ -1309,9 +1463,77 @@ return p;
 }
 
 namespace viva{
+Polygon* DrawManager::AddPolygon(VertexBuffer* vb, Surface* surface)
+{
+Polygon* p = creator->CreatePolygon(vb);
+Add(p, surface);
+return p;
+}
+}
+
+namespace viva{
+Polygon* DrawManager::AddRectangle()
+{
+return AddRectangle(defaultSurface);
+}
+}
+
+namespace viva{
+Polygon* DrawManager::AddRectangle(Surface* surface)
+{
+Polygon* p = creator->CreatePolygon(rectVertexBuffer);
+Add(p, surface);
+return p;
+}
+}
+
+namespace viva{
+Polygon* DrawManager::AddCircle()
+{
+return AddCircle(defaultSurface);
+}
+}
+
+namespace viva{
+Polygon* DrawManager::AddCircle(Surface* surface)
+{
+Polygon* p = creator->CreatePolygon(circleVertexBuffer);
+Add(p, surface);
+return p;
+}
+}
+
+namespace viva{
+Polygon* DrawManager::AddCircle(uint vertices)
+{
+return AddCircle(vertices, defaultSurface);
+}
+}
+
+namespace viva{
+Polygon* DrawManager::AddCircle(uint vertices, Surface* surface)
+{
+vector<Point> circle;
+for (int i = 0; i < vertices + 1; i++)
+circle.push_back(Point(sinf(2.0f * Math::Pi / vertices * i), cosf(2.0f * Math::Pi / vertices * i)));
+
+Polygon* p = creator->CreatePolygon(circle);
+Add(p, surface);
+return p;
+}
+}
+
+namespace viva{
 Polygon* DrawManager::AddPolygon(const vector<Point>& points)
 {
 return AddPolygon(points, defaultSurface);
+}
+}
+
+namespace viva{
+Polygon* DrawManager::AddPolygon(VertexBuffer* vb)
+{
+return AddPolygon(vb, defaultSurface);
 }
 }
 
@@ -1332,7 +1554,7 @@ return AddSprite(t, defaultSurface);
 }
 
 namespace viva{
-Sprite* DrawManager::AddRectangle(Surface* surface)
+Sprite* DrawManager::AddFillRectangle(Surface* surface)
 {
 Sprite* s = AddSprite(whitePixel, surface);
 return s;
@@ -1340,9 +1562,9 @@ return s;
 }
 
 namespace viva{
-Sprite* DrawManager::AddRectangle()
+Sprite* DrawManager::AddFillRectangle()
 {
-return AddRectangle(defaultSurface);
+return AddFillRectangle(defaultSurface);
 }
 }
 
@@ -1384,9 +1606,56 @@ defaultSurface->Add(drawable);
 }
 
 namespace viva{
-Sprite* DrawManager::GetDefaultFont() const
+TextureFilter DrawManager::GetDefaultTextureFilter() const
+{
+return defaultFilter;
+}
+}
+
+namespace viva{
+void DrawManager::SetDefaultTextureFilter(TextureFilter filter)
+{
+defaultFilter = filter;
+}
+}
+
+namespace viva{
+const FontMetrics& DrawManager::GetDefaultFontMetrics() const
+{
+return defaultMetrics;
+}
+}
+
+namespace viva{
+void DrawManager::SetDefaultFontMetrics(const FontMetrics& metrics)
+{
+defaultMetrics = metrics;
+}
+}
+
+namespace viva{
+Texture* DrawManager::GetPixel()
+{
+return whitePixel;
+}
+}
+
+namespace viva{
+Font* DrawManager::GetDefaultFont() const
 {
 return defaultFont;
+}
+}
+
+namespace viva{
+void DrawManager::Clear()
+{
+/*for (auto& s : surfaces)
+s->Destroy();
+
+surfaces.clear();*/
+
+defaultSurface->Clear();
 }
 }
 
@@ -1415,26 +1684,74 @@ Rect::Rect(float _left, float _top, float _right, float _bottom): left(_left), t
 }
 
 namespace viva{
-Font::Font::Font(Texture* tex, const Size& letterSize, int charsPerRow)
+Font::Font(Texture* tex, const vector<Rect>& glyphs): texture(tex), charsUv(glyphs)
 {
-texture = tex;
+}
+}
+
+namespace viva{
+Font::Font(Texture* tex):texture(tex)
+{
+}
+}
+
+namespace viva{
+Font::Font(const wstring& filename)
+{
+Texture* t = resourceManager->GetTexture(filename);
+
+if (t == nullptr)
+t = creator->CreateTexture(filename);
+
+texture = t;
+}
+}
+
+namespace viva{
+Font* Font::SetGlyphs(const vector<Rect>& glyphs)
+{
+charsUv = glyphs;
+return this;
+}
+}
+
+namespace viva{
+Font* Font::CalcGlyphs(const Size& letterSize, uint charsPerRow)
+{
+charsUv.clear();
+
+for (int i = 0; i < 32; i++)
+charsUv.push_back(Rect(0, 0, 0, 0));
 
 for (int i = 0, k = 32; k < 127; i++)
 {
 for (int j = 0; j < charsPerRow && k < 127; j++, k++)
 {
-charsUv.push_back(Rect(j*letterSize.Width / (float)texture->GetSize().Width,
-i*letterSize.Height / (float)texture->GetSize().Height,
-(j + 1)*letterSize.Width / (float)texture->GetSize().Width,
-(i + 1)*letterSize.Height / (float)texture->GetSize().Height));
+charsUv.push_back(Rect(j*letterSize.Width / texture->GetSize().Width,
+i*letterSize.Height / texture->GetSize().Height,
+(j + 1)*letterSize.Width / texture->GetSize().Width,
+(i + 1)*letterSize.Height / texture->GetSize().Height));
 }
 }
+
+return this;
 }
 }
 
 namespace viva{
-void Font::Font::Destroy()
+const Rect& Font::GetChar(uint code) const
 {
+return charsUv.at(code);
+}
+}
+
+namespace viva{
+void Font::Destroy()
+{
+if (!texture->IsCached())
+texture->Destroy();
+
+delete this;
 }
 }
 
@@ -1501,9 +1818,51 @@ return size;
 }
 }
 
-namespace viva{
-Polygon::Polygon(int count):vertexCount(count)
+namespace viva::Input{
+void Keyboard::OnKeyPressed(const std::function<void(KeyboardKey)>& handler)
 {
+onKeyPressedHandlers.push_back(handler);
+}
+}
+
+namespace viva::Input{
+void Keyboard::OnKeyReleased(const std::function<void(KeyboardKey)>& handler)
+{
+onKeyReleasedHandlers.push_back(handler);
+}
+}
+
+namespace viva::Input{
+void Keyboard::ClearOnKeyPressed()
+{
+onKeyPressedHandlers.clear();
+}
+}
+
+namespace viva::Input{
+void Keyboard::ClearOnKeyReleased()
+{
+onKeyReleasedHandlers.clear();
+}
+}
+
+namespace viva{
+Polygon::Polygon(): parent(nullptr), index(-1), visible(true)
+{
+}
+}
+
+namespace viva{
+Transform* Polygon::T() 
+{
+return &transform;
+}
+}
+
+namespace viva{
+Transform* Polygon::GetTransform() 
+{
+return &transform;
 }
 }
 
@@ -1515,20 +1874,77 @@ return this;
 }
 
 namespace viva{
-int Polygon::GetVertexCount() const
+uint Polygon::GetVertexCount() const
 {
 return vertexCount;
 }
 }
 
 namespace viva{
-Sprite::Sprite(): flipHorizontally(false), flipVertically(false), uv(0, 1, 1, 0)
+Surface* Polygon::GetSurface() const 
+{
+return parent;
+}
+}
+
+namespace viva{
+bool Polygon::IsVisible() const 
+{
+return visible;
+}
+}
+
+namespace viva{
+Drawable* Polygon::SetVisible(bool val) 
+{
+visible = val;
+return this;
+}
+}
+
+namespace viva{
+void Polygon::_SetSurface(Surface* surface) 
+{
+parent = surface;
+}
+}
+
+namespace viva{
+void Polygon::_SetIndex(uint i) 
+{
+index = i;
+}
+}
+
+namespace viva{
+int Polygon::_GetIndex() const 
+{
+return index;
+}
+}
+
+namespace viva{
+Sprite::Sprite(): flipHorizontally(false), flipVertically(false),uv(0, 0, 1, 1), filter(drawManager->GetDefaultTextureFilter()),parent(nullptr), index(-1), visible(true)
 {
 }
 }
 
 namespace viva{
-Sprite* Sprite::SetFilterType(TextureFilter _filter)
+Transform* Sprite::T() 
+{
+return &transform;
+}
+}
+
+namespace viva{
+Transform* Sprite::GetTransform() 
+{
+return &transform;
+}
+}
+
+namespace viva{
+Sprite* Sprite::SetTextureFilter(TextureFilter _filter)
 {
 filter = _filter;
 return this;
@@ -1536,14 +1952,14 @@ return this;
 }
 
 namespace viva{
-TextureFilter Sprite::GetFilterType() const
+TextureFilter Sprite::GetTextureFilter() const
 {
 return filter;
 }
 }
 
 namespace viva{
-Sprite* Sprite::SetPixelScale(const viva::Size& _size)
+Sprite* Sprite::SetPixelScale(const viva::Size& size)
 {
 Size frustum = camera->GetFrustumSize(transform.GetPosition().f.z);
 Size client = engine->GetClientSize();
@@ -1551,10 +1967,17 @@ Size client = engine->GetClientSize();
 //scale.x = unitsPerPixel.x * _size.width / 2;
 //scale.y = unitsPerPixel.y * _size.height / 2;
 
-transform.SetScale(frustum.Width / client.Width * _size.Width / 2,
-frustum.Height / client.Height * _size.Height / 2);
+transform.SetScale(frustum.Width / client.Width * size.Width / 2,
+frustum.Height / client.Height * size.Height / 2);
 
 return this;
+}
+}
+
+namespace viva{
+Sprite* Sprite::SetPixelScale(uint width, uint height)
+{
+return SetPixelScale(Size(width, height));
 }
 }
 
@@ -1619,6 +2042,56 @@ return this;
 }
 
 namespace viva{
+Sprite* Sprite::SetUV(float left, float top, float right, float bottom)
+{
+return SetUV(Rect(left, top, right, bottom));
+}
+}
+
+namespace viva{
+Surface* Sprite::GetSurface() const 
+{
+return parent;
+}
+}
+
+namespace viva{
+bool Sprite::IsVisible() const 
+{
+return visible;
+}
+}
+
+namespace viva{
+Drawable* Sprite::SetVisible(bool val) 
+{
+visible = val;
+return this;
+}
+}
+
+namespace viva{
+void Sprite::_SetSurface(Surface* surface) 
+{
+parent = surface;
+}
+}
+
+namespace viva{
+void Sprite::_SetIndex(uint i) 
+{
+index = i;
+}
+}
+
+namespace viva{
+int Sprite::_GetIndex() const 
+{
+return index;
+}
+}
+
+namespace viva{
 ResourceManager::ResourceManager()
 {
 }
@@ -1662,7 +2135,7 @@ return (Texture*)it->second;
 }
 
 namespace viva{
-void ResourceManager::RemoveResource(const wstring& name)
+void ResourceManager::Remove(const wstring& name)
 {
 auto it = resources.find(name);
 
@@ -1697,59 +2170,50 @@ delete this;
 namespace viva{
 Polygon* Win32Creator::CreatePolygon(const vector<Point>& points)
 {
-//color = XMFLOAT4(0, 0, 0, 0);
-//vertexCount = (int)points.size();
-//span = 0;
+VertexBuffer* vb = CreateVertexBuffer(points);
+return new Win32Polygon(vb);
+}
+}
 
-/*/method 1
-D3D11_BUFFER_DESC bd;
-ZeroMemory(&bd, sizeof(bd));
-bd.Usage = D3D11_USAGE_DYNAMIC;                // CPU writes, GPU reads
-bd.ByteWidth = sizeof(VERTEX) * 3;             // size is the VERTEX struct * 3
-bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
-bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;    // CPU writes
-Device->CreateBuffer(&bd, NULL, &vertexBuffer);
+namespace viva{
+Polygon* Win32Creator::CreatePolygon(VertexBuffer* vb)
+{
+vb->_MakeShared();
+return new Win32Polygon(vb);
+}
+}
 
-VERTEX* vertices = new VERTEX[n];
-for (int i = 0; i < n; i++)
-vertices[i] = { points[i].x, points[i].y, 0.0f, XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f) };
+namespace viva{
+VertexBuffer* Win32Creator::CreateVertexBuffer(const vector<Point>& points) 
+{
+uint count = (uint)points.size();
 
-D3D11_MAPPED_SUBRESOURCE ms;
-Context->Map(vertexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &ms);
-memcpy(ms.pData, vertices, sizeof(VERTEX)*n);
-Context->Unmap(vertexBuffer, NULL);
-delete[] vertices;//*/
-
-//method 2
 D3D11_BUFFER_DESC bd;
 ZeroMemory(&bd, sizeof(bd));
 bd.Usage = D3D11_USAGE_DEFAULT;				   // GPU writes and reads
-bd.ByteWidth = (UINT)(sizeof(Vertex) * points.size());
+bd.ByteWidth = (UINT)(sizeof(Vertex) * count);
 bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;       // use as a vertex buffer
 bd.CPUAccessFlags = 0;		                   // CPU does nothing
 
-Vertex* temp = new Vertex[points.size()];
+vector<Vertex> temp;
 for (int i = 0; i < points.size(); i++)
 {
 //float distFromOrigin = sqrtf(points[i].x*points[i].x + points[i].y*points[i].y);
 //if (distFromOrigin > span)
 //    span = distFromOrigin;
 //vertices.push_back(DirectX::XMVectorSet(points[i].x, points[i].y, 0, 0));
-temp[i] = { points[i].X, points[i].Y, 0, 1, 1, 1, 0, 0 }; // IMPORTANT, red must be non 0, 0 is reserved for sprites
+temp.push_back({ points.at(i).X, points.at(i).Y, 0, 1, 1, 1, 0, 0 }); // IMPORTANT, red must be non 0, 0 is reserved for sprites
 }
 //transformedVertices = vertices;
 
 D3D11_SUBRESOURCE_DATA sd;
 ZeroMemory(&sd, sizeof(sd));
-sd.pSysMem = temp;                   //Memory in CPU to copy in to GPU
+sd.pSysMem = temp.data();                   //Memory in CPU to copy in to GPU
 
 ID3D11Buffer* vertexBuffer;
 d3d.device->CreateBuffer(&bd, &sd, &vertexBuffer);
-delete[] temp;//*/
 
-Win32Polygon* poly = new Win32Polygon(vertexBuffer, points.size());
-poly->SetPixelShader(d3d.defaultPS);
-return poly;
+return new Win32VertexBuffer(vertexBuffer, count);
 }
 }
 
@@ -1901,7 +2365,7 @@ delete this;
 }
 
 namespace viva{
-Routine::Routine(std::function<int()> activity, wstring name): Activity(activity), Name(name)
+Routine::Routine(const std::function<int()>& activity, wstring name): Activity(activity), Name(name)
 {
 }
 }
@@ -1943,7 +2407,7 @@ if (routines.size() == 0)
 return;
 
 //might be removed so backwards iteration
-for (uint i = routines.size() - 1; i >= 0; i--)
+for (int i = (int)routines.size() - 1; i >= 0; i--)
 {
 // destroy if remove flag is up
 if (routines.at(i) != nullptr && routines.at(i)->remove)
@@ -1990,7 +2454,7 @@ routines.pop_back();
 }
 
 namespace viva{
-IRoutine* RoutineManager::AddRoutine(std::function<int()> func, const wstring& name, double delay, double lifeTime, double tick)
+IRoutine* RoutineManager::AddRoutine(const std::function<int()>& func, const wstring& name, double delay, double lifeTime, double tick)
 {
 Routine* newRoutine = new Routine(func, name);
 newRoutine->tick = tick;
@@ -2020,7 +2484,7 @@ throw Error(__FUNCTION__, "Routine not found");
 }
 
 namespace viva{
-void RoutineManager::Trigger(wstring _event)
+void RoutineManager::Trigger(int _event, int data)
 {
 auto it = handlers.find(_event);
 
@@ -2028,19 +2492,19 @@ if (it == handlers.end())
 return;
 
 for (auto& handler : it->second)
-handler();
+handler(data);
 }
 }
 
 namespace viva{
-void RoutineManager::AddHandler(wstring _event, std::function<void()> handler)
+void RoutineManager::AddHandler(int _event, const std::function<void(int)>& handler)
 {
 handlers[_event].push_back(handler);
 }
 }
 
 namespace viva{
-void RoutineManager::ClearHandlers(wstring _event)
+void RoutineManager::ClearHandlers(int _event)
 {
 auto it = handlers.find(_event);
 
@@ -2079,6 +2543,47 @@ delete this;
 }
 
 namespace viva{
+int VertexBuffer::GetVertexCount() const
+{
+return vertexCount;
+}
+}
+
+namespace viva{
+VertexBuffer::VertexBuffer(uint vertexCount): shared(false), vertexCount(vertexCount)
+{
+}
+}
+
+namespace viva{
+bool VertexBuffer::IsShared() const
+{
+return shared;
+}
+}
+
+namespace viva{
+void VertexBuffer::_MakeShared()
+{
+shared = true;
+}
+}
+
+namespace viva{
+Win32VertexBuffer::Win32VertexBuffer(ID3D11Buffer* vb, uint vertexCount): VertexBuffer(vertexCount), vertexBuffer(vb)
+{
+}
+}
+
+namespace viva{
+void Win32VertexBuffer::Destroy() 
+{
+vertexBuffer->Release();
+delete this;
+}
+}
+
+namespace viva{
 Surface::Surface()
 {
 }
@@ -2109,11 +2614,18 @@ drawables.clear();
 namespace viva{
 void Surface::Remove(Drawable* d)
 {
-if (d->_GetIndex() == -1)
+int indexOfd = d->_GetIndex();
+
+if (indexOfd == -1)
 return;
 
-if (d->_GetIndex() != drawables.size() - 1)
-drawables.at(d->_GetIndex()) = drawables.back();
+// if d is not at the end
+if (indexOfd != drawables.size() - 1)
+{
+// move back to where d is and update its index
+drawables.back()->_SetIndex(indexOfd);
+drawables.at(indexOfd) = drawables.back();
+}
 
 drawables.pop_back();
 d->_SetIndex(-1);
@@ -2235,7 +2747,7 @@ void Win32Window::SetWindowTitle(const wstring& title)
 }
 
 namespace viva{
-void Win32Window::Run(const std::function<void()>& gameloop, const std::function<void()>& intloop)
+CloseReason Win32Window::Run(const std::function<void()>& gameloop, const std::function<void()>& intloop)
 {
 ShowWindow(handle, SW_SHOW);
 UpdateWindow(handle);
@@ -2250,8 +2762,9 @@ if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 {
 if (msg.message == WM_QUIT)
 {
+CloseReason code = (CloseReason)msg.wParam;
 ZeroMemory(&msg, sizeof(msg));
-break;
+return code;
 }
 TranslateMessage(&msg);
 DispatchMessage(&msg);
@@ -2422,12 +2935,6 @@ delete this;
 }
 
 namespace viva{
-Win32PixelShader::Win32PixelShader():ps(nullptr)
-{
-}
-}
-
-namespace viva{
 Win32PixelShader::Win32PixelShader(ID3D11PixelShader* _ps):ps(_ps)
 {
 }
@@ -2456,8 +2963,18 @@ capslockActive = GetKeyState((int)KeyboardKey::CapsLock) & 1;
 curState.swap(prevState);
 
 // get button states
-for (int i = 0; i<keyNumber; i++)
+for (int i = 0; i < keyNumber; i++)
+{
 curState.at(i) = (GetAsyncKeyState(i) & 0x8000) && true;
+
+// fire events
+if (IsKeyPressed((KeyboardKey)i))
+for (auto& h : onKeyPressedHandlers)
+h((KeyboardKey)i);
+else if (IsKeyReleased((KeyboardKey)i))
+for (auto& h : onKeyReleasedHandlers)
+h((KeyboardKey)i);
+}
 }
 }
 
@@ -2478,7 +2995,7 @@ return curState.at((int)key) && !prevState.at((int)key);
 namespace viva::Input{
 bool Win32Keyboard::IsKeyReleased(KeyboardKey key) const 
 {
-return curState.at((int)key) && !prevState.at((int)key);
+return !curState.at((int)key) && prevState.at((int)key);
 }
 }
 
@@ -2538,16 +3055,22 @@ delete this;
 }
 
 namespace viva{
-Win32Polygon::Win32Polygon(ID3D11Buffer* _vertexBuffer, int count): Polygon(count)
+Win32Polygon::Win32Polygon(VertexBuffer* vb): vertexBuffer((Win32VertexBuffer*)vb)
 {
-vertexBuffer = _vertexBuffer;
+vertexCount = vb->GetVertexCount();
+ps = d3d.defaultPS;
 }
 }
 
 namespace viva{
 void Win32Polygon::Destroy() 
 {
-vertexBuffer->Release();
+if(!vertexBuffer->IsShared())
+vertexBuffer->Destroy();
+
+if (index != -1)
+parent->Remove(this);
+
 delete this;
 }
 }
@@ -2581,8 +3104,314 @@ d3d.context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP);
 d3d.context->RSSetState(d3d.rsWire);
 UINT stride = sizeof(Vertex);
 UINT offset = 0;
-d3d.context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+d3d.context->IASetVertexBuffers(0, 1, &(vertexBuffer->vertexBuffer), &stride, &offset);
+
+if(visible)
 d3d.context->Draw(vertexCount, 0);
+}
+}
+
+namespace viva{
+Action::Action(const vector<Rect>& _uvTable, const wstring& _name, double _speed): name(_name), uvTable(_uvTable), speed(_speed)
+{
+}
+}
+
+namespace viva{
+Animation::Animation(): indicator(0), currentFrame(0), currentAction(nullptr)
+{
+}
+}
+
+namespace viva{
+Transform* Animation::T() 
+{
+return sprite->T();
+}
+}
+
+namespace viva{
+Transform* Animation::GetTransform() 
+{
+return sprite->T();
+}
+}
+
+namespace viva{
+void Animation::_Play()
+{
+if (currentAction != nullptr && currentAction->speed != 0)
+{
+indicator += currentAction->speed * time->GetFrameTime();
+if (indicator >= 1)
+{
+indicator = 0;
+NextFrame();
+}
+else if (indicator < 0)
+{
+indicator = 1;
+PreviousFrame();
+}
+}
+
+sprite->SetUV(currentAction->uvTable.at(currentFrame));
+}
+}
+
+namespace viva{
+int Animation::GetFrameCount() const
+{
+if (currentAction == nullptr)
+throw Error(__FUNCTION__, "Action not set");
+
+return currentAction->uvTable.size();
+}
+}
+
+namespace viva{
+void Animation::NextFrame()
+{
+if (currentAction == nullptr)
+throw Error(__FUNCTION__, "Action not set");
+
+currentFrame++;
+
+for (int i = 0; i < onFrameChangedhandlers.size(); i++)
+onFrameChangedhandlers.at(i)(currentFrame);
+
+if (currentFrame >= currentAction->uvTable.size())
+{
+currentFrame = 0;
+
+for (int i = 0; i < onActionLoopedHandlers.size(); i++)
+onActionLoopedHandlers.at(i)(currentFrame);
+}
+}
+}
+
+namespace viva{
+void Animation::PreviousFrame()
+{
+if (currentAction == nullptr)
+throw Error(__FUNCTION__, "Action not set");
+
+currentFrame--;
+
+for (int i = 0; i < onFrameChangedhandlers.size(); i++)
+onFrameChangedhandlers.at(i)(currentFrame);
+
+if (currentFrame < 0)
+{
+currentFrame = currentAction->uvTable.size() - 1;
+
+for (int i = 0; i < onActionLoopedHandlers.size(); i++)
+onActionLoopedHandlers.at(i)(currentFrame);
+}
+}
+}
+
+namespace viva{
+double Animation::GetSpeed() const
+{
+if (currentAction == nullptr)
+throw Error(__FUNCTION__, "Action not set");
+
+return currentAction->speed;
+}
+}
+
+namespace viva{
+void Animation::SetSpeed(double speed)
+{
+if (currentAction == nullptr)
+throw Error(__FUNCTION__, "Action not set");
+
+currentAction->speed = speed;
+}
+}
+
+namespace viva{
+void Animation::SetSpeed(double speed, const wstring& action)
+{
+for(auto& a : actions)
+if (a.name == action)
+{
+a.speed = speed;
+return;
+}
+
+throw new Error(__FUNCTION__, "Name not found");
+}
+}
+
+namespace viva{
+int Animation::GetFrame() const
+{
+return currentFrame;
+}
+}
+
+namespace viva{
+void Animation::SetFrame(int _currentFrame)
+{
+if (currentAction == nullptr)
+throw Error(__FUNCTION__, "Action not set");
+
+currentFrame = _currentFrame;
+
+if (currentFrame < 0)
+currentFrame = 0;
+else if (currentFrame >= currentAction->uvTable.size())
+currentFrame = currentAction->uvTable.size() - 1;
+}
+}
+
+namespace viva{
+void Animation::SetAction(const wstring& name)
+{
+auto it = std::find_if(actions.begin(), actions.end(), [&](Action& e) { return e.name == name; });
+
+if (it == actions.end())
+throw Error(__FUNCTION__, "Name not found");
+
+currentAction = it._Ptr;
+}
+}
+
+namespace viva{
+const wstring& Animation::GetAction() const
+{
+if (currentAction == nullptr)
+throw Error(__FUNCTION__, "Action not set");
+
+return currentAction->name;
+}
+}
+
+namespace viva{
+void Animation::AddAction(const wstring& name, double speed, int columns, int rows, int first, int last)
+{
+vector<Rect> uvTable;
+
+float width = 1.0f / columns;
+float height = 1.0f / rows;
+
+try
+{
+for (int i = 0; i < rows; i++)
+for (int j = 0; j < columns; j++)
+{
+if (columns * i + j >= first)
+uvTable.push_back(Rect(width*j, height*i, width*(j + 1), height*(i + 1)));
+if (columns * i + j >= last)
+throw std::overflow_error(""); // exit double for loop
+}
+}
+catch (std::overflow_error& exit)
+{
+}
+
+actions.push_back(Action(uvTable, name, speed));
+}
+}
+
+namespace viva{
+void Animation::AddAction(const wstring& name, double speed, const vector<Rect>& uvTable)
+{
+actions.push_back(Action(uvTable, name, speed));
+}
+}
+
+namespace viva{
+void Animation::AddOnFrameChangeHandler(const std::function<void(int)>& fun)
+{
+onFrameChangedhandlers.push_back(fun);
+}
+}
+
+namespace viva{
+void Animation::AddOnActionLoopedHandler(const std::function<void(int)>& fun)
+{
+onActionLoopedHandlers.push_back(fun);
+}
+}
+
+namespace viva{
+void Animation::ClearOnFrameChangeHandlers()
+{
+onFrameChangedhandlers.clear();
+}
+}
+
+namespace viva{
+void Animation::ClearAddOnActionLoopedHandlers()
+{
+onActionLoopedHandlers.clear();
+}
+}
+
+namespace viva{
+void Animation::_Draw() 
+{
+}
+}
+
+namespace viva{
+Surface* Animation::GetSurface() const 
+{
+return sprite->GetSurface();
+}
+}
+
+namespace viva{
+bool Animation::IsVisible() const 
+{
+return sprite->IsVisible();
+}
+}
+
+namespace viva{
+Drawable* Animation::SetVisible(bool val) 
+{
+sprite->SetVisible(val);
+return this;
+}
+}
+
+namespace viva{
+void Animation::_SetSurface(Surface* surface) 
+{
+sprite->_SetSurface(surface);
+}
+}
+
+namespace viva{
+void Animation::_SetIndex(uint i) 
+{
+sprite->_SetIndex(i);
+}
+}
+
+namespace viva{
+int Animation::_GetIndex() const 
+{
+return sprite->_GetIndex();
+}
+}
+
+namespace viva{
+void Animation::Destroy() 
+{
+sprite->Destroy();
+delete this;
+}
+}
+
+namespace viva{
+Node* Animation::GetNode() 
+{
+return this;
 }
 }
 
@@ -2624,6 +3453,8 @@ d3d.context->IASetVertexBuffers(0, 1, &d3d.vertexBuffer, &stride, &offset);
 d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 // texture
 d3d.context->PSSetShaderResources(0, 1, &texture->shaderResource);
+
+if(visible)
 d3d.context->DrawIndexed(6, 0, 0);
 }
 }
@@ -2633,6 +3464,9 @@ void Win32Sprite::Destroy()
 {
 if(!texture->IsCached())
 texture->Destroy();
+
+if (index != -1)
+drawManager->Remove(this);
 
 delete this;
 }
@@ -2844,6 +3678,26 @@ return s.rfind(end) == (s.length() - end.length());
 }
 }
 
+namespace viva::util {
+double RandomDouble()
+{
+static std::random_device rd;
+static std::mt19937 gen(rd());
+static std::uniform_real_distribution<> dis(0, 1);
+return dis(gen);
+}
+}
+
+namespace viva::util {
+int RandomInt(int min, int max)
+{
+static std::random_device rd;
+static std::mt19937 gen(rd());
+std::uniform_int_distribution<> dis(min, max);
+return dis(gen);
+}
+}
+
 namespace viva {
 void intloop()
 {
@@ -2883,7 +3737,12 @@ break;
 case WM_CLOSE:
 {
 ShowWindow(hwnd, false);
-PostQuitMessage(0);
+
+if(wParam == 0)
+PostQuitMessage((int)CloseReason::WindowClose);
+else if(wParam == (int)CloseReason::EngineClose)
+PostQuitMessage((int)CloseReason::EngineClose);
+
 break;
 }
 case WM_COMMAND:

@@ -165,8 +165,18 @@ namespace viva
                 curState.swap(prevState);
 
                 // get button states
-                for (int i = 0; i<keyNumber; i++)
+                for (int i = 0; i < keyNumber; i++)
+                {
                     curState.at(i) = (GetAsyncKeyState(i) & 0x8000) && true;
+
+                    // fire events
+                    if (IsKeyPressed((KeyboardKey)i))
+                        for (auto& h : onKeyPressedHandlers)
+                            h((KeyboardKey)i);
+                    else if (IsKeyReleased((KeyboardKey)i))
+                        for (auto& h : onKeyReleasedHandlers)
+                            h((KeyboardKey)i);
+                }
             }
 
             bool IsKeyDown(KeyboardKey key) const override
@@ -181,7 +191,7 @@ namespace viva
 
             bool IsKeyReleased(KeyboardKey key) const override
             {
-                return curState.at((int)key) && !prevState.at((int)key);
+                return !curState.at((int)key) && prevState.at((int)key);
             }
 
             char GetChar(bool enableShift, bool enableCapslock) const override

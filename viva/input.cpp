@@ -8,7 +8,7 @@ namespace viva
         {
         protected:
             bool cursorVisibility;
-            bool rawCursor;
+            bool rawCursor;            
         public:
             // Get difference between mouse wheel positions from frame to frame.
             virtual int GetWheelDelta() const = 0;
@@ -62,6 +62,8 @@ namespace viva
         class Keyboard
         {
         protected:
+            vector<std::function<void(KeyboardKey)>> onKeyPressedHandlers;
+            vector<std::function<void(KeyboardKey)>> onKeyReleasedHandlers;
         public:
             // Is key down in this frame.
             // key: key to check
@@ -74,6 +76,30 @@ namespace viva
             // Is key up in this frame but was down in previous.
             // key: key to check
             virtual bool IsKeyReleased(KeyboardKey key) const = 0;
+
+            // Add handler to on key pressed event.
+            void OnKeyPressed(const std::function<void(KeyboardKey)>& handler)
+            {
+                onKeyPressedHandlers.push_back(handler);
+            }
+
+            // Add handler to on ket released event.
+            void OnKeyReleased(const std::function<void(KeyboardKey)>& handler)
+            {
+                onKeyReleasedHandlers.push_back(handler);
+            }
+
+            // Removes all handlers of on key pressed event.
+            void ClearOnKeyPressed()
+            {
+                onKeyPressedHandlers.clear();
+            }
+
+            // Removes all handlers of on key released event.
+            void ClearOnKeyReleased()
+            {
+                onKeyReleasedHandlers.clear();
+            }
 
             // Returns key typed including all ASCII chars between 32 and 127 and \n \t \b
             // If not applicable char was typed, the function returns 0.

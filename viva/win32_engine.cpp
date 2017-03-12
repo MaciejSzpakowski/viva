@@ -82,7 +82,7 @@ namespace viva
             d3d.context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
             Matrix t;
             Matrix::Identity(&t);
-            Rect surfaceuv(0, 1, 1, 0);
+            Rect surfaceuv(0, 0, 1, 1);
             d3d.context->UpdateSubresource(d3d.constantBufferUV, 0, 0, &surfaceuv, 0, 0);
             d3d.context->UpdateSubresource(d3d.constantBufferVS, 0, NULL, &t, 0, 0);
 
@@ -396,12 +396,12 @@ namespace viva
 
         void Exit() override
         {
-            PostMessage((HWND)window->GetHandle(), WM_CLOSE, 0, 0);
+            PostMessage((HWND)window->GetHandle(), WM_CLOSE, (int)CloseReason::EngineClose, 0);
         }
 
-        void Run(const std::function<void()>& gameloop) override
+        CloseReason Run(const std::function<void()>& gameloop) override
         {
-            static_cast<Win32Window*>(window)->Run(gameloop, [&]() {Activity(); });
+            return static_cast<Win32Window*>(window)->Run(gameloop, [&]() {Activity(); });
         }
 
         ID3D11Buffer* CreateConstantBuffer(UINT size)

@@ -51,7 +51,7 @@ namespace viva
 
         // Remove resource of that name. Exception thrown if not found.
         // name: search name
-        void RemoveResource(const wstring& name)
+        void Remove(const wstring& name)
         {
             auto it = resources.find(name);
 

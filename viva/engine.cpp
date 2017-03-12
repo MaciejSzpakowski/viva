@@ -2,6 +2,12 @@
 
 namespace viva
 {
+    enum class CloseReason : int
+    {
+        WindowClose = 1,
+        EngineClose
+    };
+
     // 1000 MHP
     class Engine
     {
@@ -29,7 +35,7 @@ namespace viva
 
         // Start engine (game loop).
         // gameloop: user's function called every frame
-        virtual void Run(const std::function<void()>& gameloop = []() {}) = 0;
+        virtual CloseReason Run(const std::function<void()>& gameloop = []() {}) = 0;
 
         // Get background color. Background color is the color being drawn if there's nothing there.
         const Color& GetBackgroundColor() const 

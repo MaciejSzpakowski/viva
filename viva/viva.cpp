@@ -6,6 +6,7 @@
 #include <cstdarg>
 #include <map>
 #include <array>
+#include <random>
 #include "viva.h"
 
 namespace viva

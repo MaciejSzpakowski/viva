@@ -15,6 +15,7 @@ namespace viva
     private:
         Transform* parent;
         vector<Transform*> children;
+        uint index; // index in parents collection
         TransformMode mode;
 
         Vector origin;
@@ -37,7 +38,7 @@ namespace viva
         // Ctor.
         Transform() 
             : position(), rotation(0), scale({ 1,1 }), size(1),
-            parent(nullptr), mode(TransformMode::World)
+            parent(nullptr), mode(TransformMode::World), index(-1)
         {
         }
 
@@ -100,11 +101,11 @@ namespace viva
             float w = scale.X * size / screenSize.Width;
             float h = scale.Y * size / screenSize.Height;
 
-            float ox = origin.X() / screenSize.Width + w;
-            float oy = origin.Y() / screenSize.Height - h;
+            float ox = origin.GetX() / screenSize.Width + w;
+            float oy = origin.GetY() / screenSize.Height - h;
 
-            float x = position.X() * 2 / screenSize.Width - 1;
-            float y = -position.Y() * 2 / screenSize.Height + 1;
+            float x = position.GetX() * 2 / screenSize.Width - 1;
+            float y = -position.GetY() * 2 / screenSize.Height + 1;
 
             Matrix::Identity(dst);
             Matrix sca, ori, rot, loc;
@@ -112,7 +113,7 @@ namespace viva
             Matrix::Translation(Vector(ox, oy, 0, 0), &ori);
             Matrix::Scaling({ w,h }, &sca);
             Matrix::Rotation(rotation, &rot);
-            Matrix::Translation(Vector(x, y, position.Z(), 0), &loc);
+            Matrix::Translation(Vector(x, y, position.GetZ(), 0), &loc);
 
             Matrix::Multiply(*dst, sca, dst);
             Matrix::Multiply(*dst, ori, dst);
@@ -141,34 +142,34 @@ namespace viva
         /////   POSITION  ////
         Transform* SetPosition(float x, float y, float z)
         {
-            position.X(x);
-            position.Y(y);
-            position.Z(z);
+            position.SetX(x);
+            position.SetY(y);
+            position.SetZ(z);
             return this;
         }
 
         Transform* SetPosition(float x, float y)
         {
-            position.X(x);
-            position.Y(y);
+            position.SetX(x);
+            position.SetY(y);
             return this;
         }
 
-        Transform* SetPositionX(float x)
+        Transform* SetX(float x)
         { 
-            position.X(x);
+            position.SetX(x);
             return this;
         }
 
-        Transform* SetPositionY(float y)
+        Transform* SetY(float y)
         { 
-            position.Y(y);
+            position.SetY(y);
             return this;
         }
 
-        Transform* SetPositionZ(float z)
+        Transform* SetZ(float z)
         { 
-            position.Z(z);
+            position.SetZ(z);
             return this;
         }
 
@@ -189,9 +190,8 @@ namespace viva
         // z: delta z
         Transform* Translate(float x, float y, float z)
         {
-            position.X(position.X() + x);
-            position.Y(position.Y() + y);
-            position.Z(position.Z() + z);
+            position.Add(Vector(x, y, z, 0));
+
             return this;
         }
 
@@ -226,7 +226,8 @@ namespace viva
         ///////     SCALE    //////
         Transform* SetScale(float width, float height)
         {
-            scale.X = width; scale.Y = height;
+            scale.X = width;
+            scale.Y = height;
             return this;
         }
 
@@ -281,6 +282,38 @@ namespace viva
         Transform* Shrink(float factor)
         { 
             size /= factor;
+            return this;
+        }
+
+        Transform* SetParent(Transform* p)
+        {
+            if (index != -1)
+                throw Error(__FUNCTION__, "Object can have only one parent");
+
+            parent = p;
+            index = parent->children.size();
+            parent->children.push_back(this);
+
+            return this;
+        }
+
+        Transform* GetParent()
+        {
+            return parent;
+        }
+
+        Transform* RemoveChild(Transform* child)
+        {
+            if (child->index == -1)
+                throw Error(__FUNCTION__, "Object doesn't have a parent");
+
+            if(children.at(child->index) != child)
+                throw Error(__FUNCTION__, "Wrong index");
+
+            children.erase(children.begin() + child->index);
+            child->index = -1;
+            child->parent = nullptr;
+
             return this;
         }
     };

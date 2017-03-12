@@ -5,8 +5,6 @@ namespace viva
     // Generic game object.
     class Node
     {
-    protected:
-        Transform transform;
     public:
         Node() 
         {
@@ -16,15 +14,9 @@ namespace viva
         virtual void Destroy() = 0;
 
         // Get transform of the object.
-        Transform* T() 
-        { 
-            return &transform; 
-        }
+        virtual Transform* T() = 0;
 
         // Get transform of the object.
-        Transform* GetTransform()
-        {
-            return &transform;
-        }
+        virtual Transform* GetTransform() = 0;
     };
 }

@@ -2,13 +2,10 @@
 
 namespace viva
 {
-    struct Win32PixelShader : public PixelShader
+    class Win32PixelShader : public PixelShader
     {
+    public:
         ID3D11PixelShader* ps;
-
-        Win32PixelShader() :ps(nullptr) 
-        {
-        }
 
         Win32PixelShader(ID3D11PixelShader* _ps) :ps(_ps) 
         { 
@@ -17,6 +14,23 @@ namespace viva
         void Destroy() override
         {
             ps->Release();
+            delete this;
+        }
+    };
+
+    class Win32VertexBuffer : public VertexBuffer
+    {
+    public:
+        ID3D11Buffer* vertexBuffer;
+
+        Win32VertexBuffer(ID3D11Buffer* vb, uint vertexCount)
+            : VertexBuffer(vertexCount), vertexBuffer(vb)
+        {
+        }
+
+        void Destroy() override
+        {
+            vertexBuffer->Release();
             delete this;
         }
     };

@@ -10,28 +10,47 @@ namespace viva
         Rect uv;
         bool flipHorizontally;
         bool flipVertically;
+        Transform transform;
+
+        Surface* parent;
+        uint index;
+        bool visible;
     public:
         // Ctor.
-        Sprite() : flipHorizontally(false), flipVertically(false), uv(0, 1, 1, 0)
+        Sprite() : flipHorizontally(false), flipVertically(false), 
+            uv(0, 0, 1, 1), filter(drawManager->GetDefaultTextureFilter()),
+            parent(nullptr), index(-1), visible(true)
         {
         }
 
+        // Get transform of the object.
+        Transform* T() override
+        {
+            return &transform;
+        }
+
+        // Get transform of the object.
+        Transform* GetTransform() override
+        {
+            return &transform;
+        }
+
         // Set filter type.
-        Sprite* SetFilterType(TextureFilter _filter) 
+        Sprite* SetTextureFilter(TextureFilter _filter) 
         { 
             filter = _filter; 
             return this;
         }
 
         // Get filter type.
-        TextureFilter GetFilterType() const 
+        TextureFilter GetTextureFilter() const 
         { 
             return filter; 
         }
 
         // Set scale to match pixel size.
         // _size: desired size in pixels
-        Sprite* SetPixelScale(const viva::Size& _size)
+        Sprite* SetPixelScale(const viva::Size& size)
         {
             Size frustum = camera->GetFrustumSize(transform.GetPosition().f.z);
             Size client = engine->GetClientSize();
@@ -39,10 +58,18 @@ namespace viva
             //scale.x = unitsPerPixel.x * _size.width / 2;
             //scale.y = unitsPerPixel.y * _size.height / 2;
 
-            transform.SetScale(frustum.Width / client.Width * _size.Width / 2,
-                frustum.Height / client.Height * _size.Height / 2);
+            transform.SetScale(frustum.Width / client.Width * size.Width / 2,
+                frustum.Height / client.Height * size.Height / 2);
 
             return this;
+        }
+
+        // Set scale to match pixel size.
+        // width: width in pixels
+        // height: height in pixels
+        Sprite* SetPixelScale(uint width, uint height)
+        {
+            return SetPixelScale(Size(width, height));
         }
 
         // Set scale to match texture size.
@@ -99,13 +126,57 @@ namespace viva
 
         // Set uv.
         // _uv: new uv
+        //         0          
+        //    +---------+     
+        //    |         |     
+        // 0  |         | 1    
+        //    |         |      
+        //    +---------+      
+        //         1          
         Sprite* SetUV(const Rect& _uv)
         { 
             uv = _uv;
             return this;
         }
 
+        // Set uv.
+        Sprite* SetUV(float left, float top, float right, float bottom)
+        {
+            return SetUV(Rect(left, top, right, bottom));
+        }
+
         // Get texture associated with this sprite. Sprites can share a texture.
         virtual Texture* GetTexture() = 0;
+
+        Surface* GetSurface() const override
+        {
+            return parent;
+        }
+
+        bool IsVisible() const override
+        {
+            return visible;
+        }
+
+        Drawable* SetVisible(bool val) override
+        {
+            visible = val;
+            return this;
+        }
+
+        void _SetSurface(Surface* surface) override
+        {
+            parent = surface;
+        }
+
+        void _SetIndex(uint i) override
+        {
+            index = i;
+        }
+         
+        int _GetIndex() const override
+        {
+            return index;
+        }
     };
 }

@@ -61,7 +61,7 @@ namespace viva
     {
     private:
         vector<Routine*> routines;
-        std::map<wstring, vector<std::function<void()>>> handlers;
+        std::map<int, vector<std::function<void(int)>>> handlers;
     public:
         void _Activity()
         {
@@ -71,7 +71,7 @@ namespace viva
                 return;
 
             //might be removed so backwards iteration
-            for (uint i = routines.size() - 1; i >= 0; i--)
+            for (int i = (int)routines.size() - 1; i >= 0; i--)
             {
                 // destroy if remove flag is up
                 if (routines.at(i) != nullptr && routines.at(i)->remove)
@@ -152,7 +152,7 @@ namespace viva
             throw Error(__FUNCTION__, "Routine not found");
         }
 
-        void Trigger(wstring _event)
+        void Trigger(int _event, int data)
         {
             auto it = handlers.find(_event);
 
@@ -160,16 +160,16 @@ namespace viva
                 return;
 
             for (auto& handler : it->second)
-                handler();
+                handler(data);
         }
 
-        void AddHandler(wstring _event, const std::function<void()>& handler)
+        void AddHandler(int _event, const std::function<void(int)>& handler)
         {
             handlers[_event].push_back(handler);
         }
 
         // Remove all handlers for that event.
-        void ClearHandlers(wstring _event)
+        void ClearHandlers(int _event)
         {
             auto it = handlers.find(_event);
 

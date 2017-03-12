@@ -6,13 +6,30 @@ namespace viva
     class Polygon : public Node, public Drawable, public Colorable
     {
     protected:
-        float span; //distance from origin to the furthest vertex
+        //float span; //distance from origin to the furthest vertex
         uint vertexCount;
+        Transform transform;
+
+        Surface* parent;
+        uint index;
+        bool visible;
     public:
         // Ctor.
         // count: vertex count
-        Polygon(int count) :vertexCount(count) 
+        Polygon() : parent(nullptr), index(-1), visible(true)
         {
+        }
+
+        // Get transform of the object.
+        Transform* T() override
+        {
+            return &transform;
+        }
+
+        // Get transform of the object.
+        Transform* GetTransform() override
+        {
+            return &transform;
         }
 
         Node* GetNode() override
@@ -36,9 +53,40 @@ namespace viva
         virtual void SetPixelShader(PixelShader* ps) = 0;
 
         // Get vertex count.
-        int GetVertexCount() const 
-        { 
-            return vertexCount; 
+        uint GetVertexCount() const
+        {
+            return vertexCount;
+        }
+
+        Surface* GetSurface() const override
+        {
+            return parent;
+        }
+
+        bool IsVisible() const override
+        {
+            return visible;
+        }
+
+        Drawable* SetVisible(bool val) override
+        {
+            visible = val;
+            return this;
+        }
+
+        void _SetSurface(Surface* surface) override
+        {
+            parent = surface;
+        }
+
+        void _SetIndex(uint i) override
+        {
+            index = i;
+        }
+
+        int _GetIndex() const override
+        {
+            return index;
         }
     };
 }

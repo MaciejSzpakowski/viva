@@ -4,36 +4,25 @@ namespace viva
 {
     class Drawable
     {
-    protected:
-        Surface* parent;
-        uint index;
     public:
-        Drawable() :parent(nullptr), index(-1) 
+        Drawable()
         {
         }
 
         // Draw all objects frm this collection.
         virtual void _Draw() = 0;
 
-        Surface* GetSurface() const
-        {
-            return parent;
-        }
+        virtual Surface* GetSurface() const = 0;
 
-        void _SetSurface(Surface* surface)
-        {
-            parent = surface;
-        }
+        virtual bool IsVisible() const = 0;
 
-        void _SetIndex(uint i)
-        {
-            index = i;
-        }
+        virtual Drawable* SetVisible(bool val) = 0;
 
-        int _GetIndex() const
-        {
-            return index;
-        }
+        virtual void _SetSurface(Surface* surface) = 0;
+
+        virtual void _SetIndex(uint i) = 0;
+
+        virtual int _GetIndex() const = 0;
 
         virtual Node* GetNode() = 0;
     };
