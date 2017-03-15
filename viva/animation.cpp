@@ -29,8 +29,8 @@ namespace viva
         // currently displayed frame
         int currentFrame;
     public:
-        Animation()
-            : indicator(0), currentFrame(0), currentAction(nullptr)
+        Animation(Sprite* _sprite)
+            : indicator(0), currentFrame(0), currentAction(nullptr), sprite(_sprite)
         {
         }
 
@@ -63,7 +63,8 @@ namespace viva
                 }
             }
 
-            sprite->SetUV(currentAction->uvTable.at(currentFrame));
+            if(currentAction != nullptr)
+                sprite->SetUV(currentAction->uvTable.at(currentFrame));
         }
 
         int GetFrameCount() const 
@@ -114,6 +115,11 @@ namespace viva
                 for (int i = 0; i < onActionLoopedHandlers.size(); i++)
                     onActionLoopedHandlers.at(i)(currentFrame);
             }
+        }
+
+        Sprite* GetSprite() const
+        {
+            return sprite;
         }
 
         double GetSpeed() const 
@@ -182,31 +188,39 @@ namespace viva
 
         void AddAction(const wstring& name, double speed, int columns, int rows, int first, int last)
         {
+            auto it = std::find_if(actions.begin(), actions.end(), [&](Action& e) { return e.name == name; });
+
+            if (it != actions.end())
+                throw Error(__FUNCTION__, L"Action " + name + L" is already on the list");
+
             vector<Rect> uvTable;
 
             float width = 1.0f / columns;
             float height = 1.0f / rows;
 
-            try
-            {
-                for (int i = 0; i < rows; i++)
-                    for (int j = 0; j < columns; j++)
+            for (int i = 0; i < rows; i++)
+                for (int j = 0; j < columns; j++)
+                {
+                    if (columns * i + j >= first)
+                        uvTable.push_back(Rect(width*j, height*i, width*(j + 1), height*(i + 1)));
+                    if (columns * i + j >= last)
                     {
-                        if (columns * i + j >= first)
-                            uvTable.push_back(Rect(width*j, height*i, width*(j + 1), height*(i + 1)));
-                        if (columns * i + j >= last)
-                            throw std::overflow_error(""); // exit double for loop
+                        // break;
+                        i = rows;
+                        j = columns;
                     }
-            }
-            catch (std::overflow_error& exit)
-            {
-            }
+                }
 
             actions.push_back(Action(uvTable, name, speed));
         }
 
         void AddAction(const wstring& name, double speed, const vector<Rect>& uvTable)
         {
+            auto it = std::find_if(actions.begin(), actions.end(), [&](Action& e) { return e.name == name; });
+
+            if (it != actions.end())
+                throw Error(__FUNCTION__, L"Action " + name + L" is already on the list");
+
             actions.push_back(Action(uvTable, name, speed));
         }
 
@@ -232,6 +246,10 @@ namespace viva
 
         void _Draw() override
         {
+            _Play();
+
+            if(currentAction != nullptr)
+                sprite->_Draw();
         }
 
         Surface* GetSurface() const override
@@ -274,6 +292,60 @@ namespace viva
         Node* GetNode() override
         {
             return this;
+        }
+
+        Animation* SetPixelScale(uint width, uint height)
+        {
+            sprite->SetPixelScale(width, height);
+            return this;
+        }
+
+        // Set scale to match texture size.
+        Animation* SetScale2TextureSize()
+        {
+            sprite->SetScale2TextureSize();
+            return this;
+        }
+
+        // Is sprite flipped horizontally.
+        bool IsFlippedHorizontally() const
+        {
+            return sprite->IsFlippedHorizontally();
+        }
+
+        // Set horizontal flip.
+        // _flipHorizontally: flip or not
+        Animation* SetFlipHorizontally(bool _flipHorizontally)
+        {
+            sprite->SetFlipHorizontally(_flipHorizontally);
+            return this;
+        }
+
+        // Is sprite flipped vertically.
+        bool IsFlippedVertically() const
+        {
+            return sprite->IsFlippedVertically();
+        }
+
+        // Set vertical flip.
+        // _flipVertically: flip or not
+        Animation* SetFlipVertically(bool _flipVertically)
+        {
+            sprite->SetFlipVertically(_flipVertically);
+            return this;
+        }
+
+        // Set filter type.
+        Animation* SetTextureFilter(TextureFilter _filter)
+        {
+            sprite->SetTextureFilter(_filter);
+            return this;
+        }
+
+        // Get filter type.
+        TextureFilter GetTextureFilter() const
+        {
+            return sprite->GetTextureFilter();
         }
     };
 }

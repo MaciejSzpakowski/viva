@@ -58,6 +58,16 @@ namespace viva
         {
             return CreateTexture(pixels, size, L"");
         }
+
+        Text* CreateText(const wstring& text)
+        {
+            return new Text(text);
+        }
+
+        Text* CreateText(const wstring& text, Font* font)
+        {
+            return new Text(text, font);
+        }
         
         // Create sprite from file. Supported files BMP, GIF, JPEG, PNG, TGA.
         // filepath: file path to image
@@ -79,6 +89,17 @@ namespace viva
 
         // Create surface to render objects on.
         virtual Surface* CreateSurface() = 0;
+
+        Animation* CreateAnimation(Sprite* sprite)
+        {
+            return new Animation(sprite);
+        }
+
+        Animation* CreateAnimation(const wstring& filename)
+        {
+            Sprite* sprite = CreateSprite(filename);
+            return CreateAnimation(sprite);
+        }
 
         virtual void _Destroy() = 0;
     };

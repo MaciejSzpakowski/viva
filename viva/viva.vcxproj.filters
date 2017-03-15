@@ -122,9 +122,6 @@
     <ClCompile Include="vertex_buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="win32_animation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

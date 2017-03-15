@@ -5,29 +5,25 @@ namespace viva
     class Text : public Drawable, public Node, public Colorable
     {
     private:
-        FontMetrics metrics;
         wstring text;
         TextureFilter texFilter;
         Font* font;
         Transform transform;
+        Sprite* sprite;
 
         Surface* parent;
         uint index;
         bool visible;
     public:
-        Text(const wstring& str, Font* f, FontMetrics m)
-            : metrics(m), font(f), text(str), texFilter(drawManager->GetDefaultTextureFilter()),
+        Text(const wstring& str, Font* f)
+            : font(f), text(str), texFilter(drawManager->GetDefaultTextureFilter()),
             parent(nullptr), index(-1), visible(true)
         {
+            sprite = creator->CreateSprite(font->GetTexture());
         }
 
         Text(const wstring& str)
-            : Text(str, drawManager->GetDefaultFont(), drawManager->GetDefaultFontMetrics())
-        {
-        }
-
-        Text(const wstring& str, Font* f)
-            : Text(str, f, drawManager->GetDefaultFontMetrics())
+            : Text(str, drawManager->GetDefaultFont())
         {
         }
 
@@ -35,6 +31,18 @@ namespace viva
         Transform* T() override
         {
             return &transform;
+        }
+
+        Text* SetText(const wstring& _text)
+        {
+            text = _text;
+
+            return this;
+        }
+
+        const wstring& GetText() const
+        {
+            return text;
         }
 
         // Get transform of the object.
@@ -48,7 +56,7 @@ namespace viva
             return texFilter;
         }
 
-        Text* SetTexFilter(TextureFilter filter)
+        Text* SetTextureFilter(TextureFilter filter)
         {
             texFilter = filter;
 
@@ -57,11 +65,32 @@ namespace viva
 
         void Destroy() override
         {
+            sprite->Destroy();
+
             delete this;
         }
 
         void _Draw() override
         {
+            int row = 0;
+            int col = 0;
+
+            for (int i = 0; i < text.length(); i++)
+            {
+                if (text.at(i) == '\n')
+                {
+                    row++;
+                    col = 0;
+                    continue;
+                }
+
+                sprite->SetUV(font->GetChar(text.at(i)));
+                sprite->T()->SetPosition(col * 1.0f + transform.GetPosition().GetX(), 1.3f * row + transform.GetPosition().GetY(), transform.GetPosition().GetZ());
+                sprite->SetPixelScale(20, 38);
+                sprite->_Draw();
+
+                col++;
+            }            
         }
 
         Surface* GetSurface() const override
@@ -93,6 +122,11 @@ namespace viva
         int _GetIndex() const override
         {
             return index;
+        }
+
+        Node* GetNode()
+        {
+            return this;
         }
     };
 }

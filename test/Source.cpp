@@ -8,6 +8,7 @@
 #include <string>
 
 #define IMG_LEAF  L"./images/leaf.png"
+#define IMG_LEAF_QUAD  L"./images/leaf_quads.png"
 #define IMG_BRICK L"./images/brick.jpg"
 #define IMG_ANI   L"./images/ani.png"
 
@@ -16,8 +17,6 @@ std::vector<std::function<void()>>* tests = nullptr;
 
 void gameloop()
 {
-    viva::Animation* a = new viva::Animation();
-
     /*int levelold = level;
 
     if (viva::keyboard->IsKeyPressed(viva::Input::KeyboardKey::LeftBracket))
@@ -27,6 +26,28 @@ void gameloop()
 
     if (levelold != level)
         viva::engine->Exit();*/
+}
+
+void testAnimation()
+{
+    /*wstring msg = L"Test4: animation\n"
+        "On the left, cat running to the right\n"
+        "On the right, cat running slower backwards and flipped hori.\n";
+    text1->SetText(msg);
+    text1->SetVisible(true);*/
+
+    viva::Animation* a1 = viva::drawManager->AddAnimation(IMG_ANI);
+    a1->SetPixelScale(512, 256);
+    a1->T()->SetSize(0.5f)->SetX(-10);
+    a1->AddAction(L"run", 20, 2, 4, 0, 7);
+    a1->SetAction(L"run");
+
+    viva::Animation* a2 = viva::drawManager->AddAnimation(IMG_ANI);
+    a2->SetPixelScale(512, 256);
+    a2->T()->SetSize(0.5f)->SetX(10);
+    a2->SetFlipHorizontally(true);
+    a2->AddAction(L"run", -7, 2, 4, 0, 7);
+    a2->SetAction(L"run");
 }
 
 void testNotSharedVertexBuffer()
@@ -73,8 +94,9 @@ void testSpritesAndTextures()
     viva::drawManager->Add(s2);
     s2->SetPixelScale(200, 200)->T()->SetX(10);
 
-    viva::Sprite* s3 = viva::drawManager->AddSprite(IMG_LEAF);
+    viva::Sprite* s3 = viva::drawManager->AddSprite(IMG_LEAF_QUAD);
     s3->SetScale2TextureSize()->T()->SetSize(0.5f);
+    s3->SetUV(0, 0, 0.5f, 0.5f);
 
     viva::Polygon* p1 = viva::drawManager->AddRectangle();
     p1->T()->SetSize(s3->T()->GetScale().X * 0.5f)->SetZ(-0.001f);
@@ -107,7 +129,7 @@ void testPolygonsAndColors()
     /*wstring msg = L"Test2: polygons and colors\n"
         "Red star on the left, blue rectangle in the middle, \nrainbow circle on the right";
     text1->SetText(msg);
-    text1->SetVisible(true);*/
+    text1->SetVisible(true);*/    
 
     std::vector<viva::Point> v;
     for (int i = 0; i < 10; i += 2)
@@ -136,7 +158,10 @@ void testPolygonsAndColors()
 
 void testInit()
 {
-    // coordinates
+    viva::Text* t1 = viva::drawManager->AddText(L"Hello\nThere");
+    t1->T()->SetPosition(-10, 10);
+    //viva::Sprite* s1 = viva::drawManager->AddSprite(viva::drawManager->GetDefaultFont()->GetTexture());
+    //s1->SetPixelScale(viva::drawManager->GetDefaultFont()->GetTexture()->GetSize());
 
     viva::routineManager->AddRoutine([]()
     {
@@ -153,7 +178,7 @@ int wrapper()
         {
             viva::Core core(L"", { 800,600 }, L"");
             viva::engine->OpenConsole();
-            viva::engine->SetBackgroundColor(viva::Color(1, 1, 1, 1));
+            viva::engine->SetBackgroundColor(viva::Color(0.8f, 0.8f, 0.8f, 1));
 
             // add handlers
             viva::keyboard->OnKeyPressed([](viva::Input::KeyboardKey key)
@@ -208,6 +233,7 @@ int main(int argc, char** argv)
         tests->push_back(testPolygonsAndColors);
         tests->push_back(testSpritesAndTextures);
         tests->push_back(testNotSharedVertexBuffer);
+        tests->push_back(testAnimation);
 
         wrapper();
     }

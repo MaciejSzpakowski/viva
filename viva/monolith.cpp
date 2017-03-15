@@ -538,19 +538,14 @@ return this;
 }
 
 namespace viva{
-Text::Text(const wstring& str, Font* f, FontMetrics m): metrics(m), font(f), text(str), texFilter(drawManager->GetDefaultTextureFilter()),parent(nullptr), index(-1), visible(true)
+Text::Text(const wstring& str, Font* f): font(f), text(str), texFilter(drawManager->GetDefaultTextureFilter()),parent(nullptr), index(-1), visible(true)
 {
+sprite = creator->CreateSprite(font->GetTexture());
 }
 }
 
 namespace viva{
-Text::Text(const wstring& str): Text(str, drawManager->GetDefaultFont(), drawManager->GetDefaultFontMetrics())
-{
-}
-}
-
-namespace viva{
-Text::Text(const wstring& str, Font* f): Text(str, f, drawManager->GetDefaultFontMetrics())
+Text::Text(const wstring& str): Text(str, drawManager->GetDefaultFont())
 {
 }
 }
@@ -559,6 +554,22 @@ namespace viva{
 Transform* Text::T() 
 {
 return &transform;
+}
+}
+
+namespace viva{
+Text* Text::SetText(const wstring& _text)
+{
+text = _text;
+
+return this;
+}
+}
+
+namespace viva{
+const wstring& Text::GetText() const
+{
+return text;
 }
 }
 
@@ -577,7 +588,7 @@ return texFilter;
 }
 
 namespace viva{
-Text* Text::SetTexFilter(TextureFilter filter)
+Text* Text::SetTextureFilter(TextureFilter filter)
 {
 texFilter = filter;
 
@@ -588,6 +599,8 @@ return this;
 namespace viva{
 void Text::Destroy() 
 {
+sprite->Destroy();
+
 delete this;
 }
 }
@@ -595,6 +608,25 @@ delete this;
 namespace viva{
 void Text::_Draw() 
 {
+int row = 0;
+int col = 0;
+
+for (int i = 0; i < text.length(); i++)
+{
+if (text.at(i) == '\n')
+{
+row++;
+col = 0;
+continue;
+}
+
+sprite->SetUV(font->GetChar(text.at(i)));
+sprite->T()->SetPosition(col * 1.0f + transform.GetPosition().GetX(), 1.3f * row + transform.GetPosition().GetY(), transform.GetPosition().GetZ());
+sprite->SetPixelScale(20, 38);
+sprite->_Draw();
+
+col++;
+}
 }
 }
 
@@ -638,6 +670,13 @@ namespace viva{
 int Text::_GetIndex() const 
 {
 return index;
+}
+}
+
+namespace viva{
+Node* Text::GetNode()
+{
+return this;
 }
 }
 
@@ -1322,6 +1361,35 @@ return CreateTexture(pixels, size, L"");
 }
 
 namespace viva{
+Text* Creator::CreateText(const wstring& text)
+{
+return new Text(text);
+}
+}
+
+namespace viva{
+Text* Creator::CreateText(const wstring& text, Font* font)
+{
+return new Text(text, font);
+}
+}
+
+namespace viva{
+Animation* Creator::CreateAnimation(Sprite* sprite)
+{
+return new Animation(sprite);
+}
+}
+
+namespace viva{
+Animation* Creator::CreateAnimation(const wstring& filename)
+{
+Sprite* sprite = CreateSprite(filename);
+return CreateAnimation(sprite);
+}
+}
+
+namespace viva{
 DrawManager::DrawManager()
 {
 defaultFilter = TextureFilter::Point;
@@ -1410,7 +1478,7 @@ current = current.R == 0 ? Pixel(255, 255, 255, 255) : Pixel(0, 0, 0, 0);
 Texture* t = creator->CreateTexture(data2.data(), Size(190, 95), L"?vivaDefaultFontTexture");
 resourceManager->Remove(L"?vivaDefaultFontTexture");
 defaultFont = creator->CreateFontV(t);
-defaultFont->CalcGlyphs({ 15,15 }, 18);
+defaultFont->CalcGlyphs({ 10,19 }, 19);
 }
 
 Pixel p[] = { Pixel(255,255,255,255) };
@@ -1585,6 +1653,76 @@ return AddSprite(filepath, defaultSurface);
 }
 
 namespace viva{
+Text* DrawManager::AddText(const wstring& text)
+{
+return AddText(text, defaultSurface);
+}
+}
+
+namespace viva{
+Text* DrawManager::AddText(const wstring& text, Font* font)
+{
+return AddText(text, font, defaultSurface);
+}
+}
+
+namespace viva{
+Text* DrawManager::AddText(const wstring& text, Surface* surface)
+{
+Text* t = creator->CreateText(text);
+Add(t, surface);
+
+return t;
+}
+}
+
+namespace viva{
+Text* DrawManager::AddText(const wstring& text, Font* font, Surface* surface)
+{
+Text* t = creator->CreateText(text, font);
+Add(t, surface);
+
+return t;
+}
+}
+
+namespace viva{
+Animation* DrawManager::AddAnimation(const wstring& filename, Surface* surface)
+{
+Animation* ani = creator->CreateAnimation(filename);
+Add(ani, surface);
+return ani;
+}
+}
+
+namespace viva{
+Animation* DrawManager::AddAnimation(const wstring& filename)
+{
+Animation* ani = creator->CreateAnimation(filename);
+Add(ani, defaultSurface);
+return ani;
+}
+}
+
+namespace viva{
+Animation* DrawManager::AddAnimation(Sprite* sprite, Surface* surface)
+{
+Animation* ani = creator->CreateAnimation(sprite);
+Add(ani, surface);
+return ani;
+}
+}
+
+namespace viva{
+Animation* DrawManager::AddAnimation(Sprite* sprite)
+{
+Animation* ani = creator->CreateAnimation(sprite);
+Add(ani, defaultSurface);
+return ani;
+}
+}
+
+namespace viva{
 void DrawManager::Remove(Drawable* drawable)
 {
 drawable->GetSurface()->Remove(drawable);
@@ -1616,20 +1754,6 @@ namespace viva{
 void DrawManager::SetDefaultTextureFilter(TextureFilter filter)
 {
 defaultFilter = filter;
-}
-}
-
-namespace viva{
-const FontMetrics& DrawManager::GetDefaultFontMetrics() const
-{
-return defaultMetrics;
-}
-}
-
-namespace viva{
-void DrawManager::SetDefaultFontMetrics(const FontMetrics& metrics)
-{
-defaultMetrics = metrics;
 }
 }
 
@@ -1742,6 +1866,13 @@ namespace viva{
 const Rect& Font::GetChar(uint code) const
 {
 return charsUv.at(code);
+}
+}
+
+namespace viva{
+Texture* Font::GetTexture() const
+{
+return texture;
 }
 }
 
@@ -2036,7 +2167,7 @@ return uv;
 namespace viva{
 Sprite* Sprite::SetUV(const Rect& _uv)
 {
-uv = _uv;
+uv = Rect(_uv.left, 1 - _uv.bottom, _uv.right, 1 - _uv.top);
 return this;
 }
 }
@@ -2934,20 +3065,6 @@ delete this;
 }
 }
 
-namespace viva{
-Win32PixelShader::Win32PixelShader(ID3D11PixelShader* _ps):ps(_ps)
-{
-}
-}
-
-namespace viva{
-void Win32PixelShader::Destroy() 
-{
-ps->Release();
-delete this;
-}
-}
-
 namespace viva::Input{
 Win32Keyboard::Win32Keyboard(): keyNumber(256),curState(keyNumber),prevState(keyNumber),capslockActive(false)
 {
@@ -3118,7 +3235,7 @@ Action::Action(const vector<Rect>& _uvTable, const wstring& _name, double _speed
 }
 
 namespace viva{
-Animation::Animation(): indicator(0), currentFrame(0), currentAction(nullptr)
+Animation::Animation(Sprite* _sprite): indicator(0), currentFrame(0), currentAction(nullptr), sprite(_sprite)
 {
 }
 }
@@ -3155,6 +3272,7 @@ PreviousFrame();
 }
 }
 
+if(currentAction != nullptr)
 sprite->SetUV(currentAction->uvTable.at(currentFrame));
 }
 }
@@ -3208,6 +3326,13 @@ currentFrame = currentAction->uvTable.size() - 1;
 for (int i = 0; i < onActionLoopedHandlers.size(); i++)
 onActionLoopedHandlers.at(i)(currentFrame);
 }
+}
+}
+
+namespace viva{
+Sprite* Animation::GetSprite() const
+{
+return sprite;
 }
 }
 
@@ -3292,24 +3417,27 @@ return currentAction->name;
 namespace viva{
 void Animation::AddAction(const wstring& name, double speed, int columns, int rows, int first, int last)
 {
+auto it = std::find_if(actions.begin(), actions.end(), [&](Action& e) { return e.name == name; });
+
+if (it != actions.end())
+throw Error(__FUNCTION__, L"Action " + name + L" is already on the list");
+
 vector<Rect> uvTable;
 
 float width = 1.0f / columns;
 float height = 1.0f / rows;
 
-try
-{
 for (int i = 0; i < rows; i++)
 for (int j = 0; j < columns; j++)
 {
 if (columns * i + j >= first)
 uvTable.push_back(Rect(width*j, height*i, width*(j + 1), height*(i + 1)));
 if (columns * i + j >= last)
-throw std::overflow_error(""); // exit double for loop
-}
-}
-catch (std::overflow_error& exit)
 {
+// break;
+i = rows;
+j = columns;
+}
 }
 
 actions.push_back(Action(uvTable, name, speed));
@@ -3319,6 +3447,11 @@ actions.push_back(Action(uvTable, name, speed));
 namespace viva{
 void Animation::AddAction(const wstring& name, double speed, const vector<Rect>& uvTable)
 {
+auto it = std::find_if(actions.begin(), actions.end(), [&](Action& e) { return e.name == name; });
+
+if (it != actions.end())
+throw Error(__FUNCTION__, L"Action " + name + L" is already on the list");
+
 actions.push_back(Action(uvTable, name, speed));
 }
 }
@@ -3354,6 +3487,10 @@ onActionLoopedHandlers.clear();
 namespace viva{
 void Animation::_Draw() 
 {
+_Play();
+
+if(currentAction != nullptr)
+sprite->_Draw();
 }
 }
 
@@ -3412,6 +3549,67 @@ namespace viva{
 Node* Animation::GetNode() 
 {
 return this;
+}
+}
+
+namespace viva{
+Animation* Animation::SetPixelScale(uint width, uint height)
+{
+sprite->SetPixelScale(width, height);
+return this;
+}
+}
+
+namespace viva{
+Animation* Animation::SetScale2TextureSize()
+{
+sprite->SetScale2TextureSize();
+return this;
+}
+}
+
+namespace viva{
+bool Animation::IsFlippedHorizontally() const
+{
+return sprite->IsFlippedHorizontally();
+}
+}
+
+namespace viva{
+Animation* Animation::SetFlipHorizontally(bool _flipHorizontally)
+{
+sprite->SetFlipHorizontally(_flipHorizontally);
+return this;
+}
+}
+
+namespace viva{
+bool Animation::IsFlippedVertically() const
+{
+return sprite->IsFlippedVertically();
+}
+}
+
+namespace viva{
+Animation* Animation::SetFlipVertically(bool _flipVertically)
+{
+sprite->SetFlipVertically(_flipVertically);
+return this;
+}
+}
+
+namespace viva{
+Animation* Animation::SetTextureFilter(TextureFilter _filter)
+{
+sprite->SetTextureFilter(_filter);
+return this;
+}
+}
+
+namespace viva{
+TextureFilter Animation::GetTextureFilter() const
+{
+return sprite->GetTextureFilter();
 }
 }
 
@@ -3583,6 +3781,20 @@ frameTickCount = currentTime.QuadPart - prevFrameTime;
 frameTime = double(frameTickCount) / frequency;
 prevFrameTime = currentTime.QuadPart;
 gameTime = double(currentTime.QuadPart - startTime) / frequency;
+}
+}
+
+namespace viva{
+Win32PixelShader::Win32PixelShader(ID3D11PixelShader* _ps):ps(_ps)
+{
+}
+}
+
+namespace viva{
+void Win32PixelShader::Destroy() 
+{
+ps->Release();
+delete this;
 }
 }
 

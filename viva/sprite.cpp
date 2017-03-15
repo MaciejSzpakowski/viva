@@ -135,7 +135,7 @@ namespace viva
         //         1          
         Sprite* SetUV(const Rect& _uv)
         { 
-            uv = _uv;
+            uv = Rect(_uv.left, 1 - _uv.bottom, _uv.right, 1 - _uv.top);
             return this;
         }
 

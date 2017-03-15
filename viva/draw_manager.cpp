@@ -8,7 +8,6 @@ namespace viva
     private:
         Surface* defaultSurface;
         Texture* whitePixel;
-        FontMetrics defaultMetrics;
         //vector<RenderTarget*> renderTargets;
         Font* defaultFont;
         TextureFilter defaultFilter;
@@ -104,7 +103,7 @@ namespace viva
                 Texture* t = creator->CreateTexture(data2.data(), Size(190, 95), L"?vivaDefaultFontTexture");
                 resourceManager->Remove(L"?vivaDefaultFontTexture");
                 defaultFont = creator->CreateFontV(t);
-                defaultFont->CalcGlyphs({ 15,15 }, 18);
+                defaultFont->CalcGlyphs({ 10,19 }, 19);
             }
 
             Pixel p[] = { Pixel(255,255,255,255) };
@@ -265,6 +264,60 @@ namespace viva
             return AddSprite(filepath, defaultSurface);
         }
 
+        Text* AddText(const wstring& text)
+        {
+            return AddText(text, defaultSurface);
+        }
+
+        Text* AddText(const wstring& text, Font* font)
+        {
+            return AddText(text, font, defaultSurface);
+        }
+
+        Text* AddText(const wstring& text, Surface* surface)
+        {
+            Text* t = creator->CreateText(text);
+            Add(t, surface);
+
+            return t;
+        }
+
+        Text* AddText(const wstring& text, Font* font, Surface* surface)
+        {
+            Text* t = creator->CreateText(text, font);
+            Add(t, surface);
+
+            return t;
+        }
+
+        Animation* AddAnimation(const wstring& filename, Surface* surface)
+        {
+            Animation* ani = creator->CreateAnimation(filename);
+            Add(ani, surface);
+            return ani;
+        }
+
+        Animation* AddAnimation(const wstring& filename)
+        {
+            Animation* ani = creator->CreateAnimation(filename);
+            Add(ani, defaultSurface);
+            return ani;
+        }
+
+        Animation* AddAnimation(Sprite* sprite, Surface* surface)
+        {
+            Animation* ani = creator->CreateAnimation(sprite);
+            Add(ani, surface);
+            return ani;
+        }
+
+        Animation* AddAnimation(Sprite* sprite)
+        {
+            Animation* ani = creator->CreateAnimation(sprite);
+            Add(ani, defaultSurface);
+            return ani;
+        }
+
         void Remove(Drawable* drawable)
         {
             drawable->GetSurface()->Remove(drawable);
@@ -288,16 +341,6 @@ namespace viva
         void SetDefaultTextureFilter(TextureFilter filter)
         {
             defaultFilter = filter;
-        }
-
-        const FontMetrics& GetDefaultFontMetrics() const
-        {
-            return defaultMetrics;
-        }
-
-        void SetDefaultFontMetrics(const FontMetrics& metrics)
-        {
-            defaultMetrics = metrics;
         }
 
         Texture* GetPixel()

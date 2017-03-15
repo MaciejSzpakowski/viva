@@ -54,7 +54,6 @@
 #include "viva.h"
 #include "viva.h"
 #include "viva.h"
-#include "viva.h"
 
 namespace viva {
 class Drawable;}
@@ -67,9 +66,6 @@ struct Color;}
 
 namespace viva {
 class Colorable;}
-
-namespace viva {
-struct FontMetrics;}
 
 namespace viva {
 union Vector;}
@@ -185,9 +181,6 @@ class Win32Mouse;}
 namespace viva {
 class PixelShader;}
 
-namespace viva {
-class Win32PixelShader;}
-
 namespace viva::Input {
 class Win32Keyboard;}
 
@@ -208,6 +201,9 @@ class Win32Surface;}
 
 namespace viva {
 class Win32Time;}
+
+namespace viva {
+class Win32PixelShader;}
 
 namespace viva {
 class Win32Texture;}
@@ -332,11 +328,6 @@ Colorable* SetB(float b);
 
 Colorable* SetA(float a);
 
-};}
-
-namespace viva {
-struct FontMetrics
-{
 };}
 
 namespace viva {
@@ -481,28 +472,30 @@ namespace viva {
 class Text : public Drawable, public Node, public Colorable
 {
 private:
-FontMetrics metrics;
 wstring text;
 TextureFilter texFilter;
 Font* font;
 Transform transform;
+Sprite* sprite;
 Surface* parent;
 uint index;
 bool visible;
 public:
-Text(const wstring& str, Font* f, FontMetrics m);
+Text(const wstring& str, Font* f);
 
 Text(const wstring& str);
 
-Text(const wstring& str, Font* f);
-
 Transform* T() override;
+
+Text* SetText(const wstring& _text);
+
+const wstring& GetText() const;
 
 Transform* GetTransform() override;
 
 TextureFilter GetTextureFilter() const;
 
-Text* SetTexFilter(TextureFilter filter);
+Text* SetTextureFilter(TextureFilter filter);
 
 void Destroy() override;
 
@@ -519,6 +512,8 @@ void _SetSurface(Surface* surface) override;
 void _SetIndex(uint i) override;
 
 int _GetIndex() const override;
+
+Node* GetNode();
 
 };}
 
@@ -691,12 +686,20 @@ Font* CreateFontV(Texture* tex);
 virtual Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) = 0;
 Texture* CreateTexture(const Pixel* pixels, const Size& size);
 
+Text* CreateText(const wstring& text);
+
+Text* CreateText(const wstring& text, Font* font);
+
 virtual Sprite* CreateSprite(const wstring& filepath) = 0;
 virtual Sprite* CreateSprite(Texture* texture) = 0;
 virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
 virtual Polygon* CreatePolygon(VertexBuffer* vb) = 0;
 virtual VertexBuffer* CreateVertexBuffer(const vector<Point>& points) = 0;
 virtual Surface* CreateSurface() = 0;
+Animation* CreateAnimation(Sprite* sprite);
+
+Animation* CreateAnimation(const wstring& filename);
+
 virtual void _Destroy() = 0;
 };}
 
@@ -732,7 +735,6 @@ class DrawManager
 private:
 Surface* defaultSurface;
 Texture* whitePixel;
-FontMetrics defaultMetrics;
 Font* defaultFont;
 TextureFilter defaultFilter;
 VertexBuffer* rectVertexBuffer;
@@ -778,6 +780,22 @@ Sprite* AddSprite(const wstring& filepath, Surface* surface);
 
 Sprite* AddSprite(const wstring& filepath);
 
+Text* AddText(const wstring& text);
+
+Text* AddText(const wstring& text, Font* font);
+
+Text* AddText(const wstring& text, Surface* surface);
+
+Text* AddText(const wstring& text, Font* font, Surface* surface);
+
+Animation* AddAnimation(const wstring& filename, Surface* surface);
+
+Animation* AddAnimation(const wstring& filename);
+
+Animation* AddAnimation(Sprite* sprite, Surface* surface);
+
+Animation* AddAnimation(Sprite* sprite);
+
 void Remove(Drawable* drawable);
 
 void Add(Drawable* drawable, Surface* surface);
@@ -787,10 +805,6 @@ void Add(Drawable* drawable);
 TextureFilter GetDefaultTextureFilter() const;
 
 void SetDefaultTextureFilter(TextureFilter filter);
-
-const FontMetrics& GetDefaultFontMetrics() const;
-
-void SetDefaultFontMetrics(const FontMetrics& metrics);
 
 Texture* GetPixel();
 
@@ -839,6 +853,8 @@ Font* SetGlyphs(const vector<Rect>& glyphs);
 Font* CalcGlyphs(const Size& letterSize, uint charsPerRow);
 
 const Rect& GetChar(uint code) const;
+
+Texture* GetTexture() const;
 
 void Destroy();
 
@@ -1309,17 +1325,6 @@ public:
 virtual void Destroy() = 0;
 };}
 
-namespace viva {
-class Win32PixelShader : public PixelShader
-{
-public:
-ID3D11PixelShader* ps;
-Win32PixelShader(ID3D11PixelShader* _ps);
-
-void Destroy() override;
-
-};}
-
 namespace viva::Input {
 class Win32Keyboard : public Input::Keyboard
 {
@@ -1390,7 +1395,7 @@ Sprite* sprite;
 double indicator;
 int currentFrame;
 public:
-Animation();
+Animation(Sprite* _sprite);
 
 Transform* T() override;
 
@@ -1403,6 +1408,8 @@ int GetFrameCount() const;
 void NextFrame();
 
 void PreviousFrame();
+
+Sprite* GetSprite() const;
 
 double GetSpeed() const;
 
@@ -1447,6 +1454,22 @@ int _GetIndex() const override;
 void Destroy() override;
 
 Node* GetNode() override;
+
+Animation* SetPixelScale(uint width, uint height);
+
+Animation* SetScale2TextureSize();
+
+bool IsFlippedHorizontally() const;
+
+Animation* SetFlipHorizontally(bool _flipHorizontally);
+
+bool IsFlippedVertically() const;
+
+Animation* SetFlipVertically(bool _flipVertically);
+
+Animation* SetTextureFilter(TextureFilter _filter);
+
+TextureFilter GetTextureFilter() const;
 
 };}
 
@@ -1507,6 +1530,17 @@ Win32Time();
 void _Destroy() override;
 
 void _Activity() override;
+
+};}
+
+namespace viva {
+class Win32PixelShader : public PixelShader
+{
+public:
+ID3D11PixelShader* ps;
+Win32PixelShader(ID3D11PixelShader* _ps);
+
+void Destroy() override;
 
 };}
 

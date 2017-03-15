@@ -44,7 +44,7 @@ namespace viva
             charsUv = glyphs;
             return this;
         }
-
+        
         Font* CalcGlyphs(const Size& letterSize, uint charsPerRow)
         {
             charsUv.clear();
@@ -70,6 +70,11 @@ namespace viva
         const Rect& GetChar(uint code) const
         {
             return charsUv.at(code);
+        }
+
+        Texture* GetTexture() const
+        {
+            return texture;
         }
 
         void Destroy()

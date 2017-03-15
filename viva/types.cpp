@@ -236,8 +236,4 @@ namespace viva
             return size;
         }
     };
-
-    struct FontMetrics
-    {
-    };
 }
