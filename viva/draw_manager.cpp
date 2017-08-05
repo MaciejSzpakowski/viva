@@ -102,8 +102,7 @@ namespace viva
 
                 Texture* t = creator->CreateTexture(data2.data(), Size(190, 95), L"?vivaDefaultFontTexture");
                 resourceManager->Remove(L"?vivaDefaultFontTexture");
-                defaultFont = creator->CreateFontV(t);
-                defaultFont->CalcGlyphs({ 10,19 }, 19);
+                defaultFont = creator->CreateFontV(t, Size(10,19), 19);
             }
 
             Pixel p[] = { Pixel(255,255,255,255) };

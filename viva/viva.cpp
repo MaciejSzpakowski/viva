@@ -7,6 +7,10 @@
 #include <map>
 #include <array>
 #include <random>
+#include <mutex>
+#include <queue>
+#include <future>
+#include <chrono>
 #include "viva.h"
 
 namespace viva

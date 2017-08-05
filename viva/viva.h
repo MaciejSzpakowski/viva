@@ -31,17 +31,26 @@
 #include <map>
 #include <array>
 #include <random>
+#include <mutex>
+#include <queue>
+#include <future>
+#include <chrono>
 #include "viva.h"
 #define WIN32_LEAN_AND_MEAN
+#include <Ws2tcpip.h>
+#include <WinSock2.h>
 #include <Windows.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <DirectXCollision.h>
 #include <d3dcompiler.h>
 #include <Xinput.h>
+#pragma comment(lib, "ws2_32.lib")
 #pragma comment (lib, "d3d11.lib")
 #pragma comment (lib, "D3DCompiler.lib")
 #pragma comment(lib, "Xinput9_1_0.lib")
+#include "viva.h"
+#include "viva.h"
 #include "viva.h"
 #include "viva.h"
 #include "viva.h"
@@ -166,6 +175,12 @@ class Surface;}
 namespace viva {
 class Time;}
 
+namespace viva::net {
+struct NetworkError;}
+
+namespace viva::net {
+class Base;}
+
 namespace viva {
 class Window;}
 
@@ -174,6 +189,12 @@ class Win32Window;}
 
 namespace viva {
 struct Vertex;}
+
+namespace viva::net {
+class Server;}
+
+namespace viva::net {
+class Win32Server;}
 
 namespace viva::Input {
 class Win32Mouse;}
@@ -207,6 +228,12 @@ class Win32PixelShader;}
 
 namespace viva {
 class Win32Texture;}
+
+namespace viva::net {
+class Client;}
+
+namespace viva::net {
+class Win32Client;}
 
 namespace viva{
     typedef unsigned char byte;}
@@ -677,11 +704,9 @@ virtual PixelShader* CreatePixelShader(const wstring& filepath) = 0;
 virtual PixelShader* CreatePixelShader(const std::string& str) = 0;
 Texture* CreateTexture(const wstring& filepath);
 
-Font* CreateFontV(const wstring& filename);
+Font* CreateFontV(const wstring& filename, Size letterSize,uint charsPerRow);
 
-Font* CreateFontV(Texture* tex, const vector<Rect>& glyphs);
-
-Font* CreateFontV(Texture* tex);
+Font* CreateFontV(Texture* tex, const Size& letterSize, uint charsPerRow);
 
 virtual Texture* CreateTexture(const Pixel* pixels, const Size& size, const wstring& name) = 0;
 Texture* CreateTexture(const Pixel* pixels, const Size& size);
@@ -695,6 +720,8 @@ virtual Sprite* CreateSprite(Texture* texture) = 0;
 virtual Polygon* CreatePolygon(const vector<Point>& points) = 0;
 virtual Polygon* CreatePolygon(VertexBuffer* vb) = 0;
 virtual VertexBuffer* CreateVertexBuffer(const vector<Point>& points) = 0;
+virtual net::Server* CreateServer(unsigned short port) = 0;
+virtual net::Client* CreateClient(std::string ip, unsigned short port) = 0;
 virtual Surface* CreateSurface() = 0;
 Animation* CreateAnimation(Sprite* sprite);
 
@@ -841,18 +868,15 @@ class Font
 private:
 Texture* texture;
 vector<Rect> charsUv;
-public:
-Font(Texture* tex, const vector<Rect>& glyphs);
-
-Font(Texture* tex);
-
-Font(const wstring& filename);
-
-Font* SetGlyphs(const vector<Rect>& glyphs);
-
+Size charSize;
 Font* CalcGlyphs(const Size& letterSize, uint charsPerRow);
 
+public:
+Font(Texture* tex, const Size& letterSize, uint charsPerRow);
+
 const Rect& GetChar(uint code) const;
+
+const Size& GetCharSize() const;
 
 Texture* GetTexture() const;
 
@@ -1083,6 +1107,10 @@ PixelShader* CreatePixelShader(const wstring& filepath) override;
 
 PixelShader* CreatePixelShader(const std::string& str) override;
 
+net::Server* CreateServer(unsigned short port) override;
+
+net::Client* CreateClient(std::string ip, unsigned short port) override;
+
 ID3D11ShaderResourceView* SrvFromPixels(const Pixel* pixels, const Size& _size);
 
 Sprite* CreateSprite(Texture* texture);
@@ -1226,6 +1254,31 @@ double GetFps() const;
 virtual void _Destroy() = 0;
 };}
 
+namespace viva::net {
+struct NetworkError
+{
+wstring message;
+int code;
+};}
+
+namespace viva::net {
+class Base
+{
+protected:
+size_t id;
+std::queue<NetworkError> errors;
+std::mutex errorQueueMutex;
+std::function<void(const NetworkError& error)> onErrorHandler;
+IRoutine* activityRoutine;
+public:
+void _AddError(const NetworkError& error);
+
+size_t GetId() const;
+
+void OnError(const std::function<void(const NetworkError& error)>& handler);
+
+};}
+
 namespace viva {
 class Window
 {
@@ -1268,6 +1321,59 @@ float U, V;
 Vertex();
 
 Vertex(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v);
+
+};}
+
+namespace viva::net {
+class Server : public net::Base
+{
+protected:
+unsigned short port;
+std::function<void(Client* c)> onConnectHandler;
+std::function<void(Client* c)> onDisconnectHandler;
+std::mutex errorQueueMutex;
+std::mutex clientQueueMutex;
+std::queue<Client*> clients;
+vector<Client*> ackedClients;
+bool isRunning;
+bool returnAccept;
+std::future<bool> acceptThread;
+public:
+Server(unsigned short _port);
+
+void OnConnect(const std::function<void(Client* c)>& handler);
+
+void OnDisconnect(const std::function<void(Client* c)>& handler);
+
+const vector<Client*>& GetClients() const;
+
+void _AddClient(Client* client);
+
+void _Activity();
+
+virtual void Start(int backlog) = 0;
+virtual void Stop() = 0;
+virtual void Destroy() = 0;
+};}
+
+namespace viva::net {
+class Win32Server : public Server
+{
+private:
+sockaddr_in address;
+SOCKET handle;
+public:
+Win32Server(unsigned short port);
+
+bool GetReturnAccept() const;
+
+SOCKET GetSocket() const;
+
+void Start(int backlog) override;
+
+void Stop() override;
+
+void Destroy() override;
 
 };}
 
@@ -1555,6 +1661,73 @@ void Destroy() override;
 
 };}
 
+namespace viva::net {
+class Client : public net::Base
+{
+protected:
+std::string ip;
+unsigned short port;
+std::function<void()> onConnectHandler;
+std::function<void(const vector<byte>&)> onMsgHandler;
+bool isConnected;
+bool returnReceive;
+IRoutine* timeOutHandler;
+std::future<int> timeOut;
+std::future<bool> receiveThread;
+std::mutex msgQueueMutex;
+std::vector<byte> msg;
+public:
+Client(std::string _ip, unsigned short _port);
+
+void OnConnect(const std::function<void()>& handler);
+
+void OnMsg(const std::function<void(const vector<byte>&)>& handler);
+
+void _Activity();
+
+void _PushMsgBytes(byte* arr, int len);
+
+void _ProcessMsg();
+
+void _SetConnected(bool val);
+
+const wstring& GetIp() const;
+
+void Send(vector<byte>& msg);
+
+virtual void Send(byte* msg, unsigned short len) = 0;
+virtual void Connect(double timeoutSeconds) = 0;
+virtual void Disonnect() = 0;
+virtual void Destroy() = 0;
+};}
+
+namespace viva::net {
+class Win32Client : public Client
+{
+private:
+SOCKET handle;
+sockaddr_in address;
+public:
+Win32Client(SOCKET socket, sockaddr_in address, std::string ip, unsigned short port);
+
+Win32Client(std::string ip, unsigned short port);
+
+void Connect(double timeoutSeconds) override;
+
+SOCKET GetSocket() const;
+
+sockaddr_in GetSockAddr() const;
+
+bool GetReturnReceive() const;
+
+void Send(byte* msg, unsigned short len) override;
+
+void Disonnect() override;
+
+void Destroy() override;
+
+};}
+
 namespace viva::Math {
 float Deg2Rad(float deg);}
 
@@ -1587,6 +1760,18 @@ void Checkhr(HRESULT hr, const char* function);}
 
 namespace viva {
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);}
+
+namespace viva::net {
+bool AcceptThread(Win32Server* server);}
+
+namespace viva::net {
+bool ReceiveThread(Win32Client* client);}
+
+namespace viva::net {
+int ConnectThread(Win32Client* client);}
+
+namespace viva::net {
+wstring GetLastWinsockErrorMessage(DWORD errorCode);}
 
 namespace viva::Math {
     extern const float Pi ;}
@@ -1626,4 +1811,10 @@ namespace viva {
 
 namespace viva {
     extern Input::Win32Mouse* win32mouse ;}
+
+namespace viva::net {
+    extern bool wsInitialized ;}
+
+namespace viva::net {
+    extern WSAData wsadata;}
 

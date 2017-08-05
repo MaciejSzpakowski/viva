@@ -1333,23 +1333,21 @@ return tex;
 }
 
 namespace viva{
-Font* Creator::CreateFontV(const wstring& filename)
+Font* Creator::CreateFontV(const wstring& filename, Size letterSize,uint charsPerRow)
 {
-return new Font(filename);
+Texture* tex = resourceManager->GetTexture(filename);
+
+if (tex == nullptr)
+tex = creator->CreateTexture(filename);
+
+return new Font(tex, letterSize, charsPerRow);
 }
 }
 
 namespace viva{
-Font* Creator::CreateFontV(Texture* tex, const vector<Rect>& glyphs)
+Font* Creator::CreateFontV(Texture* tex, const Size& letterSize, uint charsPerRow)
 {
-return new Font(tex, glyphs);
-}
-}
-
-namespace viva{
-Font* Creator::CreateFontV(Texture* tex)
-{
-return new Font(tex);
+return new Font(tex, letterSize, charsPerRow);
 }
 }
 
@@ -1477,8 +1475,7 @@ current = current.R == 0 ? Pixel(255, 255, 255, 255) : Pixel(0, 0, 0, 0);
 
 Texture* t = creator->CreateTexture(data2.data(), Size(190, 95), L"?vivaDefaultFontTexture");
 resourceManager->Remove(L"?vivaDefaultFontTexture");
-defaultFont = creator->CreateFontV(t);
-defaultFont->CalcGlyphs({ 10,19 }, 19);
+defaultFont = creator->CreateFontV(t, Size(10,19), 19);
 }
 
 Pixel p[] = { Pixel(255,255,255,255) };
@@ -1808,38 +1805,6 @@ Rect::Rect(float _left, float _top, float _right, float _bottom): left(_left), t
 }
 
 namespace viva{
-Font::Font(Texture* tex, const vector<Rect>& glyphs): texture(tex), charsUv(glyphs)
-{
-}
-}
-
-namespace viva{
-Font::Font(Texture* tex):texture(tex)
-{
-}
-}
-
-namespace viva{
-Font::Font(const wstring& filename)
-{
-Texture* t = resourceManager->GetTexture(filename);
-
-if (t == nullptr)
-t = creator->CreateTexture(filename);
-
-texture = t;
-}
-}
-
-namespace viva{
-Font* Font::SetGlyphs(const vector<Rect>& glyphs)
-{
-charsUv = glyphs;
-return this;
-}
-}
-
-namespace viva{
 Font* Font::CalcGlyphs(const Size& letterSize, uint charsPerRow)
 {
 charsUv.clear();
@@ -1863,9 +1828,24 @@ return this;
 }
 
 namespace viva{
+Font::Font(Texture* tex, const Size& letterSize, uint charsPerRow): texture(tex)
+{
+CalcGlyphs(letterSize, charsPerRow);
+charSize = letterSize;
+}
+}
+
+namespace viva{
 const Rect& Font::GetChar(uint code) const
 {
 return charsUv.at(code);
+}
+}
+
+namespace viva{
+const Size& Font::GetCharSize() const
+{
+return charSize;
 }
 }
 
@@ -2419,6 +2399,20 @@ return new Win32PixelShader(result);
 }
 
 namespace viva{
+net::Server* Win32Creator::CreateServer(unsigned short port) 
+{
+return new net::Win32Server(port);
+}
+}
+
+namespace viva{
+net::Client* Win32Creator::CreateClient(std::string ip, unsigned short port) 
+{
+return new net::Win32Client(ip, port);
+}
+}
+
+namespace viva{
 ID3D11ShaderResourceView* Win32Creator::SrvFromPixels(const Pixel* pixels, const Size& _size)
 {
 ID3D11Texture2D *tex;
@@ -2801,6 +2795,29 @@ return 1 / frameTime;
 }
 }
 
+namespace viva::net{
+void Base::_AddError(const NetworkError& error)
+{
+errorQueueMutex.lock();
+errors.push(error);
+errorQueueMutex.unlock();
+}
+}
+
+namespace viva::net{
+size_t Base::GetId() const
+{
+return id;
+}
+}
+
+namespace viva::net{
+void Base::OnError(const std::function<void(const NetworkError& error)>& handler)
+{
+onErrorHandler = handler;
+}
+}
+
 namespace viva{
 Window::Window()
 {
@@ -2918,6 +2935,149 @@ Vertex::Vertex()
 namespace viva{
 Vertex::Vertex(float _x, float _y, float _z, float _r, float _g, float _b, float _u, float _v): X(_x), Y(_y), Z(_z), R(_r), G(_g), B(_b), U(_u), V(_v)
 {
+}
+}
+
+namespace viva::net{
+Server::Server(unsigned short _port): port(_port), isRunning(false), returnAccept(false)
+{
+activityRoutine = routineManager->AddRoutine([this]()
+{
+this->_Activity();
+return 1;
+}, L"", 0, 0, 0);
+}
+}
+
+namespace viva::net{
+void Server::OnConnect(const std::function<void(Client* c)>& handler)
+{
+onConnectHandler = handler;
+}
+}
+
+namespace viva::net{
+void Server::OnDisconnect(const std::function<void(Client* c)>& handler)
+{
+onDisconnectHandler = handler;
+}
+}
+
+namespace viva::net{
+const vector<Client*>& Server::GetClients() const
+{
+return ackedClients;
+}
+}
+
+namespace viva::net{
+void Server::_AddClient(Client* client)
+{
+clientQueueMutex.lock();
+clients.push(client);
+clientQueueMutex.unlock();
+}
+}
+
+namespace viva::net{
+void Server::_Activity()
+{
+if (clients.size() > 0)
+{
+clientQueueMutex.lock();
+Client* client = clients.front();
+clients.pop();
+clientQueueMutex.unlock();
+
+ackedClients.push_back(client);
+onConnectHandler(client);
+}
+}
+}
+
+namespace viva::net{
+Win32Server::Win32Server(unsigned short port): Server(port)
+{
+// WSAStartup
+if (!wsInitialized)
+{
+int res = WSAStartup(MAKEWORD(2, 2), &wsadata);
+if (res != 0)
+{
+wstring msg = GetLastWinsockErrorMessage(res);
+throw viva::Error("WSAStartup", msg);
+}
+
+wsInitialized = true;
+}
+
+// socket()
+SecureZeroMemory(&address, sizeof(address));
+handle = socket(AF_INET, SOCK_STREAM, NULL);
+if (handle == INVALID_SOCKET)
+{
+wstring msg = GetLastWinsockErrorMessage(WSAGetLastError());
+throw viva::Error("socket", msg);
+}
+
+// sockaddr
+address.sin_port = htons(port);
+address.sin_addr.s_addr = htonl(INADDR_ANY);
+address.sin_family = AF_INET;
+sockaddr* paddress = (sockaddr*)&address;
+
+// bind()
+if (bind((SOCKET)handle, paddress, (int)sizeof(sockaddr)) == SOCKET_ERROR)
+{
+wstring msg = GetLastWinsockErrorMessage(WSAGetLastError());
+throw viva::Error("bind", msg);
+}
+}
+}
+
+namespace viva::net{
+bool Win32Server::GetReturnAccept() const
+{
+return returnAccept;
+}
+}
+
+namespace viva::net{
+SOCKET Win32Server::GetSocket() const
+{
+return handle;
+}
+}
+
+namespace viva::net{
+void Win32Server::Start(int backlog) 
+{
+if (isRunning)
+throw viva::Error(__FUNCTION__, L"Server already running");
+
+// listen()
+if (listen(handle, backlog) == SOCKET_ERROR)
+{
+wstring msg = GetLastWinsockErrorMessage(WSAGetLastError());
+throw viva::Error("listen", msg);
+}
+
+isRunning = true;
+
+acceptThread = std::async(AcceptThread, this);
+}
+}
+
+namespace viva::net{
+void Win32Server::Stop() 
+{
+}
+}
+
+namespace viva::net{
+void Win32Server::Destroy() 
+{
+activityRoutine->Destroy();
 }
 }
 
@@ -3813,6 +3973,235 @@ delete this;
 }
 }
 
+namespace viva::net{
+Client::Client(std::string _ip, unsigned short _port): ip(_ip), port(_port), isConnected(false), timeOutHandler(nullptr), returnReceive(false)
+{
+activityRoutine = routineManager->AddRoutine([this]()
+{
+this->_Activity();
+return 1;
+}, L"", 0, 0, 0);
+}
+}
+
+namespace viva::net{
+void Client::OnConnect(const std::function<void()>& handler)
+{
+onConnectHandler = handler;
+}
+}
+
+namespace viva::net{
+void Client::OnMsg(const std::function<void(const vector<byte>&)>& handler)
+{
+onMsgHandler = handler;
+}
+}
+
+namespace viva::net{
+void Client::_Activity()
+{
+_ProcessMsg();
+}
+}
+
+namespace viva::net{
+void Client::_PushMsgBytes(byte* arr, int len)
+{
+msgQueueMutex.lock();
+size_t size = msg.size();
+msg.resize(msg.size() + len);
+memcpy(msg.data() + size, arr, len);
+msgQueueMutex.unlock();
+}
+}
+
+namespace viva::net{
+void Client::_ProcessMsg()
+{
+if (msg.size() > 0)
+{
+msgQueueMutex.lock();
+unsigned short size;
+memcpy(&size, msg.data(), sizeof(unsigned short)); // endianess problem
+
+if (msg.size() < size + 2)
+{
+msgQueueMutex.unlock();
+return;
+}
+
+vector<byte> completeMsg(msg.begin() + 2, msg.begin() + 2 + size);
+msg.erase(msg.begin(), msg.begin() + 2 + size);
+msgQueueMutex.unlock();
+
+if (onMsgHandler)
+onMsgHandler(completeMsg);
+}
+}
+}
+
+namespace viva::net{
+void Client::_SetConnected(bool val)
+{
+isConnected = val;
+}
+}
+
+namespace viva::net{
+const wstring& Client::GetIp() const
+{
+return wstring(ip.begin(), ip.end());
+}
+}
+
+namespace viva::net{
+void Client::Send(vector<byte>& msg)
+{
+Send(msg.data(), (unsigned short)msg.size());
+}
+}
+
+namespace viva::net{
+Win32Client::Win32Client(SOCKET socket, sockaddr_in address, std::string ip, unsigned short port): Client(ip, port), handle(socket), address(address)
+{
+isConnected = true;
+}
+}
+
+namespace viva::net{
+Win32Client::Win32Client(std::string ip, unsigned short port): Client(ip, port)
+{
+// WSAStartup
+if (!wsInitialized)
+{
+int res = WSAStartup(MAKEWORD(2, 2), &wsadata);
+if (res != 0)
+{
+wstring msg = GetLastWinsockErrorMessage(res);
+throw viva::Error("WSAStartup", msg);
+}
+
+wsInitialized = true;
+}
+
+// socket()
+handle = socket(AF_INET, SOCK_STREAM, NULL);
+if (handle == INVALID_SOCKET)
+{
+wstring msg = GetLastWinsockErrorMessage(WSAGetLastError());
+throw viva::Error("socket", msg);
+}
+id = (size_t)handle;
+
+// sockaddr_in
+SecureZeroMemory(&address, sizeof(address));
+address.sin_family = AF_INET;
+inet_pton(AF_INET, ip.c_str(), &(address.sin_addr));
+address.sin_port = htons(port);
+}
+}
+
+namespace viva::net{
+void Win32Client::Connect(double timeoutSeconds) 
+{
+if (isConnected)
+throw Error(__FUNCTION__, "Client is already running");
+
+msg.clear();
+timeOut = std::async(ConnectThread, this);
+timeOutHandler = routineManager->AddRoutine([&]()
+{
+auto state = timeOut.wait_for(std::chrono::milliseconds(0));
+
+if (state != std::future_status::ready)
+{
+closesocket(handle);
+handle = socket(AF_INET, SOCK_STREAM, NULL);
+id = (long long)handle;
+WSASetLastError(10060);
+wstring msg = GetLastWinsockErrorMessage(WSAGetLastError());
+NetworkError err = { msg, 10060 };
+_AddError(err);
+}
+else if (timeOut.get() != 0)
+{
+closesocket(handle);
+handle = socket(AF_INET, SOCK_STREAM, NULL);
+id = (long long)handle;
+WSASetLastError(10060);
+wstring msg = GetLastWinsockErrorMessage(WSAGetLastError());
+NetworkError err = { msg, 10060 };
+_AddError(err);
+}
+else
+{
+onConnectHandler();
+receiveThread = std::async(ReceiveThread, this);
+}
+
+return 0;
+}, L"", timeoutSeconds, 0, 0);
+}
+}
+
+namespace viva::net{
+SOCKET Win32Client::GetSocket() const
+{
+return handle;
+}
+}
+
+namespace viva::net{
+sockaddr_in Win32Client::GetSockAddr() const
+{
+return address;
+}
+}
+
+namespace viva::net{
+bool Win32Client::GetReturnReceive() const
+{
+return returnReceive;
+}
+}
+
+namespace viva::net{
+void Win32Client::Send(byte* msg, unsigned short len) 
+{
+vector<byte> buf;
+buf.resize(2 + len);
+memcpy(buf.data(), &len, 2);
+memcpy(buf.data() + 2, msg, len);
+int sent = 0;
+
+while (sent < buf.size())
+{
+int temp = send(handle, (char*)buf.data() + sent, buf.size() - sent, 0);
+
+if (temp == SOCKET_ERROR)
+{
+wstring msg = GetLastWinsockErrorMessage(WSAGetLastError());
+throw viva::Error("Send", msg);
+}
+
+sent += temp;
+}
+}
+}
+
+namespace viva::net{
+void Win32Client::Disonnect() 
+{
+}
+}
+
+namespace viva::net{
+void Win32Client::Destroy() 
+{
+}
+}
+
 namespace viva::Math {
 float Deg2Rad(float deg)
 {
@@ -3993,6 +4382,107 @@ return 0;
 }
 }
 
+namespace viva::net {
+bool AcceptThread(Win32Server* server)
+{
+int size = sizeof(sockaddr_in);
+sockaddr_in address;
+SOCKET acceptedSocket;
+char hello[] = "Hello";
+
+while (!server->GetReturnAccept())
+{
+acceptedSocket = accept(server->GetSocket(), (sockaddr*)(&address), &size);
+
+if (acceptedSocket == INVALID_SOCKET)
+{
+auto code = WSAGetLastError();
+wstring msg = GetLastWinsockErrorMessage(code);
+NetworkError err = { msg, code };
+server->_AddError(err);
+}
+else
+{
+int sent = 0;
+while (sent < 5)
+{
+int temp = send(acceptedSocket, (const char*)hello + sent, 5 - sent, 0);
+if (temp == SOCKET_ERROR)
+return false;
+
+sent += temp;
+}
+
+Win32Client* client = new Win32Client(acceptedSocket, address, "", 0);
+server->_AddClient(client);
+}
+}
+
+return false;
+}
+}
+
+namespace viva::net {
+bool ReceiveThread(Win32Client* client)
+{
+byte tempBuffer[256];
+
+while (!client->GetReturnReceive())
+{
+int len = recv(client->GetSocket(), (char*)tempBuffer, 256, NULL);
+
+if (len == SOCKET_ERROR)
+{
+auto code = WSAGetLastError();
+wstring msg = GetLastWinsockErrorMessage(code);
+NetworkError err = { msg, code };
+client->_AddError(err);
+}
+/*else if (len == 0)
+{
+break;
+}*/
+
+client->_PushMsgBytes(tempBuffer, len);
+}
+
+return false;
+}
+}
+
+namespace viva::net {
+int ConnectThread(Win32Client* client)
+{
+char buf[5] = { 0,0,0,0,0 };
+
+if (connect(client->GetSocket(), (sockaddr*)&(client->GetSockAddr()), sizeof(sockaddr_in)) == SOCKET_ERROR)
+return WSAGetLastError();
+
+// welcome protocol
+int received = 0;
+while(received < 5)
+received += recv(client->GetSocket(), (char*)buf, 5 - received, 0);
+
+if (memcmp(buf,"Hello",5) != 0)
+return 10060; // error 10060 is timed out
+
+client->_SetConnected(true);
+
+return 0;
+}
+}
+
+namespace viva::net {
+wstring GetLastWinsockErrorMessage(DWORD errorCode)
+{
+wchar_t str[300];
+SecureZeroMemory(str, sizeof(wchar_t) * 300);
+FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, errorCode,
+MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), str, 300, 0);
+return wstring(str);
+}
+}
+
 namespace viva::Math {
 const float Pi = 3.1415926f;}
 
@@ -4031,4 +4521,10 @@ D3D11 d3d;}
 
 namespace viva {
 Input::Win32Mouse* win32mouse = nullptr;}
+
+namespace viva::net {
+bool wsInitialized = false;}
+
+namespace viva::net {
+WSAData wsadata;}
 

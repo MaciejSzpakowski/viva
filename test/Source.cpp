@@ -6,6 +6,7 @@
 #include <functional>
 #include <cmath>
 #include <string>
+#include <iostream>
 
 #define IMG_LEAF  L"./images/leaf.png"
 #define IMG_LEAF_QUAD  L"./images/leaf_quads.png"
@@ -26,6 +27,47 @@ void gameloop()
 
     if (levelold != level)
         viva::engine->Exit();*/
+}
+
+void testServerClient()
+{
+    printf("testing net\n");
+
+    viva::net::Server* server = viva::creator->CreateServer(10000);
+    viva::net::Client* client = viva::creator->CreateClient("127.0.0.1", 10000);
+
+    server->OnConnect([](auto client)
+    {
+        printf("Server accepted\n");
+    });
+    client->OnConnect([]()
+    {
+        printf("Client connected\n");
+    });
+    client->OnMsg([](const std::vector<viva::byte>& msg)
+    {
+        printf("Got msg: %s\n", msg.data());
+    });
+
+    server->Start(100);
+
+    viva::routineManager->AddRoutine([=]()
+    {
+        if (viva::keyboard->IsKeyPressed(viva::Input::KeyboardKey::KeyC))
+        {
+            printf("Conecting...\n");
+            client->Connect(3);
+        }
+        if (viva::keyboard->IsKeyPressed(viva::Input::KeyboardKey::KeyS))
+        {
+            std::string s;
+            printf("Sending:\n");
+            std::cin >> s;
+            server->GetClients()[0]->Send((viva::byte*)s.c_str(), s.length() + 1);
+        }
+
+        return 1;
+    }, L"", 0, 0, 0);
 }
 
 void testAnimation()
@@ -234,6 +276,7 @@ int main(int argc, char** argv)
         tests->push_back(testSpritesAndTextures);
         tests->push_back(testNotSharedVertexBuffer);
         tests->push_back(testAnimation);
+        tests->push_back(testServerClient);
 
         wrapper();
     }

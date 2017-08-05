@@ -29,19 +29,19 @@ namespace viva
             return tex;
         }
         
-        Font* CreateFontV(const wstring& filename)
+        Font* CreateFontV(const wstring& filename, Size letterSize,uint charsPerRow)
         {
-            return new Font(filename);
+            Texture* tex = resourceManager->GetTexture(filename);
+
+            if (tex == nullptr)
+                tex = creator->CreateTexture(filename);
+
+            return new Font(tex, letterSize, charsPerRow);
         }
 
-        Font* CreateFontV(Texture* tex, const vector<Rect>& glyphs)
+        Font* CreateFontV(Texture* tex, const Size& letterSize, uint charsPerRow)
         {
-            return new Font(tex, glyphs);
-        }
-
-        Font* CreateFontV(Texture* tex)
-        {
-            return new Font(tex);
+            return new Font(tex, letterSize, charsPerRow);
         }
 
         // Create texture from pixels.
@@ -86,6 +86,10 @@ namespace viva
 
         // Create shared vertex buffer. That can be used by multiple polygons.
         virtual VertexBuffer* CreateVertexBuffer(const vector<Point>& points) = 0;
+
+        virtual net::Server* CreateServer(unsigned short port) = 0;
+
+        virtual net::Client* CreateClient(std::string ip, unsigned short port) = 0;
 
         // Create surface to render objects on.
         virtual Surface* CreateSurface() = 0;

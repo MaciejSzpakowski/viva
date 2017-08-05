@@ -117,6 +117,16 @@ namespace viva
             return new Win32PixelShader(result);
         }
 
+        net::Server* CreateServer(unsigned short port) override
+        {
+            return new net::Win32Server(port);
+        }
+
+        net::Client* CreateClient(std::string ip, unsigned short port) override
+        {
+            return new net::Win32Client(ip, port);
+        }
+
         ID3D11ShaderResourceView* SrvFromPixels(const Pixel* pixels, const Size& _size)
         {
             ID3D11Texture2D *tex;

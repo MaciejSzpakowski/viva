@@ -8,43 +8,8 @@ namespace viva
     private:
         Texture* texture;
         vector<Rect> charsUv; // uv coordinates for glyphs
-    public:
-        // Create bitmap font from texture.
-        // tex: texture to use
-        // glyphs: exact uv coordinate for glyphs. It should contain at least ascii 0-126
-        Font(Texture* tex, const vector<Rect>& glyphs)
-            : texture(tex), charsUv(glyphs)
-        {
-        }
+        Size charSize;
 
-        // Create bitmap font from texture.
-        // tex: texture to use
-        Font(Texture* tex)
-            :texture(tex)
-        {
-        }
-
-        // Create bitmap font from texture.
-        // UV cooridnates will be generated starting from 0,0 (upper left corner).
-        // filename: texture to use
-        // letterSize: width and height of each letter in pixels
-        // charsPerRow: how many characters there are per row
-        Font(const wstring& filename)
-        {
-            Texture* t = resourceManager->GetTexture(filename);
-
-            if (t == nullptr)
-                t = creator->CreateTexture(filename);
-
-            texture = t;
-        }
-
-        Font* SetGlyphs(const vector<Rect>& glyphs)
-        {
-            charsUv = glyphs;
-            return this;
-        }
-        
         Font* CalcGlyphs(const Size& letterSize, uint charsPerRow)
         {
             charsUv.clear();
@@ -65,11 +30,26 @@ namespace viva
 
             return this;
         }
+    public:
+        // Create bitmap font from texture.
+        // tex: texture to use
+        // glyphs: exact uv coordinate for glyphs. It should contain at least ascii 0-126
+        Font(Texture* tex, const Size& letterSize, uint charsPerRow)
+            : texture(tex)
+        {
+            CalcGlyphs(letterSize, charsPerRow);
+            charSize = letterSize;
+        }
 
         // Gets uv coordinate for char 'code'.
         const Rect& GetChar(uint code) const
         {
             return charsUv.at(code);
+        }
+
+        const Size& GetCharSize() const
+        {
+            return charSize;
         }
 
         Texture* GetTexture() const
